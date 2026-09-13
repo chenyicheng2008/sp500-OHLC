@@ -79,7 +79,37 @@ def get_stock_info(ticker):
     }
 
 
-def get_adjusted_ohlc_from_csv(csv_filepath, column_name="Ticker", period="1y", encoding=None):
+def _flatten_columns(data, symbol):
+    if isinstance(data.columns, pd.MultiIndex):
+        if symbol in data.columns.get_level_values(1):
+            data = data.xs(symbol, axis=1, level=1)
+        elif symbol in data.columns.get_level_values(0):
+            data = data.xs(symbol, axis=1, level=0)
+    return data
+
+
+def download_mixed_ohlc(symbol, total_years=12, daily_years=2):
+    """Recent `daily_years` as daily bars, the rest of `total_years` as weekly bars."""
+    today = pd.Timestamp.today().normalize()
+    split = today - pd.DateOffset(years=daily_years)
+    # Snap to Monday: weekly bars are Monday-dated, so no weekly bar overlaps the daily range.
+    split = split - pd.Timedelta(days=split.weekday())
+    start = today - pd.DateOffset(years=total_years)
+
+    frames = []
+    for interval, s, e in (("1wk", start, split), ("1d", split, None)):
+        data = yf.download(symbol, start=s, end=e, interval=interval, progress=False)
+        if data is None or data.empty:
+            continue
+        data = _flatten_columns(data, symbol)
+        data["Interval"] = interval
+        frames.append(data)
+    if not frames:
+        return None
+    return pd.concat(frames).sort_index()
+
+
+def get_adjusted_ohlc_from_csv(csv_filepath, column_name="Ticker", total_years=12, daily_years=2, encoding=None):
     stock_list_df = None
     encodings = [encoding] if encoding else ["utf-8-sig", "utf-8", "big5"]
     for enc in encodings:
@@ -103,16 +133,7 @@ def get_adjusted_ohlc_from_csv(csv_filepath, column_name="Ticker", period="1y", 
             continue
         print(f"正在抓取 {symbol} 的資料...")
         try:
-            data = yf.download(symbol, period=period, progress=False)
-            if not data.empty:
-                if isinstance(data.columns, pd.MultiIndex):
-                    if symbol in data.columns.get_level_values(1):
-                        data = data.xs(symbol, axis=1, level=1)
-                    elif symbol in data.columns.get_level_values(0):
-                        data = data.xs(symbol, axis=1, level=0)
-                ohlc_data[symbol] = data
-            else:
-                ohlc_data[symbol] = None
+            ohlc_data[symbol] = download_mixed_ohlc(symbol, total_years, daily_years)
         except Exception as e:
             print(f"抓取 {symbol} 錯誤: {e}")
             ohlc_data[symbol] = None
@@ -123,7 +144,7 @@ def flatten_and_save_ohlc(ohlc_dict, output_filename):
     all_frames = []
     for ticker, df_ticker in ohlc_dict.items():
         if df_ticker is not None and not df_ticker.empty:
-            cols = [c for c in ["Close", "High", "Low", "Open"] if c in df_ticker.columns]
+            cols = [c for c in ["Close", "High", "Low", "Open", "Interval"] if c in df_ticker.columns]
             temp_df = df_ticker[cols].copy().reset_index()
             temp_df.insert(0, "Ticker", ticker)
             all_frames.append(temp_df)
@@ -131,7 +152,7 @@ def flatten_and_save_ohlc(ohlc_dict, output_filename):
         print("無有效資料可供轉換。")
         return None
     combined_df = pd.concat(all_frames, ignore_index=True)
-    final_order = ["Ticker", "Date", "Close", "High", "Low", "Open"]
+    final_order = ["Ticker", "Date", "Close", "High", "Low", "Open", "Interval"]
     combined_df = combined_df[[c for c in final_order if c in combined_df.columns]]
     combined_df.to_csv(output_filename, index=False, encoding="utf-8-sig")
     print(f"已儲存至: {output_filename}")
@@ -197,11 +218,11 @@ if __name__ == "__main__":
     combine_sp500_memory()
 
     print("== Memory OHLC ==")
-    ohlc = get_adjusted_ohlc_from_csv(os.path.join(BASE, "Memory_data.csv"), column_name="stock", period="12Y")
+    ohlc = get_adjusted_ohlc_from_csv(os.path.join(BASE, "Memory_data.csv"), column_name="stock", total_years=12, daily_years=2)
     flatten_and_save_ohlc(ohlc, os.path.join(BASE, "Memory_ohlc.csv"))
 
     print("== sp500 OHLC ==")
-    sp500_ohlc = get_adjusted_ohlc_from_csv(os.path.join(BASE, "sp500_stocks.csv"), column_name="Ticker", period="12y")
+    sp500_ohlc = get_adjusted_ohlc_from_csv(os.path.join(BASE, "sp500_stocks.csv"), column_name="Ticker", total_years=12, daily_years=2)
     flatten_and_save_ohlc(sp500_ohlc, os.path.join(BASE, "sp500_ohlc.csv"))
 
     print("All done.")

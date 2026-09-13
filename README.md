@@ -29,7 +29,9 @@ Input files (ticker lists), checked into `data/`:
 Outputs (written in place into `FETCH_BASE`, overwriting previous runs):
 - `sp500_stocks.csv`, `aisoft_df.csv`, `Memory_data.csv`
 - `SP550_memory_combined.csv` (sp500 + memory concat)
-- `sp500_ohlc.csv`, `Memory_ohlc.csv` (12-year OHLC history)
+- `sp500_ohlc.csv`, `Memory_ohlc.csv` — 12 years of OHLC: the most recent 2 years
+  as daily bars, the 10 years before that as weekly bars (keeps `sp500_ohlc.csv`
+  under GitHub's 100MB file limit). The `Interval` column is `1d` or `1wk`.
 
 ## GitHub Actions
 
