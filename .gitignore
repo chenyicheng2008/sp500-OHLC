@@ -6,3 +6,8 @@ __pycache__/
 *.csv
 !data/weekly_reutin/*.csv
 !data/tableau/*.csv
+
+# ~120MB (12y OHLC for ~500 tickers) — over GitHub's 100MB push limit and
+# would bloat repo history if committed daily. Shipped as a workflow artifact
+# instead (see .github/workflows/daily-fetch.yml).
+data/weekly_reutin/sp500_ohlc.csv

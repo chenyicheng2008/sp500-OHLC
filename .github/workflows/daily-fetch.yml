@@ -28,11 +28,26 @@ jobs:
           FETCH_TABLEAU: ${{ github.workspace }}/data/tableau
         run: python fetch_sp500_memory_software.py
 
+      # sp500_ohlc.csv (12y history for ~500 tickers) is ~120MB, over GitHub's
+      # 100MB per-file limit for a normal git push, and would bloat repo history
+      # if committed daily anyway. Ship it as a downloadable build artifact
+      # instead of committing it.
+      - name: Upload sp500_ohlc.csv as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sp500_ohlc
+          path: data/weekly_reutin/sp500_ohlc.csv
+          retention-days: 14
+
       - name: Commit refreshed CSVs
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/weekly_reutin/*.csv
+          git add data/weekly_reutin/sp500_stocks.csv \
+                  data/weekly_reutin/aisoft_df.csv \
+                  data/weekly_reutin/Memory_data.csv \
+                  data/weekly_reutin/SP550_memory_combined.csv \
+                  data/weekly_reutin/Memory_ohlc.csv
           git diff --cached --quiet && echo "No changes to commit" && exit 0
           git commit -m "Daily CSV refresh ($(date -u +%Y-%m-%d))"
           git push
