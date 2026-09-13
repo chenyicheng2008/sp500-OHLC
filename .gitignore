@@ -1,3 +1,8 @@
-*.csv
 fetch_log.txt
 __pycache__/
+
+# Ignore stray local CSVs anywhere, but keep the checked-in ticker list and
+# the daily-refreshed output CSVs under data/ (committed by the workflow).
+*.csv
+!data/weekly_reutin/*.csv
+!data/tableau/*.csv

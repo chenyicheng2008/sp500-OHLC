@@ -10,14 +10,19 @@ encode arbitrary Unicode company names and caused the sp500+memory combine step
 to silently never run. Everything below is standardized on UTF-8-SIG.
 
 Run this again next time to refresh the CSVs (same base paths, so it overwrites in place).
+
+Paths default to the original local Windows mirror, but can be overridden (e.g. by
+the GitHub Actions workflow, which runs on Linux and has no access to that drive)
+via the FETCH_BASE / FETCH_TABLEAU environment variables.
 """
+import os
 import time
 
 import pandas as pd
 import yfinance as yf
 
-BASE = r"C:\My_old_NoteBook\SOX_EPS\SOX_EPS\python_jupyter\weekly_reutin"
-TABLEAU = r"C:\My_old_NoteBook\SOX_EPS\SOX_EPS\tableau"
+BASE = os.environ.get("FETCH_BASE", r"C:\My_old_NoteBook\SOX_EPS\SOX_EPS\python_jupyter\weekly_reutin")
+TABLEAU = os.environ.get("FETCH_TABLEAU", r"C:\My_old_NoteBook\SOX_EPS\SOX_EPS\tableau")
 
 # Yahoo Finance occasionally 404s/429s on an isolated request even when the
 # symbol is fine (rate limiting / transient blip). Retry a couple of times
@@ -134,21 +139,21 @@ def flatten_and_save_ohlc(ohlc_dict, output_filename):
 
 
 def fetch_sp500():
-    sp500_df = pd.read_csv(f"{BASE}\\SP500.csv")
+    sp500_df = pd.read_csv(os.path.join(BASE, "SP500.csv"))
     sp500_data = [get_stock_info(t) for t in sp500_df["A"]]
     df = pd.DataFrame(sp500_data)
-    df.to_csv(f"{BASE}\\sp500_stocks.csv", index=False, encoding="UTF-8-SIG")
+    df.to_csv(os.path.join(BASE, "sp500_stocks.csv"), index=False, encoding="UTF-8-SIG")
     return df
 
 
 def fetch_aisoft():
-    aisoft = pd.read_csv(f"{TABLEAU}\\AIsoftware_en.csv", encoding="UTF-8-SIG")
+    aisoft = pd.read_csv(os.path.join(TABLEAU, "AIsoftware_en.csv"), encoding="UTF-8-SIG")
     aisoft_data = [get_stock_info(t) for t in aisoft["stock"]]
     aisoft_data = pd.DataFrame(aisoft_data)
     aisoft_df = aisoft_data[aisoft_data["Market Cap"] > 0].sort_values(by="Market Cap", ascending=False)
     aisoft_df.rename(columns={"Ticker": "stock"}, inplace=True)
     aisoft_df = aisoft_df.merge(aisoft, on="stock", how="left")
-    aisoft_df.to_csv(f"{BASE}\\aisoft_df.csv", index=False, encoding="UTF-8-SIG")
+    aisoft_df.to_csv(os.path.join(BASE, "aisoft_df.csv"), index=False, encoding="UTF-8-SIG")
     return aisoft_df
 
 
@@ -169,15 +174,15 @@ def fetch_memory():
     memory_data = memory_data[memory_data["Market Cap"] > 0].sort_values(by="Market Cap", ascending=False)
     # FIX: was encoding="big5" in the original notebook, inconsistent with the rest
     # of the pipeline (UTF-8-SIG) and unable to encode arbitrary Unicode company names.
-    memory_data.to_csv(f"{BASE}\\Memory_data.csv", index=False, encoding="UTF-8-SIG")
+    memory_data.to_csv(os.path.join(BASE, "Memory_data.csv"), index=False, encoding="UTF-8-SIG")
     return memory_data
 
 
 def combine_sp500_memory():
-    sp500 = pd.read_csv(f"{BASE}\\sp500_stocks.csv", encoding="UTF-8-SIG")
-    memory = pd.read_csv(f"{BASE}\\Memory_data.csv", encoding="UTF-8-SIG")
+    sp500 = pd.read_csv(os.path.join(BASE, "sp500_stocks.csv"), encoding="UTF-8-SIG")
+    memory = pd.read_csv(os.path.join(BASE, "Memory_data.csv"), encoding="UTF-8-SIG")
     combined = pd.concat([sp500, memory], ignore_index=True)
-    combined.to_csv(f"{BASE}\\SP550_memory_combined.csv", index=False, encoding="UTF-8-SIG")
+    combined.to_csv(os.path.join(BASE, "SP550_memory_combined.csv"), index=False, encoding="UTF-8-SIG")
     return combined
 
 
@@ -192,11 +197,11 @@ if __name__ == "__main__":
     combine_sp500_memory()
 
     print("== Memory OHLC ==")
-    ohlc = get_adjusted_ohlc_from_csv(f"{BASE}\\Memory_data.csv", column_name="stock", period="12Y")
-    flatten_and_save_ohlc(ohlc, f"{BASE}\\Memory_ohlc.csv")
+    ohlc = get_adjusted_ohlc_from_csv(os.path.join(BASE, "Memory_data.csv"), column_name="stock", period="12Y")
+    flatten_and_save_ohlc(ohlc, os.path.join(BASE, "Memory_ohlc.csv"))
 
     print("== sp500 OHLC ==")
-    sp500_ohlc = get_adjusted_ohlc_from_csv(f"{BASE}\\sp500_stocks.csv", column_name="Ticker", period="12y")
-    flatten_and_save_ohlc(sp500_ohlc, f"{BASE}\\sp500_ohlc.csv")
+    sp500_ohlc = get_adjusted_ohlc_from_csv(os.path.join(BASE, "sp500_stocks.csv"), column_name="Ticker", period="12y")
+    flatten_and_save_ohlc(sp500_ohlc, os.path.join(BASE, "sp500_ohlc.csv"))
 
     print("All done.")

@@ -1,0 +1,48 @@
+﻿stock,name,ethnic_group,Main_business_direction,Featured_Growth_Focus
+CRM,SALESFORCE,Enterprise Cloud and AI Platform,Cloud CRM and AI Marketing,EINSTEIN_GPT imports enterprise AI process
+NOW,SERVICENOW,Enterprise Cloud and AI Platform,Workflow automation platform,Cooperate with NVIDIA AI service agent
+HUBS,HUBSPOT,Enterprise Cloud and AI Platform,Marketing Automation SAAS,AI-assisted CRM and marketing assistant
+TEAM,ATLASSIAN,Enterprise Cloud and AI Platform,Collaboration and project management,AI automatic document summarization and task suggestions
+ORCL,ORACLE,Enterprise Cloud and AI Platform,Cloud database and infrastructure,GENERATIVE_AI database integration
+SNOW,SNOWFLAKE,Cloud data platform,Cloud data warehousing and AI analysis,DATACLOUD+GENAI analysis
+DDOG,DATADOG,Cloud data platform,Cloud monitoring and observability,AI event detection and predictive maintenance
+MDB,MONGODB,Cloud data platform,Cloud native database,Support AI application development
+PLTR,PALANTIR,Cloud data platform,AI data analysis platform,AIP Enterprise AI Transformation Engine
+NET,CLOUDFLARE,Cloud data platform,CDN與邊緣AI服務,WORKERSAI provides inference capabilities
+FSLY,FASTLY,Cloud data platform,Edge computing and CDN,AI traffic prediction and security
+ESTC,ELASTIC,Cloud data platform,Search and Observability Platform,AI semantic search and analysis
+AI,C3.AI,Cloud data platform,Enterprise AI development platform,Enterprise AI model integration
+PANW,PALOALTO_NETWORKS,Information Security and AI Protection,Firewalls and Cloud Security,CORTEXAI Threat Detection
+CRWD,CROWDSTRIKE,Information Security and AI Protection,Cloud endpoint protection,AI Behavior Analysis and ZEROTRUST
+ZS,ZSCALER,Information Security and AI Protection,Zero Trust Security Platform,AI automated threat analysis
+OKTA,OKTA,Information Security and AI Protection,Identity verification platform,AI risk prediction and security verification
+ADBE,ADOBE,AI-based content creation,Creative software and media platform,FIREFLY generative AI imaging
+ADSK,AUTODESK,AI-based content creation,3D modeling and design software,AI automatic design and BIM application
+U,UNITY,AI-based content creation,Games and 3D engines,AI generated simulation and game scenes
+RBLX,ROBLOX,Consumption and social AI,Metaverse Platform,AI generates virtual world and content
+RDDT,REDDIT,Consumption and social AI,social platform,AI recommendation and content summary
+PINS,PINTEREST,Consumption and social AI,Image search and inspiration platform,AI image recommendation
+SNAP,SNAP,Consumption and social AI,Social Media and AR Filters,AI virtual character and lens generation
+SPOT,SPOTIFY,Consumption and social AI,music streaming,AI playlist generation and recommendation
+ROKU,ROKU,Consumption and social AI,Streaming video platform,AI ad matching and audience analysis
+TTD,THETRADEDESK,Marketing and Advertising AI,Digital advertising exchange platform,AI delivery algorithm optimization
+ZETA,ZETAGLOBAL,Marketing and Advertising AI,Digital Marketing Automation,GENAI content generation and customer prediction
+SHOP,SHOPIFY,Marketing and Advertising AI,,
+TWLO,TWILIO,Marketing and Advertising AI,Cloud communication API,AI customer service and marketing automation
+APPS,DIGITAL_TURBINE,Marketing and Advertising AI,Mobile Advertising SDK Aggregation,AI traffic optimization
+FIG,FISCAL_NOTE,Marketing and Advertising AI,Policy and AI data analysis,AI Monitoring and Compliance Reporting
+HIMS,HIMS&HERSHEALTH,AI health education,Online medical services,AI diagnosis and prescription generation
+DOCS,DOXIMITY,AI health education,Medical social platform,AI Summary and Physician Support
+DUOL,DUOLINGO,AI health education,Online education platform,AI teaching assistant and voice dialogue
+DOCU,DOCUSIGN,AI health education,Electronic signature platform,AI document generation and approval
+SOUN,SOUNDHOUNDAI,AI health education,Voice AI platform,GENERATIVEVOICEAI
+TEM,TEMU/PDD,Innovation and generative AI,E-commerce platform,AI recommendation and supply chain analysis
+APP,APPLOVIN,Innovation and generative AI,Mobile APP Marketing Platform,AI prediction revenue optimization
+KVYO,KLAVIYO,Innovation and generative AI,Marketing email automation,AI customer prediction and personalization
+FTNT,FORTINET,Information Security and AI Protection,,
+GOOG,,CSP,,
+AMZN,,CSP,,
+MSFT,,CSP,,
+^GSPC,S&P500,INDEX,,
+^IXIC,Nasdaq,INDEX,,
+^SOX,SOX,INDEX,,
