@@ -39,3 +39,38 @@ Outputs (written in place into `FETCH_BASE`, overwriting previous runs):
 Taipei), pointing `FETCH_BASE`/`FETCH_TABLEAU` at `data/weekly_reutin` and
 `data/tableau`, then commits any changed output CSVs back to the repo. It can
 also be triggered manually from the Actions tab (`workflow_dispatch`).
+
+## Breadth & sector analysis
+
+`analysis/breadth_sector.py` reads `sp500_ohlc.csv` + `sp500_stocks.csv` and writes
+market-internals tables into `data/analysis/`:
+
+```bash
+python analysis/breadth_sector.py        # -> data/analysis/*.csv + analysis_bundle.json
+python analysis/build_report_data.py     # -> data/analysis/report_data.json (feeds the HTML report)
+```
+
+Breadth runs on the daily portion of the OHLC file (the most recent ~2 years); the
+weekly bars before that are used only for the long-run equal-weight vs cap-weight
+series. Names with no market cap or fewer than 60 daily bars are dropped — they carry
+no index weight and only add noise.
+
+| Output | What's in it |
+| --- | --- |
+| `breadth_daily.csv` | Daily % above 20/50/150/200 DMA, A/D line, McClellan oscillator + summation, Zweig breadth thrust, 52-week new highs/lows, cap- and equal-weighted index levels |
+| `breadth_signals.csv` | Ten named regime signals (trend, divergence, participation, concentration) with a bullish/neutral/bearish-style status each |
+| `breadth_participation.csv` | Per horizon: % of names positive, % beating the index, mean vs median return, P10/P90 dispersion |
+| `breadth_drawdown_buckets.csv` | Distribution of constituents by distance from their 52-week high |
+| `breadth_ew_cw_long.csv` | 12-year equal-weight / cap-weight ratio (weekly bars spliced onto daily) |
+| `sector_summary.csv` | Per sector: cap-weighted / equal-weighted / median returns over 1W–12M, breadth, valuation, consensus growth, index weight |
+| `sector_rotation.csv` | Sector rank over 12M / 3M / 1M and the rank change between them |
+| `sector_daily_index.csv` | Cap-weighted daily index level per sector |
+| `industry_summary.csv` | The same return/breadth/valuation columns per industry (min. 3 constituents) |
+| `leaders_3m.csv`, `laggards_3m.csv` | The 15 strongest and weakest names over 3 months |
+
+Index weights use shares implied by the latest market cap divided by the latest close,
+held constant through history. That ignores buybacks, issuance and index changes, so the
+reconstructed index is for relative comparison, not a precise replication.
+
+`analysis/report.html` is a self-contained Traditional-Chinese report built from
+`report_data.json` (charts, signal board, sector and industry tables).

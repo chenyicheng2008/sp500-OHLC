@@ -6,3 +6,4 @@ __pycache__/
 *.csv
 !data/weekly_reutin/*.csv
 !data/tableau/*.csv
+!data/analysis/*.csv

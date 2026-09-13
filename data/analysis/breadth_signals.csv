@@ -1,0 +1,11 @@
+﻿signal,status,detail,value
+Primary trend (% > 200DMA),neutral,59.1% of constituents are above their 200-day average,59.1
+Intermediate trend (% > 50DMA),bearish,39.1% above the 50-day average,39.1
+Short-term (% > 20DMA),oversold,24.8% above the 20-day average,24.8
+Breadth vs index divergence,warning,index sits at the 82th percentile of its own 6-month range while % > 200DMA sits at the 44th,38.1
+McClellan oscillator,neutral,-50 (19/39-day EMA spread of ratio-adjusted net advances),-50.2
+Net new 52w highs (10d avg),neutral,-1.4 per day over the last 10 sessions,-1.4
+Zweig breadth thrust,neutral,10-day EMA of advances/(advances+declines) = 0.433,0.433
+Participation in the 12M advance,narrow,only 36% of names beat the index; mean 23.9% vs median 8.7%,36.2
+Mega-cap concentration,elevated,the 10 largest names are 42.4% of index cap and drove 50% of the 12-month cap gain,49.5
+Equal-weight vs cap-weight,cap-weight leading,the equal-weight/cap-weight ratio is -2.1% over 12 months,-2.1
