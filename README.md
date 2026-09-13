@@ -72,5 +72,20 @@ Index weights use shares implied by the latest market cap divided by the latest 
 held constant through history. That ignores buybacks, issuance and index changes, so the
 reconstructed index is for relative comparison, not a precise replication.
 
-`analysis/report.html` is a self-contained Traditional-Chinese report built from
-`report_data.json` (charts, signal board, sector and industry tables).
+### Standalone report
+
+`analysis/build_report.py` bakes `report_data.json` into `analysis/report_template.html`
+and writes a self-contained Traditional-Chinese report to
+`analysis/reports/sp500_internals_<data date>.html` — one HTML file with its data, CSS
+and JS inlined, so it opens straight from disk with no server and no network.
+
+```bash
+python analysis/breadth_sector.py && python analysis/build_report_data.py && python analysis/build_report.py
+```
+
+The filename carries the data date, and the page prints both the data date (`資料日`,
+the last trading day in the file) and the build date (`報告產出`) in its masthead. Each
+run writes a new dated file rather than overwriting the last one.
+
+The analysis scripts need `pandas` and `numpy`; `requirements.txt` covers only the fetch
+step.

@@ -1,0 +1,1150 @@
+<title>標普500市場內部檢視</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  color-scheme: light;
+  --plane:#f4f5f7; --surface:#fbfbfc; --raised:#ffffff; --sunken:#eef0f3;
+  --ink:#101317; --ink-2:#565d66; --ink-3:#8a9099;
+  --rule:#e2e3e7; --rule-strong:#c9ccd2;
+  --accent:#2a78d6; --accent-soft:#e7f0fc;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a;
+  --good:#0ca30c; --warn:#fab219; --serious:#ec835a; --critical:#d03b3b;
+  --pos:#2a78d6; --neg:#d03b3b; --mid:#f0efec;
+  --grid:#e6e7eb; --axis:#c9ccd2;
+  --shadow:0 1px 2px rgba(16,19,23,.05), 0 8px 24px -16px rgba(16,19,23,.22);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --plane:#0e1013; --surface:#191c21; --raised:#21252b; --sunken:#14171b;
+    --ink:#f2f4f7; --ink-2:#b9bec6; --ink-3:#878d96;
+    --rule:#2b2f36; --rule-strong:#3c414a;
+    --accent:#3987e5; --accent-soft:#152438;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70;
+    --good:#0ca30c; --warn:#fab219; --serious:#ec835a; --critical:#d03b3b;
+    --pos:#3987e5; --neg:#e66767; --mid:#383835;
+    --grid:#24282e; --axis:#3c414a;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --plane:#0e1013; --surface:#191c21; --raised:#21252b; --sunken:#14171b;
+  --ink:#f2f4f7; --ink-2:#b9bec6; --ink-3:#878d96;
+  --rule:#2b2f36; --rule-strong:#3c414a;
+  --accent:#3987e5; --accent-soft:#152438;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70;
+  --good:#0ca30c; --warn:#fab219; --serious:#ec835a; --critical:#d03b3b;
+  --pos:#3987e5; --neg:#e66767; --mid:#383835;
+  --grid:#24282e; --axis:#3c414a;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--plane); color:var(--ink);
+  font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  font-size:15px; line-height:1.75; margin:0;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1080px; margin:0 auto; padding-inline:20px; padding-block:0 72px}
+h1,h2,h3{font-family:"Noto Serif TC",Georgia,serif; text-wrap:balance; margin:0}
+.mono{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,monospace; font-variant-numeric:tabular-nums}
+.num{font-family:"IBM Plex Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums; font-weight:500}
+
+/* ---------- masthead ---------- */
+.mast{border-bottom:1px solid var(--rule); background:var(--surface)}
+.mast-in{max-width:1080px; margin:0 auto; padding-inline:20px; padding-block:40px 28px}
+.kicker{
+  font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--ink-3); margin:0 0 14px
+}
+h1{font-size:clamp(28px,5vw,42px); font-weight:700; line-height:1.25; letter-spacing:-.01em}
+.dek{color:var(--ink-2); font-size:16px; max-width:62ch; margin:16px 0 0}
+.stamp{
+  display:flex; flex-wrap:wrap; gap:8px 22px; margin-top:22px;
+  font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--ink-3)
+}
+.stamp b{color:var(--ink-2); font-weight:500}
+
+/* ---------- verdict ---------- */
+.verdict{
+  display:grid; grid-template-columns:auto 1fr; gap:0 20px; align-items:start;
+  background:var(--raised); border:1px solid var(--rule); border-radius:3px;
+  padding:22px 24px; margin-top:28px; box-shadow:var(--shadow);
+}
+.verdict::before{
+  content:""; grid-row:1/3; width:3px; border-radius:2px; align-self:stretch;
+  background:var(--warn);
+}
+.verdict h2{font-size:19px; line-height:1.5}
+.verdict p{margin:10px 0 0; color:var(--ink-2); font-size:14.5px; max-width:70ch}
+
+/* ---------- stat row ---------- */
+.stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(168px,1fr)); gap:1px;
+  background:var(--rule); border:1px solid var(--rule); border-radius:3px; margin-top:20px; overflow:hidden}
+.stat{background:var(--raised); padding:18px 18px 16px; display:flex; flex-direction:column; gap:4px}
+.stat-k{font-size:11.5px; color:var(--ink-3); letter-spacing:.04em; line-height:1.5}
+.stat-v{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums;
+  font-size:26px; font-weight:600; letter-spacing:-.02em; line-height:1.15}
+.stat-n{font-size:11.5px; color:var(--ink-3); line-height:1.5}
+
+/* ---------- nav ---------- */
+nav{position:sticky; top:0; z-index:40; background:color-mix(in srgb,var(--plane) 92%,transparent);
+  backdrop-filter:blur(8px); border-bottom:1px solid var(--rule)}
+.nav-in{max-width:1080px; margin:0 auto; padding-inline:20px; display:flex; gap:4px;
+  overflow-x:auto; scrollbar-width:none}
+.nav-in::-webkit-scrollbar{display:none}
+nav a{
+  flex:none; padding:12px 12px 10px; font-size:13px; color:var(--ink-3); text-decoration:none;
+  border-bottom:2px solid transparent; white-space:nowrap
+}
+nav a:hover{color:var(--ink)}
+nav a:focus-visible{outline:2px solid var(--accent); outline-offset:-2px; border-radius:2px}
+
+/* ---------- sections ---------- */
+section{padding-top:52px; scroll-margin-top:56px}
+.sec-head{display:flex; align-items:baseline; gap:14px; border-bottom:1px solid var(--rule-strong); padding-bottom:10px}
+.sec-no{font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--accent); letter-spacing:.1em; flex:none}
+.sec-head h2{font-size:23px; font-weight:700; letter-spacing:-.01em}
+.sec-sub{color:var(--ink-2); font-size:14px; margin:14px 0 0; max-width:68ch}
+
+/* ---------- panels & charts ---------- */
+.panel{background:var(--surface); border:1px solid var(--rule); border-radius:3px; margin-top:22px}
+.panel-head{padding:16px 20px 0}
+.panel-head h3{font-size:15.5px; font-weight:600; font-family:"Noto Sans TC",sans-serif}
+.panel-head p{margin:6px 0 0; font-size:13px; color:var(--ink-2); max-width:70ch}
+.panel-body{padding:12px 12px 16px}
+.grid2{display:grid; grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); gap:22px; margin-top:22px}
+.grid2 .panel{margin-top:0}
+figure{margin:0}
+figcaption{padding:0 20px 16px; font-size:12.5px; color:var(--ink-3); line-height:1.6}
+svg{display:block; width:100%; height:auto; max-width:100%; overflow:visible}
+.legend{display:flex; flex-wrap:wrap; gap:6px 18px; padding:4px 20px 0; font-size:12.5px; color:var(--ink-2)}
+.legend span{display:inline-flex; align-items:center; gap:7px}
+.swatch{width:14px; height:3px; border-radius:2px; flex:none}
+.swatch.dot{width:9px; height:9px; border-radius:50%}
+
+/* ---------- tables ---------- */
+.tw{overflow-x:auto; border:1px solid var(--rule); border-radius:3px; background:var(--surface); margin-top:22px}
+table{border-collapse:collapse; width:100%; font-size:13px; min-width:560px}
+caption{text-align:left; padding:16px 18px 12px; font-size:15.5px; font-weight:600; color:var(--ink)}
+caption small{display:block; font-weight:400; font-size:12.5px; color:var(--ink-2); margin-top:5px; line-height:1.6}
+th,td{padding:8px 12px; text-align:right; border-bottom:1px solid var(--rule); white-space:nowrap}
+th{font-size:11px; font-weight:500; color:var(--ink-3); letter-spacing:.05em; text-align:right;
+  background:var(--sunken); position:sticky; top:0}
+th:first-child,td:first-child{text-align:left; position:sticky; left:0; background:var(--surface)}
+th:first-child{background:var(--sunken); z-index:2}
+tbody tr:hover td{background:var(--sunken)}
+tbody tr:hover td:first-child{background:var(--sunken)}
+tbody tr:last-child td{border-bottom:none}
+#t-signals td:last-child,#t-signals th:last-child{text-align:left; white-space:normal; min-width:280px}
+#t-signals td:nth-child(2),#t-signals th:nth-child(2){text-align:left}
+td.n{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums}
+.sub{color:var(--ink-3); font-size:11.5px}
+.tag{display:inline-block; padding:1px 7px; border-radius:2px; font-size:11px;
+  font-family:"IBM Plex Mono",monospace; letter-spacing:.02em; border:1px solid transparent}
+.tag.cyc{color:var(--s1); border-color:color-mix(in srgb,var(--s1) 35%,transparent); background:color-mix(in srgb,var(--s1) 9%,transparent)}
+.tag.def{color:var(--s2); border-color:color-mix(in srgb,var(--s2) 35%,transparent); background:color-mix(in srgb,var(--s2) 9%,transparent)}
+
+/* signal pills */
+.pill{display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:500;
+  font-family:"IBM Plex Mono",monospace; padding:2px 9px; border-radius:2px; border:1px solid}
+.pill i{width:7px; height:7px; border-radius:50%; flex:none; font-style:normal}
+.p-good{color:var(--good); border-color:color-mix(in srgb,var(--good) 40%,transparent); background:color-mix(in srgb,var(--good) 10%,transparent)}
+.p-warn{color:var(--warn); border-color:color-mix(in srgb,var(--warn) 45%,transparent); background:color-mix(in srgb,var(--warn) 12%,transparent)}
+.p-ser{color:var(--serious); border-color:color-mix(in srgb,var(--serious) 45%,transparent); background:color-mix(in srgb,var(--serious) 12%,transparent)}
+.p-bad{color:var(--critical); border-color:color-mix(in srgb,var(--critical) 40%,transparent); background:color-mix(in srgb,var(--critical) 10%,transparent)}
+.p-neu{color:var(--ink-2); border-color:var(--rule-strong); background:var(--sunken)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .p-warn{color:#e8a71a}}
+:root[data-theme="dark"] .p-warn{color:#e8a71a}
+
+/* inline bar inside a table cell */
+.bar{position:relative; height:16px; min-width:110px; display:block}
+.bar i{position:absolute; top:3px; height:10px; border-radius:2px; display:block}
+.bar u{position:absolute; top:0; bottom:0; width:1px; background:var(--rule-strong); left:50%}
+
+/* ---------- takeaways ---------- */
+ul.take{list-style:none; padding:0; margin:20px 0 0; display:flex; flex-direction:column; gap:0}
+ul.take li{display:grid; grid-template-columns:22px 1fr; gap:14px; padding:14px 0;
+  border-bottom:1px solid var(--rule); font-size:14.5px; color:var(--ink-2)}
+ul.take li:last-child{border-bottom:none}
+ul.take li::before{content:attr(data-i); font-family:"IBM Plex Mono",monospace; font-size:12px;
+  color:var(--ink-3); padding-top:3px}
+ul.take li > span{min-width:0}
+ul.take b{color:var(--ink); font-weight:500}
+
+/* ---------- tooltip ---------- */
+#tip{position:fixed; z-index:90; pointer-events:none; opacity:0; transition:opacity .1s;
+  background:var(--raised); color:var(--ink); border:1px solid var(--rule-strong); border-radius:3px;
+  padding:9px 11px; font-size:12.5px; line-height:1.65; box-shadow:var(--shadow); max-width:250px}
+#tip .tt-h{font-family:"IBM Plex Mono",monospace; font-size:11px; color:var(--ink-3);
+  letter-spacing:.04em; margin-bottom:4px}
+#tip .tt-r{display:flex; align-items:center; gap:8px; justify-content:space-between}
+#tip .tt-r span{display:inline-flex; align-items:center; gap:6px}
+#tip b{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums; font-weight:600}
+
+footer{margin-top:56px; padding-top:24px; border-top:1px solid var(--rule);
+  font-size:12.5px; color:var(--ink-3); line-height:1.8}
+footer b{color:var(--ink-2); font-weight:500}
+footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:var(--sunken);
+  padding:1px 5px; border-radius:2px; color:var(--ink-2)}
+@media (prefers-reduced-motion: reduce){*{animation:none!important; transition:none!important}}
+@media (max-width:520px){
+  .mast-in{padding-block:30px 22px}
+  .verdict{grid-template-columns:1fr; gap:14px}
+  .verdict::before{grid-row:auto; width:32px; height:3px}
+  .stat-v{font-size:22px}
+}
+</style>
+
+<header class="mast">
+  <div class="mast-in">
+    <p class="kicker">S&amp;P 500 · Market Internals</p>
+    <h1>指數在高點附近，內部卻在退潮</h1>
+    <p class="dek">用 496 檔成分股的日線資料，重算市場廣度（breadth）與類股／產業結構——不看指數點位，只看有多少股票真的在漲。</p>
+    <div class="stamp">
+      <span>資料日 <b id="st-asof">—</b></span>
+      <span>報告產出 <b id="st-gen">—</b></span>
+      <span>成分股 <b id="st-n">496</b> 檔</span>
+      <span>日線 <b>504</b> 根（約 2 年）</span>
+      <span>來源 <b>yfinance / sp500_ohlc.csv</b></span>
+    </div>
+    <div class="verdict">
+      <h2 id="v-title">長線多頭未破，中短線廣度已轉弱，且這波漲勢從頭到尾就很窄</h2>
+      <p id="v-body"></p>
+    </div>
+    <div class="stats" id="statrow"></div>
+  </div>
+</header>
+
+<nav aria-label="章節導覽"><div class="nav-in">
+  <a href="#breadth">01 廣度總覽</a>
+  <a href="#trend">02 趨勢與背離</a>
+  <a href="#partic">03 參與度</a>
+  <a href="#conc">04 集中度</a>
+  <a href="#sector">05 類股</a>
+  <a href="#rotation">06 輪動</a>
+  <a href="#industry">07 產業</a>
+  <a href="#stocks">08 個股</a>
+  <a href="#method">09 方法</a>
+</div></nav>
+
+<div class="wrap">
+
+<section id="breadth">
+  <div class="sec-head"><span class="sec-no">01</span><h2>廣度總覽</h2></div>
+  <p class="sec-sub">十個獨立的廣度訊號。每一個都由成分股資料直接算出，右欄是當前讀數，不是評分或加權後的綜合指標。</p>
+  <div class="tw"><table id="t-signals">
+    <caption>廣度訊號板<small>狀態門檻寫在腳本裡（例如 %&gt;200日均線 ≥60 為多頭、&lt;45 為空頭），不隨當下走勢調整。</small></caption>
+  </table></div>
+</section>
+
+<section id="trend">
+  <div class="sec-head"><span class="sec-no">02</span><h2>趨勢與背離</h2></div>
+  <p class="sec-sub">廣度和指數在同一段時間裡走了不同方向。四張圖分別看：站上均線的比例、市值加權與等權指數的落差、騰落線的高點、以及創新高減創新低。</p>
+
+  <figure class="panel">
+    <div class="panel-head">
+      <h3>站上均線的成分股比例</h3>
+      <p>近一年，%&gt;50日均線（中期）跌破 %&gt;200日均線（長期）——長線結構還在，短中期已經在崩。</p>
+    </div>
+    <div class="legend" id="lg-ma"></div>
+    <div class="panel-body"><div id="c-ma"></div></div>
+    <figcaption id="cap-ma"></figcaption>
+  </figure>
+
+  <div class="grid2">
+    <figure class="panel">
+      <div class="panel-head"><h3>市值加權 vs 等權指數</h3><p>兩者皆以一年前 = 100。差距擴大＝漲勢集中在大型股。</p></div>
+      <div class="legend" id="lg-idx"></div>
+      <div class="panel-body"><div id="c-idx"></div></div>
+      <figcaption id="cap-idx"></figcaption>
+    </figure>
+    <figure class="panel">
+      <div class="panel-head"><h3>騰落線（A/D Line）</h3><p>每日上漲家數減下跌家數的累計值。它的高點比指數高點早到。</p></div>
+      <div class="panel-body"><div id="c-ad"></div></div>
+      <figcaption id="cap-ad"></figcaption>
+    </figure>
+  </div>
+
+  <figure class="panel">
+    <div class="panel-head"><h3>52 週新高減新低（10 日均）</h3><p>零軸之上是新高主導，之下是新低主導。</p></div>
+    <div class="panel-body"><div id="c-hl"></div></div>
+    <figcaption id="cap-hl"></figcaption>
+  </figure>
+</section>
+
+<section id="partic">
+  <div class="sec-head"><span class="sec-no">03</span><h2>參與度</h2></div>
+  <p class="sec-sub">指數漲了多少是一回事，多少股票跟著漲是另一回事。平均報酬遠高於中位數，代表少數極端贏家把平均拉了上去。</p>
+  <div class="tw"><table id="t-part">
+    <caption>各期間的個股參與度<small>「贏過指數」以同期市值加權指數報酬為基準。P10／P90 為個股報酬的十分位與九十分位。</small></caption>
+  </table></div>
+
+  <figure class="panel">
+    <div class="panel-head"><h3>距 52 週高點的位置分布</h3><p>指數只差高點不到 2%，但成分股分散得很開。</p></div>
+    <div class="panel-body"><div id="c-dd"></div></div>
+    <figcaption id="cap-dd"></figcaption>
+  </figure>
+</section>
+
+<section id="conc">
+  <div class="sec-head"><span class="sec-no">04</span><h2>集中度</h2></div>
+  <p class="sec-sub">前十大市值股佔指數的份量，以及它們在過去一年貢獻了多少指數漲幅。</p>
+  <div class="stats" id="concrow" style="margin-top:22px"></div>
+  <figure class="panel">
+    <div class="panel-head"><h3>前十大權重股</h3><p>佔指數市值的比重。</p></div>
+    <div class="panel-body"><div id="c-top10"></div></div>
+    <figcaption id="cap-top10"></figcaption>
+  </figure>
+</section>
+
+<section id="sector">
+  <div class="sec-head"><span class="sec-no">05</span><h2>類股</h2></div>
+  <p class="sec-sub">11 個類股的報酬、廣度與評價。特別注意「市值加權／等權／中位數」三欄的落差——那是判斷一個類股是全面走強還是被兩三檔權值股撐著的關鍵。</p>
+
+  <figure class="panel">
+    <div class="panel-head"><h3>近三個月類股報酬（市值加權）</h3><p>橫軸為報酬率，垂直線為指數本身的同期報酬。</p></div>
+    <div class="panel-body"><div id="c-sec"></div></div>
+    <figcaption id="cap-sec"></figcaption>
+  </figure>
+
+  <figure class="panel">
+    <div class="panel-head">
+      <h3>類股領導地圖</h3>
+      <p>橫軸：近三個月相對指數的超額報酬。縱軸：類股內部有多少比例的個股站上 200 日均線。右上＝價格與廣度同步強勢，左下＝雙弱。</p>
+    </div>
+    <div class="legend" id="lg-quad"></div>
+    <div class="panel-body"><div id="c-quad"></div></div>
+    <figcaption id="cap-quad"></figcaption>
+  </figure>
+
+  <div class="tw"><table id="t-sector">
+    <caption>類股明細<small>市值加權＝把類股當成一個指數；等權＝成分股報酬平均；中位數＝排序後的中間值，不受單一飆股影響。三者落差越大，該類股的漲勢越集中。</small></caption>
+  </table></div>
+
+  <div class="tw"><table id="t-secval">
+    <caption>類股評價與成長預估<small>皆取類股內個股的中位數。「本益比／成長」為預估本益比除以明年獲利成長率（％），數字越低代表為成長付出的價格越便宜；成長為負時不具意義，以 — 表示。</small></caption>
+  </table></div>
+</section>
+
+<section id="rotation">
+  <div class="sec-head"><span class="sec-no">06</span><h2>輪動</h2></div>
+  <p class="sec-sub">同一批類股在 12 個月、3 個月、1 個月三個期間的排名。排名往前跑代表資金正在流入，往後掉代表領導地位在流失。</p>
+  <div class="tw"><table id="t-rot">
+    <caption>類股排名變化<small>排名 1 = 該期間表現最好。「12M→3M」為正代表名次前進（改善）；達 ±3 名以上標記為改善／轉弱。</small></caption>
+  </table></div>
+</section>
+
+<section id="industry">
+  <div class="sec-head"><span class="sec-no">07</span><h2>產業</h2></div>
+  <p class="sec-sub">細分到產業層級（成分股至少 3 檔，共 70 個產業）。這一層才看得出領導權實際換到哪裡。</p>
+  <div class="grid2">
+    <div class="tw" style="margin-top:0"><table id="t-indup"><caption>近三個月最強產業<small>市值加權報酬前 12 名。</small></caption></table></div>
+    <div class="tw" style="margin-top:0"><table id="t-inddn"><caption>近三個月最弱產業<small>市值加權報酬後 12 名。</small></caption></table></div>
+  </div>
+  <div class="tw"><table id="t-ind12">
+    <caption>一年維度的贏家與輸家<small>把 12 個月與 3 個月並排，才看得出哪些產業是「漲完了」、哪些是「剛起來」。</small></caption>
+  </table></div>
+</section>
+
+<section id="stocks">
+  <div class="sec-head"><span class="sec-no">08</span><h2>個股</h2></div>
+  <p class="sec-sub">近三個月漲跌幅最極端的各 15 檔，附上 12 個月報酬作對照。</p>
+  <div class="grid2">
+    <div class="tw" style="margin-top:0"><table id="t-lead"><caption>近三個月領漲<small>依 3 個月報酬排序。</small></caption></table></div>
+    <div class="tw" style="margin-top:0"><table id="t-lag"><caption>近三個月落後<small>依 3 個月報酬排序。</small></caption></table></div>
+  </div>
+</section>
+
+<section id="method">
+  <div class="sec-head"><span class="sec-no">09</span><h2>方法與限制</h2></div>
+  <ul class="take" id="method-list"></ul>
+</section>
+
+<footer>
+  <p><b>怎麼重算</b>：<code>python analysis/breadth_sector.py</code> 產出 <code>data/analysis/*.csv</code>，再用 <code>python analysis/build_report_data.py</code> 產出本頁嵌入的 <code>report_data.json</code>。原始 OHLC 由 <code>fetch_sp500_memory_software.py</code> 每日經 GitHub Actions 更新。</p>
+  <p>本頁為技術面與結構面的量化整理，僅呈現資料本身，不構成投資建議。</p>
+</footer>
+</div>
+<div id="tip" role="status" aria-live="polite"></div>
+
+<script>window.__SPX__={"asof":"2026-09-11","generated":"2026-09-13","dates":["2025-08-29","2025-09-05","2025-09-12","2025-09-19","2025-09-26","2025-10-03","2025-10-10","2025-10-17","2025-10-24","2025-10-31","2025-11-07","2025-11-14","2025-11-21","2025-11-28","2025-12-05","2025-12-12","2025-12-19","2025-12-26","2026-01-02","2026-01-09","2026-01-16","2026-01-23","2026-01-30","2026-02-06","2026-02-13","2026-02-20","2026-02-27","2026-03-06","2026-03-13","2026-03-20","2026-03-27","2026-04-03","2026-04-10","2026-04-17","2026-04-24","2026-05-01","2026-05-08","2026-05-15","2026-05-22","2026-05-29","2026-06-05","2026-06-12","2026-06-19","2026-06-26","2026-07-03","2026-07-10","2026-07-17","2026-07-24","2026-07-31","2026-08-07","2026-08-14","2026-08-21","2026-08-28","2026-09-04","2026-09-11"],"ma20":[67.47,55.76,54.75,49.09,53.33,61.41,28.89,42.02,58.59,40.4,45.05,43.12,47.07,77.78,62.42,66.94,56.65,66.53,57.46,70.16,66.94,58.27,54.64,67.74,61.9,63.1,61.49,35.08,22.58,12.5,13.31,52.82,66.13,80.04,59.88,56.45,42.54,35.69,59.68,50.6,60.89,70.97,51.21,63.1,68.95,63.1,59.27,55.85,54.03,65.73,67.94,50.81,44.35,36.69,24.8],"ma50":[65.25,60.61,62.22,59.19,57.17,61.82,38.59,45.45,53.94,42.02,44.85,44.13,41.7,60.93,55.87,59.92,58.1,63.56,60.53,72.32,72.93,67.88,67.54,69.15,63.51,66.13,63.31,45.16,32.86,20.77,19.56,30.44,44.35,60.69,52.62,54.84,51.81,44.56,57.86,54.64,54.64,60.69,56.25,63.91,67.34,68.35,64.72,65.73,63.1,67.14,70.97,58.67,54.44,48.19,39.11],"ma200":[69.43,69.03,68.42,65.18,65.59,68.42,58.1,62.55,65.99,57.29,57.09,59.43,56.8,62.55,63.36,64.17,61.94,63.77,61.74,68.62,70.24,69.84,68.22,69.03,67.41,68.02,68.02,58.1,50.81,46.15,44.33,49.6,54.05,61.74,57.09,58.1,55.67,52.63,59.51,59.11,59.31,61.74,61.13,64.37,67.21,67.0,68.42,66.19,67.61,73.08,74.14,72.53,71.52,66.94,59.07],"adline":[5608,5583,5527,5488,5549,5903,5233,5681,6078,5707,5737,5789,5579,6437,6359,6564,6536,7070,6551,6983,7228,7180,7225,7739,7985,8186,8512,7892,7303,7012,7076,7655,7905,8531,8251,8100,7948,7628,8184,8024,8053,8430,8170,8661,8853,8860,8862,8789,8861,9290,9484,9274,9133,8871,8366],"capw":[100.0,100.96,102.97,104.7,104.09,105.15,102.57,104.66,106.73,107.97,106.15,106.01,104.56,108.89,109.47,108.53,108.69,110.24,109.17,111.13,110.78,110.44,110.99,110.38,108.71,109.98,109.48,107.13,105.7,103.75,101.12,104.81,108.82,114.25,114.87,116.83,119.81,119.82,120.45,122.17,118.85,119.41,120.65,117.65,120.13,121.65,119.67,118.13,120.17,124.14,124.54,122.85,123.46,123.47,122.57],"eqw":[100.0,100.05,100.54,100.79,100.88,102.36,99.09,100.74,102.66,100.92,100.9,100.77,99.86,103.09,103.48,104.29,104.08,105.11,104.6,107.17,107.89,107.72,107.34,109.48,109.7,110.45,111.11,107.84,105.01,103.39,102.72,105.34,107.17,110.91,110.18,110.48,110.86,109.33,112.2,113.0,112.84,114.76,113.42,115.43,116.93,116.78,116.51,116.65,117.69,120.67,122.23,121.65,121.2,120.33,118.1],"nethl":[0.0,0.0,8.3,17.7,18.5,29.8,30.5,15.7,16.2,15.2,7.5,13.4,8.9,13.2,29.0,30.1,27.3,25.8,21.4,26.7,41.3,34.2,25.0,43.6,57.0,48.6,41.5,33.4,10.3,-1.0,-1.2,-2.4,4.9,19.3,28.6,19.5,10.4,1.7,3.0,12.4,17.3,15.6,13.7,20.4,27.3,29.2,23.7,18.8,15.6,21.7,23.3,18.6,11.5,7.4,-1.4],"latest":{"pct_above_20dma":24.8,"pct_above_50dma":39.11,"pct_above_150dma":56.85,"pct_above_200dma":59.07,"new_highs":11.0,"new_lows":12.0,"net_hl":-1.0,"net_hl_10d":-1.4,"mcclellan_osc":-50.25,"breadth_thrust":0.43,"ad_line":8366.0,"cap_weighted":150.68,"equal_weighted":138.39},"pctile":{"pct_above_20dma":5.2,"pct_above_50dma":9.9,"pct_above_150dma":24.6,"pct_above_200dma":29.8},"range1y":{"pct_above_20dma":{"min":12.5,"med":56.4,"max":80.0},"pct_above_50dma":{"min":19.6,"med":57.0,"max":73.7},"pct_above_150dma":{"min":40.7,"med":61.3,"max":73.2},"pct_above_200dma":{"min":44.3,"med":63.4,"max":74.7}},"adline_peak":{"val":9484,"date":"2026-08-14","now":8366},"cap_peak":{"val":153.4,"date":"2026-08-13"},"signals":[{"signal":"Primary trend (% > 200DMA)","status":"neutral","detail":"59.1% of constituents are above their 200-day average","value":59.1},{"signal":"Intermediate trend (% > 50DMA)","status":"bearish","detail":"39.1% above the 50-day average","value":39.1},{"signal":"Short-term (% > 20DMA)","status":"oversold","detail":"24.8% above the 20-day average","value":24.8},{"signal":"Breadth vs index divergence","status":"warning","detail":"index sits at the 82th percentile of its own 6-month range while % > 200DMA sits at the 44th","value":38.1},{"signal":"McClellan oscillator","status":"neutral","detail":"-50 (19/39-day EMA spread of ratio-adjusted net advances)","value":-50.2},{"signal":"Net new 52w highs (10d avg)","status":"neutral","detail":"-1.4 per day over the last 10 sessions","value":-1.4},{"signal":"Zweig breadth thrust","status":"neutral","detail":"10-day EMA of advances/(advances+declines) = 0.433","value":0.433},{"signal":"Participation in the 12M advance","status":"narrow","detail":"only 36% of names beat the index; mean 23.9% vs median 8.7%","value":36.2},{"signal":"Mega-cap concentration","status":"elevated","detail":"the 10 largest names are 42.4% of index cap and drove 50% of the 12-month cap gain","value":49.5},{"signal":"Equal-weight vs cap-weight","status":"cap-weight leading","detail":"the equal-weight/cap-weight ratio is -2.1% over 12 months","value":-2.1}],"participation":[{"horizon":"1W","days":5,"n":496,"pct_positive":22.6,"mean_ret":-2.3,"median_ret":-2.4,"mean_minus_median":0.1,"pct_beat_index":34.7,"p10":-7.2,"p90":2.4,"dispersion_p90_p10":9.5,"index_ret":-1.2},{"horizon":"1M","days":21,"n":496,"pct_positive":30.0,"mean_ret":-2.7,"median_ret":-3.1,"mean_minus_median":0.4,"pct_beat_index":36.1,"p10":-12.1,"p90":6.2,"dispersion_p90_p10":18.3,"index_ret":-1.1},{"horizon":"3M","days":63,"n":496,"pct_positive":53.6,"mean_ret":3.0,"median_ret":1.5,"mean_minus_median":1.4,"pct_beat_index":47.0,"p10":-14.7,"p90":19.6,"dispersion_p90_p10":34.3,"index_ret":3.2},{"horizon":"6M","days":126,"n":496,"pct_positive":63.9,"mean_ret":11.7,"median_ret":6.0,"mean_minus_median":5.8,"pct_beat_index":35.7,"p10":-15.6,"p90":38.5,"dispersion_p90_p10":54.1,"index_ret":15.3},{"horizon":"12M","days":252,"n":495,"pct_positive":62.8,"mean_ret":23.9,"median_ret":8.7,"mean_minus_median":15.2,"pct_beat_index":36.2,"p10":-26.9,"p90":58.9,"dispersion_p90_p10":85.8,"index_ret":20.0}],"drawdown":[{"bucket":"<-30%","count":79,"pct":16.0},{"bucket":"-30~-20%","count":87,"pct":17.6},{"bucket":"-20~-10%","count":142,"pct":28.7},{"bucket":"-10~-5%","count":123,"pct":24.9},{"bucket":"-5~0%","count":52,"pct":10.5},{"bucket":"at 52w high","count":11,"pct":2.2}],"concentration":{"top5_weight":30.42791069135156,"top10_weight":42.42814531882343,"top25_weight":55.23889790817489,"hhi":241.35854348353297,"top10_share_of_12m_gain":49.50688642679996,"index_12m_return":19.961692912895067,"top10_names":[{"ticker":"NVDA","weight":7.276114623712583},{"ticker":"AAPL","weight":6.693809176399832},{"ticker":"GOOGL","weight":5.7145937084695095},{"ticker":"GOOG","weight":5.663103341854625},{"ticker":"MSFT","weight":5.080289840915011},{"ticker":"AMZN","weight":3.82328555851186},{"ticker":"AVGO","weight":2.3853266144483385},{"ticker":"META","weight":2.2788351003867806},{"ticker":"TSLA","weight":1.9923514764080554},{"ticker":"MU","weight":1.5204358777168356}]},"sector":[{"Sector":"energy","n":21,"market_cap":2402098328576.0,"cw_1W":1.05,"ew_1W":-0.05,"med_1W":0.96,"cw_1M":6.65,"ew_1M":6.15,"med_1M":7.11,"cw_3M":15.18,"ew_3M":13.62,"med_3M":9.55,"pct_positive_3M":85.71,"cw_6M":14.3,"ew_6M":15.4,"med_6M":10.63,"cw_12M":50.62,"ew_12M":53.18,"med_12M":45.09,"pct_above_50dma":85.71,"pct_above_200dma":85.71,"pct_within_5pct_of_52wh":57.14,"median_pct_from_52wh":-3.72,"median_pe":18.19,"median_fwd_pe":14.03,"median_div_yield":2.07,"median_cy_growth":43.96,"median_ny_growth":-5.57,"median_cq_growth":35.93,"median_nq_growth":39.09,"fwd_pe_over_ny_growth":-2.52,"weight_pct":3.32,"rs_3m":12.01,"rs_12m":30.61,"label":"Energy","style":"cyclical"},{"Sector":"financial-services","n":70,"market_cap":7587703881728.0,"cw_1W":-2.58,"ew_1W":-3.36,"med_1W":-2.6,"cw_1M":-1.4,"ew_1M":-1.9,"med_1M":-1.68,"cw_3M":9.39,"ew_3M":7.84,"med_3M":6.69,"pct_positive_3M":85.71,"cw_6M":20.89,"ew_6M":19.13,"med_6M":20.91,"cw_12M":10.03,"ew_12M":10.55,"med_12M":10.28,"pct_above_50dma":32.86,"pct_above_200dma":82.86,"pct_within_5pct_of_52wh":22.86,"median_pct_from_52wh":-8.09,"median_pe":15.31,"median_fwd_pe":12.9,"median_div_yield":1.67,"median_cy_growth":13.68,"median_ny_growth":10.79,"median_cq_growth":7.84,"median_nq_growth":9.7,"fwd_pe_over_ny_growth":1.2,"weight_pct":10.47,"rs_3m":6.21,"rs_12m":-9.97,"label":"Financial Services","style":"cyclical"},{"Sector":"healthcare","n":58,"market_cap":6092670119936.0,"cw_1W":-4.52,"ew_1W":-4.64,"med_1W":-4.65,"cw_1M":-1.86,"ew_1M":-0.49,"med_1M":-1.06,"cw_3M":7.67,"ew_3M":12.82,"med_3M":11.17,"pct_positive_3M":74.14,"cw_6M":10.91,"ew_6M":18.06,"med_6M":10.82,"cw_12M":22.63,"ew_12M":27.39,"med_12M":24.16,"pct_above_50dma":56.9,"pct_above_200dma":70.69,"pct_within_5pct_of_52wh":22.41,"median_pct_from_52wh":-9.73,"median_pe":25.37,"median_fwd_pe":15.75,"median_div_yield":0.52,"median_cy_growth":8.92,"median_ny_growth":10.9,"median_cq_growth":6.64,"median_nq_growth":9.52,"fwd_pe_over_ny_growth":1.44,"weight_pct":8.41,"rs_3m":4.49,"rs_12m":2.62,"label":"Healthcare","style":"defensive"},{"Sector":"technology","n":83,"market_cap":25956245747200.0,"cw_1W":-0.06,"ew_1W":0.45,"med_1W":0.27,"cw_1M":-0.05,"ew_1M":-1.28,"med_1M":-1.96,"cw_3M":5.95,"ew_3M":5.93,"med_3M":5.67,"pct_positive_3M":59.04,"cw_6M":31.65,"ew_6M":35.55,"med_6M":24.94,"cw_12M":31.11,"ew_12M":81.47,"med_12M":14.8,"pct_above_50dma":61.45,"pct_above_200dma":65.06,"pct_within_5pct_of_52wh":12.05,"median_pct_from_52wh":-24.39,"median_pe":29.24,"median_fwd_pe":18.12,"median_div_yield":0.14,"median_cy_growth":20.96,"median_ny_growth":17.3,"median_cq_growth":19.77,"median_nq_growth":18.38,"fwd_pe_over_ny_growth":1.05,"weight_pct":35.83,"rs_3m":2.77,"rs_12m":11.1,"label":"Technology","style":"cyclical"},{"Sector":"basic-materials","n":20,"market_cap":1093984472064.0,"cw_1W":-2.95,"ew_1W":-3.17,"med_1W":-3.02,"cw_1M":-1.84,"ew_1M":-1.99,"med_1M":-4.05,"cw_3M":0.23,"ew_3M":0.13,"med_3M":0.53,"pct_positive_3M":50.0,"cw_6M":3.1,"ew_6M":2.3,"med_6M":-0.3,"cw_12M":14.78,"ew_12M":23.8,"med_12M":21.22,"pct_above_50dma":40.0,"pct_above_200dma":55.0,"pct_within_5pct_of_52wh":5.0,"median_pct_from_52wh":-14.72,"median_pe":21.24,"median_fwd_pe":16.09,"median_div_yield":1.34,"median_cy_growth":13.47,"median_ny_growth":11.49,"median_cq_growth":6.18,"median_nq_growth":32.57,"fwd_pe_over_ny_growth":1.4,"weight_pct":1.51,"rs_3m":-2.95,"rs_12m":-5.22,"label":"Basic Materials","style":"cyclical"},{"Sector":"industrials","n":74,"market_cap":5077853615616.0,"cw_1W":-1.0,"ew_1W":-1.63,"med_1W":-1.58,"cw_1M":-7.36,"ew_1M":-7.44,"med_1M":-7.69,"cw_3M":-1.34,"ew_3M":-2.13,"med_3M":-2.25,"pct_positive_3M":37.84,"cw_6M":5.28,"ew_6M":3.78,"med_6M":4.98,"cw_12M":20.24,"ew_12M":14.73,"med_12M":10.76,"pct_above_50dma":20.27,"pct_above_200dma":54.05,"pct_within_5pct_of_52wh":4.05,"median_pct_from_52wh":-15.82,"median_pe":28.82,"median_fwd_pe":20.18,"median_div_yield":1.12,"median_cy_growth":11.94,"median_ny_growth":12.51,"median_cq_growth":12.06,"median_nq_growth":14.75,"fwd_pe_over_ny_growth":1.61,"weight_pct":7.01,"rs_3m":-4.52,"rs_12m":0.24,"label":"Industrials","style":"cyclical"},{"Sector":"consumer-cyclical","n":54,"market_cap":6790686890496.0,"cw_1W":-2.6,"ew_1W":-4.15,"med_1W":-3.23,"cw_1M":-2.92,"ew_1M":-7.56,"med_1M":-7.3,"cw_3M":-1.48,"ew_3M":-3.76,"med_3M":-4.51,"pct_positive_3M":38.89,"cw_6M":4.56,"ew_6M":-1.37,"med_6M":-1.64,"cw_12M":1.15,"ew_12M":-4.47,"med_12M":-3.49,"pct_above_50dma":20.37,"pct_above_200dma":37.04,"pct_within_5pct_of_52wh":3.7,"median_pct_from_52wh":-21.97,"median_pe":20.02,"median_fwd_pe":16.08,"median_div_yield":1.21,"median_cy_growth":7.69,"median_ny_growth":11.1,"median_cq_growth":5.1,"median_nq_growth":9.29,"fwd_pe_over_ny_growth":1.45,"weight_pct":9.37,"rs_3m":-4.66,"rs_12m":-18.86,"label":"Consumer Cyclical","style":"cyclical"},{"Sector":"real-estate","n":29,"market_cap":1169761505280.0,"cw_1W":-1.96,"ew_1W":-2.35,"med_1W":-2.39,"cw_1M":-2.5,"ew_1M":-2.93,"med_1M":-3.54,"cw_3M":-2.1,"ew_3M":-4.33,"med_3M":-5.7,"pct_positive_3M":17.24,"cw_6M":4.95,"ew_6M":4.5,"med_6M":4.5,"cw_12M":9.82,"ew_12M":3.93,"med_12M":5.55,"pct_above_50dma":17.24,"pct_above_200dma":58.62,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-11.05,"median_pe":30.87,"median_fwd_pe":32.8,"median_div_yield":4.04,"median_cy_growth":15.18,"median_ny_growth":4.53,"median_cq_growth":3.93,"median_nq_growth":7.31,"fwd_pe_over_ny_growth":7.24,"weight_pct":1.61,"rs_3m":-5.27,"rs_12m":-10.18,"label":"Real Estate","style":"defensive"},{"Sector":"communication-services","n":22,"market_cap":11514405010432.0,"cw_1W":-0.28,"ew_1W":-2.19,"med_1W":-2.82,"cw_1M":0.77,"ew_1M":1.84,"med_1M":3.13,"cw_3M":-2.5,"ew_3M":-0.12,"med_3M":1.57,"pct_positive_3M":54.55,"cw_6M":6.65,"ew_6M":-1.19,"med_6M":2.75,"cw_12M":18.71,"ew_12M":-1.18,"med_12M":-3.75,"pct_above_50dma":68.18,"pct_above_200dma":59.09,"pct_within_5pct_of_52wh":4.55,"median_pct_from_52wh":-15.28,"median_pe":17.12,"median_fwd_pe":14.86,"median_div_yield":0.65,"median_cy_growth":12.22,"median_ny_growth":8.1,"median_cq_growth":19.11,"median_nq_growth":18.05,"fwd_pe_over_ny_growth":1.83,"weight_pct":15.89,"rs_3m":-5.68,"rs_12m":-1.3,"label":"Communication Services","style":"cyclical"},{"Sector":"consumer-defensive","n":34,"market_cap":3421739337216.0,"cw_1W":-1.32,"ew_1W":-2.88,"med_1W":-3.02,"cw_1M":-2.25,"ew_1M":-1.93,"med_1M":-2.76,"cw_3M":-2.76,"ew_3M":-0.04,"med_3M":-1.51,"pct_positive_3M":41.18,"cw_6M":-2.55,"ew_6M":0.78,"med_6M":-1.06,"cw_12M":7.75,"ew_12M":5.28,"med_12M":1.72,"pct_above_50dma":35.29,"pct_above_200dma":44.12,"pct_within_5pct_of_52wh":11.76,"median_pct_from_52wh":-16.75,"median_pe":22.8,"median_fwd_pe":15.0,"median_div_yield":3.04,"median_cy_growth":7.88,"median_ny_growth":6.42,"median_cq_growth":3.9,"median_nq_growth":5.77,"fwd_pe_over_ny_growth":2.34,"weight_pct":4.72,"rs_3m":-5.94,"rs_12m":-12.25,"label":"Consumer Defensive","style":"defensive"},{"Sector":"utilities","n":31,"market_cap":1336025697280.0,"cw_1W":-1.47,"ew_1W":-1.43,"med_1W":-1.63,"cw_1M":-3.3,"ew_1M":-3.65,"med_1M":-3.09,"cw_3M":-3.02,"ew_3M":-3.85,"med_3M":-3.28,"pct_positive_3M":19.35,"cw_6M":-7.62,"ew_6M":-7.31,"med_6M":-7.38,"cw_12M":2.78,"ew_12M":4.07,"med_12M":4.56,"pct_above_50dma":9.68,"pct_above_200dma":19.35,"pct_within_5pct_of_52wh":3.23,"median_pct_from_52wh":-12.55,"median_pe":20.68,"median_fwd_pe":16.65,"median_div_yield":3.26,"median_cy_growth":7.61,"median_ny_growth":7.91,"median_cq_growth":5.98,"median_nq_growth":13.41,"fwd_pe_over_ny_growth":2.11,"weight_pct":1.84,"rs_3m":-6.2,"rs_12m":-17.22,"label":"Utilities","style":"defensive"}],"rotation":[{"Sector":"energy","cw_1M":6.6,"cw_3M":15.2,"cw_12M":50.6,"rank_1M":1.0,"rank_3M":1.0,"rank_12M":1.0,"rank_change_12m_to_3m":0.0,"rank_change_3m_to_1m":0.0,"trend":"stable","label":"Energy"},{"Sector":"financial-services","cw_1M":-1.4,"cw_3M":9.4,"cw_12M":10.0,"rank_1M":4.0,"rank_3M":2.0,"rank_12M":7.0,"rank_change_12m_to_3m":5.0,"rank_change_3m_to_1m":-2.0,"trend":"improving","label":"Financial Services"},{"Sector":"healthcare","cw_1M":-1.9,"cw_3M":7.7,"cw_12M":22.6,"rank_1M":6.0,"rank_3M":3.0,"rank_12M":3.0,"rank_change_12m_to_3m":0.0,"rank_change_3m_to_1m":-3.0,"trend":"stable","label":"Healthcare"},{"Sector":"technology","cw_1M":-0.0,"cw_3M":5.9,"cw_12M":31.1,"rank_1M":3.0,"rank_3M":4.0,"rank_12M":2.0,"rank_change_12m_to_3m":-2.0,"rank_change_3m_to_1m":1.0,"trend":"stable","label":"Technology"},{"Sector":"basic-materials","cw_1M":-1.8,"cw_3M":0.2,"cw_12M":14.8,"rank_1M":5.0,"rank_3M":5.0,"rank_12M":6.0,"rank_change_12m_to_3m":1.0,"rank_change_3m_to_1m":0.0,"trend":"stable","label":"Basic Materials"},{"Sector":"industrials","cw_1M":-7.4,"cw_3M":-1.3,"cw_12M":20.2,"rank_1M":11.0,"rank_3M":6.0,"rank_12M":4.0,"rank_change_12m_to_3m":-2.0,"rank_change_3m_to_1m":-5.0,"trend":"stable","label":"Industrials"},{"Sector":"consumer-cyclical","cw_1M":-2.9,"cw_3M":-1.5,"cw_12M":1.1,"rank_1M":9.0,"rank_3M":7.0,"rank_12M":11.0,"rank_change_12m_to_3m":4.0,"rank_change_3m_to_1m":-2.0,"trend":"improving","label":"Consumer Cyclical"},{"Sector":"real-estate","cw_1M":-2.5,"cw_3M":-2.1,"cw_12M":9.8,"rank_1M":8.0,"rank_3M":8.0,"rank_12M":8.0,"rank_change_12m_to_3m":0.0,"rank_change_3m_to_1m":0.0,"trend":"stable","label":"Real Estate"},{"Sector":"communication-services","cw_1M":0.8,"cw_3M":-2.5,"cw_12M":18.7,"rank_1M":2.0,"rank_3M":9.0,"rank_12M":5.0,"rank_change_12m_to_3m":-4.0,"rank_change_3m_to_1m":7.0,"trend":"deteriorating","label":"Communication Services"},{"Sector":"consumer-defensive","cw_1M":-2.2,"cw_3M":-2.8,"cw_12M":7.8,"rank_1M":7.0,"rank_3M":10.0,"rank_12M":9.0,"rank_change_12m_to_3m":-1.0,"rank_change_3m_to_1m":3.0,"trend":"stable","label":"Consumer Defensive"},{"Sector":"utilities","cw_1M":-3.3,"cw_3M":-3.0,"cw_12M":2.8,"rank_1M":10.0,"rank_3M":11.0,"rank_12M":10.0,"rank_change_12m_to_3m":-1.0,"rank_change_3m_to_1m":1.0,"trend":"stable","label":"Utilities"}],"industry":[{"Industry":"oil-gas-refining-marketing","n":3,"market_cap":331533074432.0,"cw_1W":3.1,"ew_1W":3.1,"med_1W":2.1,"cw_1M":15.9,"ew_1M":16.0,"med_1M":15.6,"cw_3M":50.7,"ew_3M":50.7,"med_3M":52.2,"pct_positive_3M":100.0,"cw_6M":63.6,"ew_6M":63.7,"med_6M":67.0,"cw_12M":124.3,"ew_12M":125.5,"med_12M":121.6,"pct_above_50dma":100.0,"pct_above_200dma":100.0,"pct_within_5pct_of_52wh":100.0,"median_pct_from_52wh":-0.5,"median_pe":14.8,"median_fwd_pe":11.7,"median_div_yield":1.2,"median_cy_growth":325.2,"median_ny_growth":-25.6,"median_cq_growth":383.6,"median_nq_growth":186.7,"fwd_pe_over_ny_growth":-0.5,"Sector":"energy","rs_3m":47.6},{"Industry":"biotechnology","n":5,"market_cap":304428662784.0,"cw_1W":-6.3,"ew_1W":-4.8,"med_1W":-5.1,"cw_1M":10.1,"ew_1M":24.5,"med_1M":-0.0,"cw_3M":34.9,"ew_3M":56.0,"med_3M":28.0,"pct_positive_3M":100.0,"cw_6M":23.9,"ew_6M":51.0,"med_6M":32.0,"cw_12M":59.8,"ew_12M":129.9,"med_12M":41.3,"pct_above_50dma":80.0,"pct_above_200dma":100.0,"pct_within_5pct_of_52wh":20.0,"median_pct_from_52wh":-7.6,"median_pe":19.3,"median_fwd_pe":13.7,"median_div_yield":0.0,"median_cy_growth":-12.9,"median_ny_growth":25.6,"median_cq_growth":-148.9,"median_nq_growth":8.2,"fwd_pe_over_ny_growth":0.5,"Sector":"healthcare","rs_3m":31.7},{"Industry":"software-infrastructure","n":15,"market_cap":5397078066176.0,"cw_1W":-3.0,"ew_1W":-1.8,"med_1W":-2.7,"cw_1M":-1.0,"ew_1M":-2.1,"med_1M":-2.0,"cw_3M":19.3,"ew_3M":11.5,"med_3M":16.4,"pct_positive_3M":80.0,"cw_6M":24.4,"ew_6M":39.8,"med_6M":26.9,"cw_12M":-3.7,"ew_12M":23.7,"med_12M":7.4,"pct_above_50dma":66.7,"pct_above_200dma":80.0,"pct_within_5pct_of_52wh":26.7,"median_pct_from_52wh":-9.7,"median_pe":32.8,"median_fwd_pe":21.0,"median_div_yield":0.0,"median_cy_growth":17.3,"median_ny_growth":15.7,"median_cq_growth":18.2,"median_nq_growth":15.1,"fwd_pe_over_ny_growth":1.3,"Sector":"technology","rs_3m":16.2},{"Industry":"diagnostics-research","n":10,"market_cap":593446390784.0,"cw_1W":-3.2,"ew_1W":-3.9,"med_1W":-4.6,"cw_1M":-1.3,"ew_1M":-1.8,"med_1M":-2.0,"cw_3M":19.0,"ew_3M":20.5,"med_3M":16.7,"pct_positive_3M":90.0,"cw_6M":21.4,"ew_6M":30.6,"med_6M":23.7,"cw_12M":18.1,"ew_12M":27.8,"med_12M":30.6,"pct_above_50dma":70.0,"pct_above_200dma":70.0,"pct_within_5pct_of_52wh":40.0,"median_pct_from_52wh":-5.9,"median_pe":32.7,"median_fwd_pe":21.7,"median_div_yield":0.1,"median_cy_growth":10.4,"median_ny_growth":9.8,"median_cq_growth":9.8,"median_nq_growth":10.0,"fwd_pe_over_ny_growth":2.2,"Sector":"healthcare","rs_3m":15.8},{"Industry":"agricultural-inputs","n":3,"market_cap":84124103680.0,"cw_1W":-4.4,"ew_1W":-3.0,"med_1W":-3.4,"cw_1M":11.5,"ew_1M":11.7,"med_1M":11.5,"cw_3M":16.0,"ew_3M":19.4,"med_3M":20.5,"pct_positive_3M":100.0,"cw_6M":1.2,"ew_6M":-4.6,"med_6M":-1.2,"cw_12M":19.2,"ew_12M":17.5,"med_12M":18.0,"pct_above_50dma":100.0,"pct_above_200dma":100.0,"pct_within_5pct_of_52wh":33.3,"median_pct_from_52wh":-7.1,"median_pe":9.9,"median_fwd_pe":16.1,"median_div_yield":1.5,"median_cy_growth":12.6,"median_ny_growth":32.5,"median_cq_growth":-66.8,"median_nq_growth":38.4,"fwd_pe_over_ny_growth":0.5,"Sector":"basic-materials","rs_3m":12.8},{"Industry":"credit-services","n":6,"market_cap":1608353734656.0,"cw_1W":-2.7,"ew_1W":-3.7,"med_1W":-3.8,"cw_1M":0.1,"ew_1M":-3.4,"med_1M":-5.0,"cw_3M":14.5,"ew_3M":14.4,"med_3M":15.6,"pct_positive_3M":100.0,"cw_6M":17.1,"ew_6M":17.4,"med_6M":19.0,"cw_12M":3.0,"ew_12M":-1.4,"med_12M":0.2,"pct_above_50dma":33.3,"pct_above_200dma":83.3,"pct_within_5pct_of_52wh":16.7,"median_pct_from_52wh":-14.0,"median_pe":15.6,"median_fwd_pe":12.7,"median_div_yield":1.1,"median_cy_growth":9.3,"median_ny_growth":13.7,"median_cq_growth":4.7,"median_nq_growth":11.9,"fwd_pe_over_ny_growth":0.9,"Sector":"financial-services","rs_3m":11.3},{"Industry":"software-application","n":15,"market_cap":1157344407552.0,"cw_1W":-7.0,"ew_1W":-7.9,"med_1W":-8.0,"cw_1M":1.1,"ew_1M":-1.4,"med_1M":-3.8,"cw_3M":13.8,"ew_3M":12.7,"med_3M":15.3,"pct_positive_3M":80.0,"cw_6M":8.8,"ew_6M":10.0,"med_6M":-0.3,"cw_12M":-19.9,"ew_12M":-18.9,"med_12M":-23.9,"pct_above_50dma":46.7,"pct_above_200dma":46.7,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-30.5,"median_pe":24.5,"median_fwd_pe":16.3,"median_div_yield":0.0,"median_cy_growth":15.9,"median_ny_growth":13.0,"median_cq_growth":11.3,"median_nq_growth":11.9,"fwd_pe_over_ny_growth":1.3,"Sector":"technology","rs_3m":10.6},{"Industry":"oil-gas-e-p","n":9,"market_cap":515480849408.0,"cw_1W":0.9,"ew_1W":0.3,"med_1W":1.0,"cw_1M":6.0,"ew_1M":5.6,"med_1M":5.5,"cw_3M":12.5,"ew_3M":11.0,"med_3M":9.6,"pct_positive_3M":100.0,"cw_6M":6.7,"ew_6M":4.4,"med_6M":10.1,"cw_12M":36.7,"ew_12M":37.0,"med_12M":35.4,"pct_above_50dma":88.9,"pct_above_200dma":66.7,"pct_within_5pct_of_52wh":55.6,"median_pct_from_52wh":-3.7,"median_pe":12.5,"median_fwd_pe":10.9,"median_div_yield":2.1,"median_cy_growth":54.6,"median_ny_growth":-9.2,"median_cq_growth":38.5,"median_nq_growth":62.0,"fwd_pe_over_ny_growth":-1.2,"Sector":"energy","rs_3m":9.3},{"Industry":"banks-diversified","n":5,"market_cap":2001565278208.0,"cw_1W":-0.6,"ew_1W":-0.2,"med_1W":-0.0,"cw_1M":-1.5,"ew_1M":-0.6,"med_1M":-0.2,"cw_3M":12.0,"ew_3M":10.9,"med_3M":14.1,"pct_positive_3M":100.0,"cw_6M":29.1,"ew_6M":31.2,"med_6M":32.9,"cw_12M":25.6,"ew_12M":33.7,"med_12M":27.7,"pct_above_50dma":100.0,"pct_above_200dma":100.0,"pct_within_5pct_of_52wh":100.0,"median_pct_from_52wh":-2.8,"median_pe":15.0,"median_fwd_pe":11.8,"median_div_yield":1.7,"median_cy_growth":22.5,"median_ny_growth":10.8,"median_cq_growth":15.8,"median_nq_growth":18.1,"fwd_pe_over_ny_growth":1.1,"Sector":"financial-services","rs_3m":8.8},{"Industry":"medical-distribution","n":4,"market_cap":228760840192.0,"cw_1W":-4.7,"ew_1W":-4.3,"med_1W":-4.5,"cw_1M":0.8,"ew_1M":0.1,"med_1M":0.3,"cw_3M":11.2,"ew_3M":10.8,"med_3M":11.1,"pct_positive_3M":100.0,"cw_6M":-3.1,"ew_6M":2.6,"med_6M":0.6,"cw_12M":27.0,"ew_12M":31.1,"med_12M":28.2,"pct_above_50dma":100.0,"pct_above_200dma":100.0,"pct_within_5pct_of_52wh":25.0,"median_pct_from_52wh":-8.5,"median_pe":24.8,"median_fwd_pe":16.4,"median_div_yield":0.6,"median_cy_growth":12.9,"median_ny_growth":11.8,"median_cq_growth":12.2,"median_nq_growth":15.4,"fwd_pe_over_ny_growth":1.4,"Sector":"healthcare","rs_3m":8.0},{"Industry":"specialty-business-services","n":3,"market_cap":132848412672.0,"cw_1W":-3.0,"ew_1W":-4.7,"med_1W":-3.5,"cw_1M":0.3,"ew_1M":0.9,"med_1M":0.0,"cw_3M":11.0,"ew_3M":14.4,"med_3M":11.1,"pct_positive_3M":66.7,"cw_6M":3.7,"ew_6M":6.4,"med_6M":4.8,"cw_12M":-10.7,"ew_12M":-10.6,"med_12M":1.1,"pct_above_50dma":66.7,"pct_above_200dma":66.7,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-6.7,"median_pe":41.0,"median_fwd_pe":16.6,"median_div_yield":0.9,"median_cy_growth":11.8,"median_ny_growth":14.0,"median_cq_growth":9.9,"median_nq_growth":11.6,"fwd_pe_over_ny_growth":1.2,"Sector":"industrials","rs_3m":7.8},{"Industry":"medical-care-facilities","n":3,"market_cap":116668949504.0,"cw_1W":3.8,"ew_1W":2.5,"med_1W":3.3,"cw_1M":2.5,"ew_1M":1.5,"med_1M":1.5,"cw_3M":10.6,"ew_3M":7.3,"med_3M":13.0,"pct_positive_3M":66.7,"cw_6M":-15.9,"ew_6M":-3.0,"med_6M":-8.0,"cw_12M":9.8,"ew_12M":13.5,"med_12M":9.0,"pct_above_50dma":66.7,"pct_above_200dma":33.3,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-24.7,"median_pe":14.3,"median_fwd_pe":10.5,"median_div_yield":0.5,"median_cy_growth":4.5,"median_ny_growth":8.7,"median_cq_growth":-3.8,"median_nq_growth":0.0,"fwd_pe_over_ny_growth":1.2,"Sector":"healthcare","rs_3m":7.4},{"Industry":"reit-healthcare-facilities","n":3,"market_cap":230332855296.0,"cw_1W":-2.4,"ew_1W":-2.7,"med_1W":-2.3,"cw_1M":1.8,"ew_1M":0.7,"med_1M":1.1,"cw_3M":10.6,"ew_3M":6.9,"med_3M":7.9,"pct_positive_3M":100.0,"cw_6M":13.6,"ew_6M":14.9,"med_6M":15.1,"cw_12M":38.8,"ew_12M":32.1,"med_12M":33.3,"pct_above_50dma":0.0,"pct_above_200dma":100.0,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-10.5,"median_pe":105.2,"median_fwd_pe":113.9,"median_div_yield":2.2,"median_cy_growth":64.1,"median_ny_growth":55.6,"median_cq_growth":14.4,"median_nq_growth":5.2,"fwd_pe_over_ny_growth":2.1,"Sector":"real-estate","rs_3m":7.4},{"Industry":"computer-hardware","n":7,"market_cap":1259508187136.0,"cw_1W":5.7,"ew_1W":6.1,"med_1W":5.0,"cw_1M":6.4,"ew_1M":7.9,"med_1M":6.6,"cw_3M":9.3,"ew_3M":15.8,"med_3M":25.4,"pct_positive_3M":57.1,"cw_6M":120.9,"ew_6M":115.4,"med_6M":91.4,"cw_12M":207.6,"ew_12M":461.6,"med_12M":333.6,"pct_above_50dma":71.4,"pct_above_200dma":100.0,"pct_within_5pct_of_52wh":28.6,"median_pct_from_52wh":-24.1,"median_pe":22.1,"median_fwd_pe":14.1,"median_div_yield":0.1,"median_cy_growth":96.6,"median_ny_growth":23.6,"median_cq_growth":153.2,"median_nq_growth":104.0,"fwd_pe_over_ny_growth":0.6,"Sector":"technology","rs_3m":6.2},{"Industry":"insurance-property-casualty","n":8,"market_cap":487546793984.0,"cw_1W":-2.0,"ew_1W":-1.7,"med_1W":-2.2,"cw_1M":0.9,"ew_1M":0.1,"med_1M":-0.1,"cw_3M":9.1,"ew_3M":8.5,"med_3M":6.0,"pct_positive_3M":100.0,"cw_6M":10.3,"ew_6M":12.4,"med_6M":5.4,"cw_12M":14.8,"ew_12M":18.8,"med_12M":18.5,"pct_above_50dma":37.5,"pct_above_200dma":100.0,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-7.3,"median_pe":11.5,"median_fwd_pe":12.9,"median_div_yield":1.2,"median_cy_growth":9.0,"median_ny_growth":-0.3,"median_cq_growth":-15.7,"median_nq_growth":-7.3,"fwd_pe_over_ny_growth":-37.9,"Sector":"financial-services","rs_3m":5.9},{"Industry":"utilities-independent-power-producers","n":3,"market_cap":174541060096.0,"cw_1W":0.9,"ew_1W":1.4,"med_1W":1.4,"cw_1M":0.8,"ew_1M":-0.8,"med_1M":1.2,"cw_3M":7.6,"ew_3M":3.1,"med_3M":1.5,"pct_positive_3M":66.7,"cw_6M":-8.9,"ew_6M":-12.3,"med_6M":-6.8,"cw_12M":-19.2,"ew_12M":-22.7,"med_12M":-28.7,"pct_above_50dma":33.3,"pct_above_200dma":0.0,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-31.6,"median_pe":27.9,"median_fwd_pe":14.3,"median_div_yield":0.6,"median_cy_growth":29.0,"median_ny_growth":10.1,"median_cq_growth":23.2,"median_nq_growth":156.8,"fwd_pe_over_ny_growth":1.4,"Sector":"utilities","rs_3m":4.4},{"Industry":"asset-management","n":13,"market_cap":791518609408.0,"cw_1W":-4.3,"ew_1W":-3.1,"med_1W":-3.6,"cw_1M":-6.3,"ew_1M":-3.4,"med_1M":-4.3,"cw_3M":7.4,"ew_3M":8.8,"med_3M":6.8,"pct_positive_3M":84.6,"cw_6M":28.1,"ew_6M":33.3,"med_6M":29.7,"cw_12M":-4.5,"ew_12M":17.3,"med_12M":5.5,"pct_above_50dma":46.2,"pct_above_200dma":92.3,"pct_within_5pct_of_52wh":46.2,"median_pct_from_52wh":-5.9,"median_pe":17.1,"median_fwd_pe":12.2,"median_div_yield":2.1,"median_cy_growth":18.4,"median_ny_growth":14.3,"median_cq_growth":14.4,"median_nq_growth":17.2,"fwd_pe_over_ny_growth":0.9,"Sector":"financial-services","rs_3m":4.3},{"Industry":"drug-manufacturers-general","n":9,"market_cap":3146260998144.0,"cw_1W":-4.8,"ew_1W":-5.4,"med_1W":-4.6,"cw_1M":-1.1,"ew_1M":1.3,"med_1M":3.4,"cw_3M":7.3,"ew_3M":10.6,"med_3M":12.0,"pct_positive_3M":88.9,"cw_6M":12.9,"ew_6M":11.8,"med_6M":10.9,"cw_12M":44.6,"ew_12M":43.0,"med_12M":41.5,"pct_above_50dma":77.8,"pct_above_200dma":100.0,"pct_within_5pct_of_52wh":44.4,"median_pct_from_52wh":-6.5,"median_pe":36.5,"median_fwd_pe":15.1,"median_div_yield":2.3,"median_cy_growth":2.7,"median_ny_growth":16.2,"median_cq_growth":-12.8,"median_nq_growth":23.0,"fwd_pe_over_ny_growth":0.9,"Sector":"healthcare","rs_3m":4.1},{"Industry":"insurance-life","n":4,"market_cap":173817204736.0,"cw_1W":-2.6,"ew_1W":-2.7,"med_1W":-2.8,"cw_1M":-1.9,"ew_1M":-2.3,"med_1M":-2.8,"cw_3M":7.0,"ew_3M":7.1,"med_3M":7.7,"pct_positive_3M":75.0,"cw_6M":24.9,"ew_6M":26.4,"med_6M":28.1,"cw_12M":18.4,"ew_12M":19.7,"med_12M":21.5,"pct_above_50dma":50.0,"pct_above_200dma":100.0,"pct_within_5pct_of_52wh":50.0,"median_pct_from_52wh":-5.8,"median_pe":11.9,"median_fwd_pe":9.6,"median_div_yield":2.2,"median_cy_growth":4.4,"median_ny_growth":6.3,"median_cq_growth":-8.5,"median_nq_growth":6.7,"fwd_pe_over_ny_growth":1.5,"Sector":"financial-services","rs_3m":3.9},{"Industry":"telecom-services","n":5,"market_cap":693498718208.0,"cw_1W":-1.8,"ew_1W":-2.5,"med_1W":-3.0,"cw_1M":4.9,"ew_1M":2.9,"med_1M":3.5,"cw_3M":7.0,"ew_3M":6.9,"med_3M":6.6,"pct_positive_3M":80.0,"cw_6M":-7.3,"ew_6M":-12.0,"med_6M":-14.0,"cw_12M":-8.1,"ew_12M":-13.0,"med_12M":-15.8,"pct_above_50dma":100.0,"pct_above_200dma":40.0,"pct_within_5pct_of_52wh":20.0,"median_pct_from_52wh":-20.4,"median_pe":8.6,"median_fwd_pe":9.6,"median_div_yield":4.3,"median_cy_growth":10.3,"median_ny_growth":8.0,"median_cq_growth":11.8,"median_nq_growth":5.3,"fwd_pe_over_ny_growth":1.2,"Sector":"communication-services","rs_3m":3.8},{"Industry":"internet-retail","n":3,"market_cap":2905162702848.0,"cw_1W":-1.0,"ew_1W":-2.7,"med_1W":-0.8,"cw_1M":-3.8,"ew_1M":-1.1,"med_1M":-3.9,"cw_3M":6.8,"ew_3M":11.9,"med_3M":6.3,"pct_positive_3M":66.7,"cw_6M":22.6,"ew_6M":22.6,"med_6M":22.6,"cw_12M":10.2,"ew_12M":3.2,"med_12M":11.5,"pct_above_50dma":33.3,"pct_above_200dma":100.0,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-9.6,"median_pe":22.6,"median_fwd_pe":24.7,"median_div_yield":0.0,"median_cy_growth":22.5,"median_ny_growth":9.9,"median_cq_growth":3.8,"median_nq_growth":25.3,"fwd_pe_over_ny_growth":2.5,"Sector":"consumer-cyclical","rs_3m":3.6},{"Industry":"travel-services","n":6,"market_cap":377918899712.0,"cw_1W":-7.5,"ew_1W":-6.0,"med_1W":-6.1,"cw_1M":-14.1,"ew_1M":-15.3,"med_1M":-16.7,"cw_3M":6.2,"ew_3M":1.9,"med_3M":-1.5,"pct_positive_3M":50.0,"cw_6M":9.2,"ew_6M":5.2,"med_6M":0.9,"cw_12M":-8.2,"ew_12M":-6.9,"med_12M":-21.2,"pct_above_50dma":16.7,"pct_above_200dma":33.3,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-22.9,"median_pe":16.9,"median_fwd_pe":12.2,"median_div_yield":0.8,"median_cy_growth":14.2,"median_ny_growth":16.7,"median_cq_growth":11.4,"median_nq_growth":19.5,"fwd_pe_over_ny_growth":0.7,"Sector":"consumer-cyclical","rs_3m":3.0},{"Industry":"capital-markets","n":5,"market_cap":1078724386816.0,"cw_1W":-2.3,"ew_1W":-3.3,"med_1W":-1.7,"cw_1M":0.6,"ew_1M":3.0,"med_1M":-0.3,"cw_3M":5.8,"ew_3M":9.5,"med_3M":3.0,"pct_positive_3M":80.0,"cw_6M":33.8,"ew_6M":35.1,"med_6M":36.8,"cw_12M":30.7,"ew_12M":27.8,"med_12M":36.4,"pct_above_50dma":40.0,"pct_above_200dma":100.0,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-6.9,"median_pe":19.5,"median_fwd_pe":15.7,"median_div_yield":1.1,"median_cy_growth":27.2,"median_ny_growth":17.8,"median_cq_growth":21.4,"median_nq_growth":11.8,"fwd_pe_over_ny_growth":0.9,"Sector":"financial-services","rs_3m":2.7},{"Industry":"railroads","n":4,"market_cap":379407966208.0,"cw_1W":-1.1,"ew_1W":-0.8,"med_1W":-0.9,"cw_1M":-3.1,"ew_1M":-3.3,"med_1M":-3.4,"cw_3M":5.4,"ew_3M":5.5,"med_3M":5.1,"pct_positive_3M":100.0,"cw_6M":18.1,"ew_6M":18.0,"med_6M":17.9,"cw_12M":37.6,"ew_12M":39.8,"med_12M":42.5,"pct_above_50dma":0.0,"pct_above_200dma":100.0,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-7.9,"median_pe":27.9,"median_fwd_pe":22.0,"median_div_yield":1.4,"median_cy_growth":16.5,"median_ny_growth":11.9,"median_cq_growth":14.8,"median_nq_growth":20.2,"fwd_pe_over_ny_growth":1.9,"Sector":"industrials","rs_3m":2.3},{"Industry":"financial-data-stock-exchanges","n":10,"market_cap":594319492096.0,"cw_1W":-5.9,"ew_1W":-6.6,"med_1W":-5.8,"cw_1M":1.9,"ew_1M":1.2,"med_1M":-0.2,"cw_3M":5.4,"ew_3M":4.4,"med_3M":5.7,"pct_positive_3M":70.0,"cw_6M":0.3,"ew_6M":2.8,"med_6M":1.9,"cw_12M":-15.6,"ew_12M":-13.5,"med_12M":-6.4,"pct_above_50dma":30.0,"pct_above_200dma":50.0,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-13.5,"median_pe":22.8,"median_fwd_pe":19.9,"median_div_yield":1.1,"median_cy_growth":11.5,"median_ny_growth":11.5,"median_cq_growth":9.0,"median_nq_growth":10.3,"fwd_pe_over_ny_growth":1.7,"Sector":"financial-services","rs_3m":2.2},{"Industry":"oil-gas-midstream","n":4,"market_cap":280878256128.0,"cw_1W":-0.9,"ew_1W":-0.9,"med_1W":-1.0,"cw_1M":1.8,"ew_1M":2.3,"med_1M":2.0,"cw_3M":4.6,"ew_3M":5.1,"med_3M":5.7,"pct_positive_3M":75.0,"cw_6M":6.5,"ew_6M":8.8,"med_6M":8.9,"cw_12M":36.4,"ew_12M":41.6,"med_12M":33.9,"pct_above_50dma":75.0,"pct_above_200dma":100.0,"pct_within_5pct_of_52wh":50.0,"median_pct_from_52wh":-5.4,"median_pe":23.8,"median_fwd_pe":22.0,"median_div_yield":3.3,"median_cy_growth":18.1,"median_ny_growth":6.0,"median_cq_growth":9.1,"median_nq_growth":4.6,"fwd_pe_over_ny_growth":3.7,"Sector":"energy","rs_3m":1.4},{"Industry":"banks-regional","n":9,"market_cap":454006347776.0,"cw_1W":-0.9,"ew_1W":-0.9,"med_1W":-1.0,"cw_1M":-4.2,"ew_1M":-4.4,"med_1M":-4.4,"cw_3M":4.6,"ew_3M":3.8,"med_3M":5.2,"pct_positive_3M":77.8,"cw_6M":21.3,"ew_6M":20.7,"med_6M":22.4,"cw_12M":22.8,"ew_12M":21.8,"med_12M":24.3,"pct_above_50dma":0.0,"pct_above_200dma":100.0,"pct_within_5pct_of_52wh":22.2,"median_pct_from_52wh":-6.1,"median_pe":12.8,"median_fwd_pe":10.8,"median_div_yield":3.3,"median_cy_growth":13.8,"median_ny_growth":13.8,"median_cq_growth":5.2,"median_nq_growth":15.2,"fwd_pe_over_ny_growth":0.8,"Sector":"financial-services","rs_3m":1.4},{"Industry":"packaging-containers","n":6,"market_cap":110221119488.0,"cw_1W":-4.0,"ew_1W":-3.9,"med_1W":-4.7,"cw_1M":-9.3,"ew_1M":-8.8,"med_1M":-8.2,"cw_3M":4.4,"ew_3M":4.7,"med_3M":5.9,"pct_positive_3M":83.3,"cw_6M":5.0,"ew_6M":4.5,"med_6M":4.2,"cw_12M":1.6,"ew_12M":4.0,"med_12M":7.1,"pct_above_50dma":0.0,"pct_above_200dma":66.7,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-12.7,"median_pe":18.1,"median_fwd_pe":13.0,"median_div_yield":3.2,"median_cy_growth":13.1,"median_ny_growth":17.8,"median_cq_growth":5.1,"median_nq_growth":21.4,"fwd_pe_over_ny_growth":0.7,"Sector":"consumer-cyclical","rs_3m":1.2},{"Industry":"insurance-brokers","n":6,"market_cap":274507316224.0,"cw_1W":-7.6,"ew_1W":-7.5,"med_1W":-7.6,"cw_1M":-8.2,"ew_1M":-7.5,"med_1M":-6.6,"cw_3M":4.3,"ew_3M":7.8,"med_3M":9.1,"pct_positive_3M":83.3,"cw_6M":5.2,"ew_6M":5.1,"med_6M":3.3,"cw_12M":-14.6,"ew_12M":-16.2,"med_12M":-16.6,"pct_above_50dma":0.0,"pct_above_200dma":50.0,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-21.1,"median_pe":21.4,"median_fwd_pe":15.2,"median_div_yield":1.1,"median_cy_growth":8.6,"median_ny_growth":9.2,"median_cq_growth":8.6,"median_nq_growth":6.0,"fwd_pe_over_ny_growth":1.7,"Sector":"financial-services","rs_3m":1.2},{"Industry":"insurance-diversified","n":3,"market_cap":109092339712.0,"cw_1W":-2.7,"ew_1W":-2.8,"med_1W":-2.6,"cw_1M":-0.9,"ew_1M":-0.9,"med_1M":-1.1,"cw_3M":4.1,"ew_3M":4.3,"med_3M":5.4,"pct_positive_3M":100.0,"cw_6M":1.3,"ew_6M":1.4,"med_6M":2.0,"cw_12M":3.3,"ew_12M":3.6,"med_12M":5.8,"pct_above_50dma":0.0,"pct_above_200dma":33.3,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-9.8,"median_pe":9.4,"median_fwd_pe":9.8,"median_div_yield":1.7,"median_cy_growth":-4.7,"median_ny_growth":7.3,"median_cq_growth":-19.1,"median_nq_growth":-17.0,"fwd_pe_over_ny_growth":1.4,"Sector":"financial-services","rs_3m":0.9},{"Industry":"medical-devices","n":10,"market_cap":618440406016.0,"cw_1W":-6.8,"ew_1W":-7.4,"med_1W":-7.1,"cw_1M":-10.3,"ew_1M":-9.9,"med_1M":-9.2,"cw_3M":3.7,"ew_3M":1.6,"med_3M":0.6,"pct_positive_3M":50.0,"cw_6M":-9.5,"ew_6M":-7.9,"med_6M":-2.4,"cw_12M":-23.4,"ew_12M":-18.4,"med_12M":-14.3,"pct_above_50dma":20.0,"pct_above_200dma":30.0,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-22.3,"median_pe":25.3,"median_fwd_pe":16.6,"median_div_yield":0.6,"median_cy_growth":8.9,"median_ny_growth":9.8,"median_cq_growth":10.0,"median_nq_growth":10.0,"fwd_pe_over_ny_growth":1.7,"Sector":"healthcare","rs_3m":0.5},{"Industry":"farm-products","n":3,"market_cap":83951015936.0,"cw_1W":2.4,"ew_1W":2.3,"med_1W":2.4,"cw_1M":6.3,"ew_1M":5.2,"med_1M":9.5,"cw_3M":3.5,"ew_3M":1.7,"med_3M":-1.7,"pct_positive_3M":33.3,"cw_6M":5.6,"ew_6M":2.7,"med_6M":-1.5,"cw_12M":33.2,"ew_12M":32.3,"med_12M":45.3,"pct_above_50dma":66.7,"pct_above_200dma":66.7,"pct_within_5pct_of_52wh":33.3,"median_pct_from_52wh":-6.3,"median_pe":26.4,"median_fwd_pe":12.7,"median_div_yield":2.3,"median_cy_growth":27.3,"median_ny_growth":11.2,"median_cq_growth":8.9,"median_nq_growth":57.4,"fwd_pe_over_ny_growth":1.1,"Sector":"consumer-defensive","rs_3m":0.3},{"Industry":"beverages-non-alcoholic","n":4,"market_cap":693824352256.0,"cw_1W":-1.2,"ew_1W":-2.1,"med_1W":-1.6,"cw_1M":0.4,"ew_1M":0.4,"med_1M":0.6,"cw_3M":2.1,"ew_3M":-0.2,"med_3M":-1.5,"pct_positive_3M":50.0,"cw_6M":6.2,"ew_6M":8.5,"med_6M":14.0,"cw_12M":22.0,"ew_12M":22.4,"med_12M":26.1,"pct_above_50dma":50.0,"pct_above_200dma":75.0,"pct_within_5pct_of_52wh":25.0,"median_pct_from_52wh":-9.7,"median_pe":29.1,"median_fwd_pe":20.1,"median_div_yield":2.6,"median_cy_growth":11.0,"median_ny_growth":8.7,"median_cq_growth":9.8,"median_nq_growth":12.3,"fwd_pe_over_ny_growth":2.3,"Sector":"consumer-defensive","rs_3m":-1.1},{"Industry":"specialty-industrial-machinery","n":17,"market_cap":1048410249728.0,"cw_1W":1.3,"ew_1W":-0.3,"med_1W":-0.7,"cw_1M":-8.5,"ew_1M":-8.8,"med_1M":-8.3,"cw_3M":2.0,"ew_3M":-1.9,"med_3M":-0.3,"pct_positive_3M":47.1,"cw_6M":9.0,"ew_6M":2.2,"med_6M":4.1,"cw_12M":20.8,"ew_12M":11.1,"med_12M":15.6,"pct_above_50dma":23.5,"pct_above_200dma":52.9,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-18.4,"median_pe":30.1,"median_fwd_pe":21.0,"median_div_yield":1.3,"median_cy_growth":11.0,"median_ny_growth":10.5,"median_cq_growth":10.3,"median_nq_growth":10.4,"fwd_pe_over_ny_growth":2.0,"Sector":"industrials","rs_3m":-1.1},{"Industry":"packaged-foods","n":7,"market_cap":99645858304.0,"cw_1W":-4.7,"ew_1W":-5.0,"med_1W":-5.1,"cw_1M":-3.4,"ew_1M":-4.2,"med_1M":-3.1,"cw_3M":1.8,"ew_3M":1.4,"med_3M":4.7,"pct_positive_3M":71.4,"cw_6M":1.6,"ew_6M":0.4,"med_6M":-5.9,"cw_12M":-13.3,"ew_12M":-14.1,"med_12M":-18.6,"pct_above_50dma":14.3,"pct_above_200dma":28.6,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-24.4,"median_pe":8.5,"median_fwd_pe":11.4,"median_div_yield":6.6,"median_cy_growth":-13.3,"median_ny_growth":4.5,"median_cq_growth":-16.9,"median_nq_growth":-9.3,"fwd_pe_over_ny_growth":2.6,"Sector":"consumer-defensive","rs_3m":-1.3},{"Industry":"electronic-components","n":4,"market_cap":444774154240.0,"cw_1W":5.7,"ew_1W":5.4,"med_1W":3.1,"cw_1M":-1.9,"ew_1M":-3.9,"med_1M":-1.0,"cw_3M":1.4,"ew_3M":-2.1,"med_3M":-1.6,"pct_positive_3M":50.0,"cw_6M":24.9,"ew_6M":22.7,"med_6M":27.2,"cw_12M":52.0,"ew_12M":53.8,"med_12M":44.8,"pct_above_50dma":75.0,"pct_above_200dma":75.0,"pct_within_5pct_of_52wh":25.0,"median_pct_from_52wh":-15.7,"median_pe":40.9,"median_fwd_pe":22.3,"median_div_yield":0.6,"median_cy_growth":30.8,"median_ny_growth":27.3,"median_cq_growth":28.0,"median_nq_growth":27.1,"fwd_pe_over_ny_growth":0.8,"Sector":"technology","rs_3m":-1.8},{"Industry":"industrial-distribution","n":3,"market_cap":123315776000.0,"cw_1W":-1.5,"ew_1W":-2.8,"med_1W":-2.5,"cw_1M":-4.2,"ew_1M":-6.7,"med_1M":-5.6,"cw_3M":1.2,"ew_3M":-1.6,"med_3M":-2.4,"pct_positive_3M":33.3,"cw_6M":12.5,"ew_6M":5.0,"med_6M":10.2,"cw_12M":10.4,"ew_12M":-3.2,"med_12M":5.0,"pct_above_50dma":33.3,"pct_above_200dma":66.7,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-8.5,"median_pe":32.7,"median_fwd_pe":25.1,"median_div_yield":1.9,"median_cy_growth":15.7,"median_ny_growth":9.9,"median_cq_growth":14.4,"median_nq_growth":15.6,"fwd_pe_over_ny_growth":2.5,"Sector":"industrials","rs_3m":-1.9},{"Industry":"semiconductors","n":13,"market_cap":10314070602752.0,"cw_1W":0.1,"ew_1W":6.1,"med_1W":5.2,"cw_1M":-2.4,"ew_1M":0.7,"med_1M":-1.2,"cw_3M":0.5,"ew_3M":-8.5,"med_3M":-9.1,"pct_positive_3M":23.1,"cw_6M":34.8,"ew_6M":55.5,"med_6M":32.0,"cw_12M":43.6,"ew_12M":110.4,"med_12M":45.4,"pct_above_50dma":53.8,"pct_above_200dma":61.5,"pct_within_5pct_of_52wh":7.7,"median_pct_from_52wh":-24.7,"median_pe":45.0,"median_fwd_pe":17.8,"median_div_yield":0.7,"median_cy_growth":64.9,"median_ny_growth":27.2,"median_cq_growth":63.2,"median_nq_growth":69.3,"fwd_pe_over_ny_growth":0.7,"Sector":"technology","rs_3m":-2.7},{"Industry":"information-technology-services","n":10,"market_cap":473397532160.0,"cw_1W":-1.0,"ew_1W":-4.0,"med_1W":-4.4,"cw_1M":2.3,"ew_1M":2.9,"med_1M":2.6,"cw_3M":0.1,"ew_3M":13.8,"med_3M":17.6,"pct_positive_3M":90.0,"cw_6M":-2.5,"ew_6M":-2.2,"med_6M":-3.0,"cw_12M":-14.2,"ew_12M":-18.7,"med_12M":-22.8,"pct_above_50dma":90.0,"pct_above_200dma":30.0,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-32.3,"median_pe":16.1,"median_fwd_pe":11.8,"median_div_yield":2.0,"median_cy_growth":8.9,"median_ny_growth":8.3,"median_cq_growth":5.7,"median_nq_growth":6.9,"fwd_pe_over_ny_growth":1.4,"Sector":"technology","rs_3m":-3.1},{"Industry":"farm-heavy-construction-machinery","n":3,"market_cap":623073497088.0,"cw_1W":0.4,"ew_1W":-0.6,"med_1W":-1.4,"cw_1M":-1.0,"ew_1M":-0.6,"med_1M":-4.3,"cw_3M":-0.5,"ew_3M":5.1,"med_3M":4.7,"pct_positive_3M":66.7,"cw_6M":15.6,"ew_6M":13.0,"med_6M":16.0,"cw_12M":68.9,"ew_12M":56.0,"med_12M":45.2,"pct_above_50dma":33.3,"pct_above_200dma":100.0,"pct_within_5pct_of_52wh":33.3,"median_pct_from_52wh":-11.0,"median_pe":35.2,"median_fwd_pe":25.3,"median_div_yield":1.0,"median_cy_growth":32.6,"median_ny_growth":20.7,"median_cq_growth":39.7,"median_nq_growth":36.4,"fwd_pe_over_ny_growth":1.2,"Sector":"industrials","rs_3m":-3.7},{"Industry":"entertainment","n":10,"market_cap":749722381312.0,"cw_1W":-3.8,"ew_1W":-3.2,"med_1W":-3.7,"cw_1M":2.7,"ew_1M":2.3,"med_1M":3.1,"cw_3M":-0.6,"ew_3M":1.0,"med_3M":0.1,"pct_positive_3M":50.0,"cw_6M":-5.2,"ew_6M":7.8,"med_6M":8.6,"cw_12M":-18.4,"ew_12M":8.7,"med_12M":1.3,"pct_above_50dma":90.0,"pct_above_200dma":70.0,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-11.1,"median_pe":23.2,"median_fwd_pe":19.9,"median_div_yield":0.8,"median_cy_growth":10.4,"median_ny_growth":11.4,"median_cq_growth":45.8,"median_nq_growth":22.2,"fwd_pe_over_ny_growth":1.7,"Sector":"communication-services","rs_3m":-3.8},{"Industry":"household-personal-products","n":7,"market_cap":541679489024.0,"cw_1W":-2.6,"ew_1W":-4.9,"med_1W":-4.5,"cw_1M":-1.3,"ew_1M":-4.7,"med_1M":-6.3,"cw_3M":-1.0,"ew_3M":-1.2,"med_3M":-2.2,"pct_positive_3M":14.3,"cw_6M":-0.6,"ew_6M":-0.0,"med_6M":-0.1,"cw_12M":-3.5,"ew_12M":-3.8,"med_12M":0.9,"pct_above_50dma":14.3,"pct_above_200dma":28.6,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-11.8,"median_pe":21.9,"median_fwd_pe":19.6,"median_div_yield":3.0,"median_cy_growth":5.0,"median_ny_growth":6.0,"median_cq_growth":5.2,"median_nq_growth":0.0,"fwd_pe_over_ny_growth":3.3,"Sector":"consumer-defensive","rs_3m":-4.2},{"Industry":"medical-instruments-supplies","n":8,"market_cap":284710564864.0,"cw_1W":-3.2,"ew_1W":-6.3,"med_1W":-5.1,"cw_1M":-7.0,"ew_1M":-8.5,"med_1M":-5.6,"cw_3M":-1.2,"ew_3M":2.7,"med_3M":7.6,"pct_positive_3M":62.5,"cw_6M":-8.2,"ew_6M":8.1,"med_6M":3.7,"cw_12M":-6.3,"ew_12M":4.8,"med_12M":6.4,"pct_above_50dma":37.5,"pct_above_200dma":50.0,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-19.1,"median_pe":23.6,"median_fwd_pe":12.7,"median_div_yield":0.1,"median_cy_growth":9.0,"median_ny_growth":7.4,"median_cq_growth":3.8,"median_nq_growth":9.6,"fwd_pe_over_ny_growth":1.7,"Sector":"healthcare","rs_3m":-4.4},{"Industry":"communication-equipment","n":6,"market_cap":751062798336.0,"cw_1W":4.8,"ew_1W":5.6,"med_1W":6.3,"cw_1M":-6.9,"ew_1M":-5.3,"med_1M":-4.1,"cw_3M":-1.4,"ew_3M":13.3,"med_3M":9.1,"pct_positive_3M":66.7,"cw_6M":44.2,"ew_6M":60.5,"med_6M":48.0,"cw_12M":78.2,"ew_12M":145.2,"med_12M":113.7,"pct_above_50dma":66.7,"pct_above_200dma":83.3,"pct_within_5pct_of_52wh":16.7,"median_pct_from_52wh":-10.3,"median_pe":32.9,"median_fwd_pe":21.7,"median_div_yield":0.5,"median_cy_growth":64.9,"median_ny_growth":14.7,"median_cq_growth":68.4,"median_nq_growth":42.6,"fwd_pe_over_ny_growth":1.5,"Sector":"technology","rs_3m":-4.6},{"Industry":"scientific-technical-instruments","n":6,"market_cap":230058706944.0,"cw_1W":4.7,"ew_1W":2.2,"med_1W":0.9,"cw_1M":-9.2,"ew_1M":-8.0,"med_1M":-9.7,"cw_3M":-1.5,"ew_3M":1.1,"med_3M":-1.8,"pct_positive_3M":33.3,"cw_6M":13.7,"ew_6M":8.0,"med_6M":9.9,"cw_12M":51.1,"ew_12M":52.4,"med_12M":18.7,"pct_above_50dma":66.7,"pct_above_200dma":50.0,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-13.6,"median_pe":29.2,"median_fwd_pe":22.2,"median_div_yield":0.0,"median_cy_growth":17.8,"median_ny_growth":10.5,"median_cq_growth":15.0,"median_nq_growth":9.5,"fwd_pe_over_ny_growth":2.1,"Sector":"technology","rs_3m":-4.6},{"Industry":"specialty-retail","n":5,"market_cap":109012267008.0,"cw_1W":-4.8,"ew_1W":-4.0,"med_1W":-1.9,"cw_1M":-8.3,"ew_1M":-6.2,"med_1M":-7.7,"cw_3M":-2.7,"ew_3M":2.3,"med_3M":6.3,"pct_positive_3M":80.0,"cw_6M":-0.9,"ew_6M":5.0,"med_6M":-8.5,"cw_12M":-1.2,"ew_12M":3.4,"med_12M":13.2,"pct_above_50dma":60.0,"pct_above_200dma":40.0,"pct_within_5pct_of_52wh":20.0,"median_pct_from_52wh":-22.6,"median_pe":19.9,"median_fwd_pe":17.1,"median_div_yield":1.3,"median_cy_growth":9.3,"median_ny_growth":9.2,"median_cq_growth":6.4,"median_nq_growth":3.9,"fwd_pe_over_ny_growth":1.8,"Sector":"consumer-cyclical","rs_3m":-5.9},{"Industry":"internet-content-information","n":3,"market_cap":9893225431040.0,"cw_1W":0.1,"ew_1W":1.3,"med_1W":-1.0,"cw_1M":0.4,"ew_1M":2.9,"med_1M":-1.4,"cw_3M":-2.8,"ew_3M":1.0,"med_3M":-5.3,"pct_positive_3M":33.3,"cw_6M":9.5,"ew_6M":8.0,"med_6M":10.8,"cw_12M":27.7,"ew_12M":22.9,"med_12M":40.4,"pct_above_50dma":33.3,"pct_above_200dma":100.0,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-15.8,"median_pe":17.0,"median_fwd_pe":22.6,"median_div_yield":0.3,"median_cy_growth":90.6,"median_ny_growth":-27.8,"median_cq_growth":4.8,"median_nq_growth":18.4,"fwd_pe_over_ny_growth":-0.8,"Sector":"communication-services","rs_3m":-6.0},{"Industry":"healthcare-plans","n":6,"market_cap":708352266240.0,"cw_1W":-3.2,"ew_1W":-1.6,"med_1W":-1.9,"cw_1M":-2.2,"ew_1M":0.8,"med_1M":0.9,"cw_3M":-2.8,"ew_3M":1.0,"med_3M":0.1,"pct_positive_3M":50.0,"cw_6M":38.6,"ew_6M":60.3,"med_6M":42.1,"cw_12M":20.9,"ew_12M":40.5,"med_12M":35.6,"pct_above_50dma":50.0,"pct_above_200dma":100.0,"pct_within_5pct_of_52wh":50.0,"median_pct_from_52wh":-5.5,"median_pe":21.5,"median_fwd_pe":13.3,"median_div_yield":1.9,"median_cy_growth":10.2,"median_ny_growth":9.4,"median_cq_growth":-13.5,"median_nq_growth":-3.4,"fwd_pe_over_ny_growth":1.4,"Sector":"healthcare","rs_3m":-6.0},{"Industry":"aerospace-defense","n":12,"market_cap":1324570595328.0,"cw_1W":-3.2,"ew_1W":-3.6,"med_1W":-2.5,"cw_1M":-11.7,"ew_1M":-12.3,"med_1M":-11.2,"cw_3M":-3.0,"ew_3M":-5.5,"med_3M":-5.3,"pct_positive_3M":16.7,"cw_6M":-5.6,"ew_6M":-10.9,"med_6M":-6.4,"cw_12M":7.7,"ew_12M":2.4,"med_12M":2.3,"pct_above_50dma":0.0,"pct_above_200dma":25.0,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-21.4,"median_pe":29.7,"median_fwd_pe":21.4,"median_div_yield":0.8,"median_cy_growth":11.9,"median_ny_growth":12.5,"median_cq_growth":12.2,"median_nq_growth":11.9,"fwd_pe_over_ny_growth":1.7,"Sector":"industrials","rs_3m":-6.2},{"Industry":"specialty-chemicals","n":9,"market_cap":532109625344.0,"cw_1W":-3.2,"ew_1W":-3.9,"med_1W":-3.3,"cw_1M":-4.1,"ew_1M":-4.8,"med_1M":-4.2,"cw_3M":-3.7,"ew_3M":-3.5,"med_3M":1.4,"pct_positive_3M":55.6,"cw_6M":-2.0,"ew_6M":-2.1,"med_6M":0.6,"cw_12M":3.3,"ew_12M":17.1,"med_12M":4.1,"pct_above_50dma":22.2,"pct_above_200dma":44.4,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-14.4,"median_pe":29.9,"median_fwd_pe":20.2,"median_div_yield":1.9,"median_cy_growth":8.6,"median_ny_growth":9.7,"median_cq_growth":5.1,"median_nq_growth":12.6,"fwd_pe_over_ny_growth":2.1,"Sector":"basic-materials","rs_3m":-6.9},{"Industry":"oil-gas-equipment-services","n":3,"market_cap":171769059328.0,"cw_1W":-4.3,"ew_1W":-4.5,"med_1W":-3.9,"cw_1M":1.5,"ew_1M":2.4,"med_1M":7.1,"cw_3M":-3.8,"ew_3M":-5.1,"med_3M":-6.6,"pct_positive_3M":33.3,"cw_6M":15.0,"ew_6M":12.4,"med_6M":6.4,"cw_12M":47.1,"ew_12M":49.5,"med_12M":58.8,"pct_above_50dma":66.7,"pct_above_200dma":100.0,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-14.6,"median_pe":19.0,"median_fwd_pe":17.3,"median_div_yield":1.9,"median_cy_growth":-2.9,"median_ny_growth":23.5,"median_cq_growth":-9.5,"median_nq_growth":-6.5,"fwd_pe_over_ny_growth":0.7,"Sector":"energy","rs_3m":-7.0},{"Industry":"reit-specialty","n":7,"market_cap":358522350592.0,"cw_1W":-0.5,"ew_1W":-1.2,"med_1W":-0.3,"cw_1M":-1.6,"ew_1M":-2.2,"med_1M":-2.5,"cw_3M":-3.9,"ew_3M":-6.1,"med_3M":-7.4,"pct_positive_3M":14.3,"cw_6M":3.3,"ew_6M":1.9,"med_6M":2.4,"cw_12M":8.7,"ew_12M":5.5,"med_12M":-1.7,"pct_above_50dma":42.9,"pct_above_200dma":57.1,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-13.4,"median_pe":33.4,"median_fwd_pe":32.8,"median_div_yield":3.0,"median_cy_growth":22.0,"median_ny_growth":6.1,"median_cq_growth":6.2,"median_nq_growth":10.3,"fwd_pe_over_ny_growth":5.3,"Sector":"real-estate","rs_3m":-7.0},{"Industry":"airlines","n":3,"market_cap":107391438848.0,"cw_1W":1.3,"ew_1W":1.3,"med_1W":1.3,"cw_1M":-11.7,"ew_1M":-11.9,"med_1M":-12.2,"cw_3M":-3.9,"ew_3M":-5.2,"med_3M":-2.5,"pct_positive_3M":0.0,"cw_6M":26.8,"ew_6M":22.7,"med_6M":26.9,"cw_12M":19.6,"ew_12M":20.7,"med_12M":28.4,"pct_above_50dma":0.0,"pct_above_200dma":66.7,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-19.3,"median_pe":13.3,"median_fwd_pe":8.2,"median_div_yield":1.0,"median_cy_growth":9.8,"median_ny_growth":44.3,"median_cq_growth":20.5,"median_nq_growth":35.8,"fwd_pe_over_ny_growth":0.2,"Sector":"industrials","rs_3m":-7.1},{"Industry":"reit-retail","n":5,"market_cap":173504713728.0,"cw_1W":-2.5,"ew_1W":-2.2,"med_1W":-2.1,"cw_1M":-4.7,"ew_1M":-3.3,"med_1M":-3.0,"cw_3M":-4.2,"ew_3M":-5.7,"med_3M":-5.7,"pct_positive_3M":0.0,"cw_6M":3.5,"ew_6M":3.8,"med_6M":3.4,"cw_12M":12.8,"ew_12M":12.3,"med_12M":9.0,"pct_above_50dma":0.0,"pct_above_200dma":80.0,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-10.0,"median_pe":25.1,"median_fwd_pe":30.1,"median_div_yield":4.3,"median_cy_growth":-1.0,"median_ny_growth":1.8,"median_cq_growth":4.5,"median_nq_growth":9.3,"fwd_pe_over_ny_growth":16.4,"Sector":"real-estate","rs_3m":-7.4},{"Industry":"engineering-construction","n":4,"market_cap":208502289408.0,"cw_1W":4.8,"ew_1W":3.3,"med_1W":5.1,"cw_1M":-3.9,"ew_1M":-3.8,"med_1M":-3.4,"cw_3M":-4.5,"ew_3M":-1.0,"med_3M":-4.3,"pct_positive_3M":25.0,"cw_6M":15.8,"ew_6M":14.5,"med_6M":12.5,"cw_12M":60.6,"ew_12M":53.6,"med_12M":45.1,"pct_above_50dma":100.0,"pct_above_200dma":100.0,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-17.2,"median_pe":44.4,"median_fwd_pe":24.7,"median_div_yield":0.1,"median_cy_growth":40.8,"median_ny_growth":15.7,"median_cq_growth":38.5,"median_nq_growth":30.1,"fwd_pe_over_ny_growth":1.6,"Sector":"industrials","rs_3m":-7.6},{"Industry":"utilities-regulated-electric","n":23,"market_cap":1021642160128.0,"cw_1W":-1.8,"ew_1W":-1.8,"med_1W":-1.9,"cw_1M":-4.2,"ew_1M":-4.6,"med_1M":-3.6,"cw_3M":-4.6,"ew_3M":-5.2,"med_3M":-3.6,"pct_positive_3M":8.7,"cw_6M":-7.5,"ew_6M":-7.2,"med_6M":-7.4,"cw_12M":7.5,"ew_12M":6.9,"med_12M":7.6,"pct_above_50dma":0.0,"pct_above_200dma":17.4,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-10.7,"median_pe":20.2,"median_fwd_pe":16.7,"median_div_yield":3.4,"median_cy_growth":7.1,"median_ny_growth":7.5,"median_cq_growth":5.6,"median_nq_growth":11.4,"fwd_pe_over_ny_growth":2.2,"Sector":"utilities","rs_3m":-7.8},{"Industry":"auto-parts","n":4,"market_cap":144455269376.0,"cw_1W":-2.3,"ew_1W":-2.3,"med_1W":-2.1,"cw_1M":-5.4,"ew_1M":-4.5,"med_1M":-5.8,"cw_3M":-4.7,"ew_3M":-3.2,"med_3M":-5.7,"pct_positive_3M":25.0,"cw_6M":-11.7,"ew_6M":-9.0,"med_6M":-14.1,"cw_12M":-24.1,"ew_12M":-23.9,"med_12M":-25.4,"pct_above_50dma":25.0,"pct_above_200dma":25.0,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-27.2,"median_pe":23.9,"median_fwd_pe":16.3,"median_div_yield":0.0,"median_cy_growth":4.6,"median_ny_growth":12.7,"median_cq_growth":5.9,"median_nq_growth":12.1,"fwd_pe_over_ny_growth":1.3,"Sector":"consumer-cyclical","rs_3m":-7.9},{"Industry":"restaurants","n":6,"market_cap":409655569408.0,"cw_1W":-4.6,"ew_1W":-5.7,"med_1W":-5.2,"cw_1M":-6.1,"ew_1M":-5.1,"med_1M":-7.8,"cw_3M":-5.0,"ew_3M":-0.8,"med_3M":-1.3,"pct_positive_3M":50.0,"cw_6M":-10.6,"ew_6M":-5.5,"med_6M":-5.3,"cw_12M":-4.5,"ew_12M":-4.7,"med_12M":-4.1,"pct_above_50dma":33.3,"pct_above_200dma":50.0,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-15.0,"median_pe":20.3,"median_fwd_pe":19.1,"median_div_yield":2.4,"median_cy_growth":6.0,"median_ny_growth":9.9,"median_cq_growth":4.9,"median_nq_growth":12.0,"fwd_pe_over_ny_growth":1.9,"Sector":"consumer-cyclical","rs_3m":-8.2},{"Industry":"integrated-freight-logistics","n":5,"market_cap":227439169536.0,"cw_1W":-1.6,"ew_1W":0.4,"med_1W":1.6,"cw_1M":-1.7,"ew_1M":0.1,"med_1M":-2.0,"cw_3M":-5.9,"ew_3M":-4.8,"med_3M":-6.3,"pct_positive_3M":20.0,"cw_6M":11.0,"ew_6M":15.3,"med_6M":10.1,"cw_12M":49.2,"ew_12M":56.5,"med_12M":60.4,"pct_above_50dma":20.0,"pct_above_200dma":60.0,"pct_within_5pct_of_52wh":20.0,"median_pct_from_52wh":-9.2,"median_pe":28.0,"median_fwd_pe":20.4,"median_div_yield":1.6,"median_cy_growth":22.7,"median_ny_growth":18.1,"median_cq_growth":21.4,"median_nq_growth":23.1,"fwd_pe_over_ny_growth":1.1,"Sector":"industrials","rs_3m":-9.1},{"Industry":"reit-residential","n":5,"market_cap":73336249344.0,"cw_1W":-2.8,"ew_1W":-2.8,"med_1W":-2.9,"cw_1M":-5.3,"ew_1M":-5.3,"med_1M":-5.3,"cw_3M":-6.5,"ew_3M":-6.9,"med_3M":-8.6,"pct_positive_3M":0.0,"cw_6M":5.5,"ew_6M":5.1,"med_6M":3.3,"cw_12M":-1.7,"ew_12M":-1.9,"med_12M":-3.9,"pct_above_50dma":0.0,"pct_above_200dma":40.0,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-11.2,"median_pe":34.0,"median_fwd_pe":43.3,"median_div_yield":4.3,"median_cy_growth":-1.3,"median_ny_growth":-14.8,"median_cq_growth":-8.0,"median_nq_growth":5.3,"fwd_pe_over_ny_growth":-2.9,"Sector":"real-estate","rs_3m":-9.7},{"Industry":"building-products-equipment","n":6,"market_cap":266191581696.0,"cw_1W":-0.4,"ew_1W":-2.6,"med_1W":-3.4,"cw_1M":-7.2,"ew_1M":-9.7,"med_1M":-8.4,"cw_3M":-7.1,"ew_3M":-13.0,"med_3M":-12.0,"pct_positive_3M":16.7,"cw_6M":4.2,"ew_6M":-3.3,"med_6M":3.9,"cw_12M":4.1,"ew_12M":-9.8,"med_12M":-5.6,"pct_above_50dma":16.7,"pct_above_200dma":16.7,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-20.5,"median_pe":37.0,"median_fwd_pe":16.0,"median_div_yield":1.3,"median_cy_growth":12.9,"median_ny_growth":14.7,"median_cq_growth":11.1,"median_nq_growth":19.4,"fwd_pe_over_ny_growth":1.1,"Sector":"industrials","rs_3m":-10.3},{"Industry":"reit-industrial","n":3,"market_cap":217740605440.0,"cw_1W":-2.2,"ew_1W":-2.4,"med_1W":-2.4,"cw_1M":-5.2,"ew_1M":-6.0,"med_1M":-6.2,"cw_3M":-7.3,"ew_3M":-7.4,"med_3M":-7.4,"pct_positive_3M":0.0,"cw_6M":3.1,"ew_6M":2.1,"med_6M":1.5,"cw_12M":16.5,"ew_12M":10.9,"med_12M":7.0,"pct_above_50dma":0.0,"pct_above_200dma":33.3,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-10.0,"median_pe":30.2,"median_fwd_pe":29.3,"median_div_yield":4.1,"median_cy_growth":-3.4,"median_ny_growth":2.4,"median_cq_growth":-0.9,"median_nq_growth":-14.4,"fwd_pe_over_ny_growth":12.4,"Sector":"real-estate","rs_3m":-10.5},{"Industry":"auto-manufacturers","n":3,"market_cap":1576468512768.0,"cw_1W":-2.8,"ew_1W":-2.5,"med_1W":-2.9,"cw_1M":10.5,"ew_1M":3.8,"med_1M":1.0,"cw_3M":-7.7,"ew_3M":-2.1,"med_3M":-4.0,"pct_positive_3M":33.3,"cw_6M":-5.8,"ew_6M":9.4,"med_6M":17.1,"cw_12M":7.3,"ew_12M":27.9,"med_12M":28.0,"pct_above_50dma":66.7,"pct_above_200dma":66.7,"pct_within_5pct_of_52wh":33.3,"median_pct_from_52wh":-19.0,"median_pe":38.2,"median_fwd_pe":7.3,"median_div_yield":0.8,"median_cy_growth":26.4,"median_ny_growth":10.7,"median_cq_growth":-8.8,"median_nq_growth":10.1,"fwd_pe_over_ny_growth":0.7,"Sector":"consumer-cyclical","rs_3m":-10.8},{"Industry":"discount-stores","n":5,"market_cap":1371796219904.0,"cw_1W":-1.9,"ew_1W":-4.7,"med_1W":-5.0,"cw_1M":-6.0,"ew_1M":-3.0,"med_1M":-4.7,"cw_3M":-8.1,"ew_3M":2.6,"med_3M":2.9,"pct_positive_3M":60.0,"cw_6M":-10.6,"ew_6M":2.4,"med_6M":-7.5,"cw_12M":6.1,"ew_12M":24.1,"med_12M":19.4,"pct_above_50dma":40.0,"pct_above_200dma":40.0,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-17.2,"median_pe":16.2,"median_fwd_pe":16.3,"median_div_yield":0.9,"median_cy_growth":15.1,"median_ny_growth":5.8,"median_cq_growth":10.0,"median_nq_growth":6.1,"fwd_pe_over_ny_growth":2.8,"Sector":"consumer-defensive","rs_3m":-11.2},{"Industry":"residential-construction","n":4,"market_cap":96687740928.0,"cw_1W":-4.6,"ew_1W":-4.6,"med_1W":-4.7,"cw_1M":-5.8,"ew_1M":-5.6,"med_1M":-6.0,"cw_3M":-9.3,"ew_3M":-8.9,"med_3M":-7.7,"pct_positive_3M":0.0,"cw_6M":-4.0,"ew_6M":-4.7,"med_6M":-2.9,"cw_12M":-24.9,"ew_12M":-24.8,"med_12M":-23.4,"pct_above_50dma":0.0,"pct_above_200dma":0.0,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-25.4,"median_pe":12.8,"median_fwd_pe":12.1,"median_div_yield":1.1,"median_cy_growth":-13.6,"median_ny_growth":12.9,"median_cq_growth":-8.9,"median_nq_growth":4.3,"fwd_pe_over_ny_growth":0.9,"Sector":"consumer-cyclical","rs_3m":-12.5},{"Industry":"building-materials","n":3,"market_cap":127877715968.0,"cw_1W":-2.5,"ew_1W":-2.2,"med_1W":-2.9,"cw_1M":-8.5,"ew_1M":-8.4,"med_1M":-9.3,"cw_3M":-12.3,"ew_3M":-11.5,"med_3M":-9.7,"pct_positive_3M":0.0,"cw_6M":-9.6,"ew_6M":-9.1,"med_6M":-10.5,"cw_12M":-17.3,"ew_12M":-16.6,"med_12M":-16.8,"pct_above_50dma":0.0,"pct_above_200dma":0.0,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-27.7,"median_pe":29.8,"median_fwd_pe":23.1,"median_div_yield":0.8,"median_cy_growth":4.2,"median_ny_growth":16.8,"median_cq_growth":-0.2,"median_nq_growth":9.9,"fwd_pe_over_ny_growth":1.4,"Sector":"basic-materials","rs_3m":-15.5},{"Industry":"resorts-casinos","n":3,"market_cap":46807886848.0,"cw_1W":-3.7,"ew_1W":-3.7,"med_1W":-3.8,"cw_1M":-8.6,"ew_1M":-10.1,"med_1M":-9.3,"cw_3M":-15.7,"ew_3M":-16.3,"med_3M":-15.5,"pct_positive_3M":0.0,"cw_6M":-12.7,"ew_6M":-6.7,"med_6M":-10.8,"cw_12M":-16.6,"ew_12M":-12.2,"med_12M":-19.7,"pct_above_50dma":0.0,"pct_above_200dma":33.3,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-33.6,"median_pe":21.0,"median_fwd_pe":17.0,"median_div_yield":1.1,"median_cy_growth":2.7,"median_ny_growth":10.4,"median_cq_growth":-3.2,"median_nq_growth":0.4,"fwd_pe_over_ny_growth":1.6,"Sector":"consumer-cyclical","rs_3m":-18.9},{"Industry":"semiconductor-equipment-materials","n":5,"market_cap":1057279012864.0,"cw_1W":4.1,"ew_1W":6.0,"med_1W":4.7,"cw_1M":-12.4,"ew_1M":-11.0,"med_1M":-11.0,"cw_3M":-18.5,"ew_3M":-15.1,"med_3M":-17.3,"pct_positive_3M":0.0,"cw_6M":35.6,"ew_6M":31.5,"med_6M":32.6,"cw_12M":156.3,"ew_12M":169.5,"med_12M":180.1,"pct_above_50dma":20.0,"pct_above_200dma":100.0,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-34.0,"median_pe":49.2,"median_fwd_pe":25.6,"median_div_yield":0.3,"median_cy_growth":45.1,"median_ny_growth":23.0,"median_cq_growth":72.9,"median_nq_growth":53.7,"fwd_pe_over_ny_growth":1.1,"Sector":"technology","rs_3m":-21.7},{"Industry":"apparel-retail","n":3,"market_cap":223882435584.0,"cw_1W":-4.1,"ew_1W":-7.9,"med_1W":-4.7,"cw_1M":-14.1,"ew_1M":-14.1,"med_1M":-17.2,"cw_3M":-18.6,"ew_3M":-15.7,"med_3M":-18.8,"pct_positive_3M":0.0,"cw_6M":-12.3,"ew_6M":-15.1,"med_6M":-18.6,"cw_12M":2.7,"ew_12M":2.5,"med_12M":-8.8,"pct_above_50dma":0.0,"pct_above_200dma":33.3,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-24.9,"median_pe":23.3,"median_fwd_pe":21.8,"median_div_yield":0.8,"median_cy_growth":9.4,"median_ny_growth":3.3,"median_cq_growth":6.3,"median_nq_growth":-6.2,"fwd_pe_over_ny_growth":6.6,"Sector":"consumer-cyclical","rs_3m":-21.8},{"Industry":"advertising-agencies","n":3,"market_cap":137669801984.0,"cw_1W":1.1,"ew_1W":-2.8,"med_1W":-5.0,"cw_1M":4.0,"ew_1M":1.8,"med_1M":6.3,"cw_3M":-27.8,"ew_3M":-17.3,"med_3M":-24.1,"pct_positive_3M":33.3,"cw_6M":-25.5,"ew_6M":-23.8,"med_6M":-27.9,"cw_12M":-40.8,"ew_12M":-34.9,"med_12M":-42.9,"pct_above_50dma":0.0,"pct_above_200dma":33.3,"pct_within_5pct_of_52wh":0.0,"median_pct_from_52wh":-55.8,"median_pe":24.9,"median_fwd_pe":14.2,"median_div_yield":0.0,"median_cy_growth":22.5,"median_ny_growth":13.7,"median_cq_growth":14.2,"median_nq_growth":24.5,"fwd_pe_over_ny_growth":1.0,"Sector":"communication-services","rs_3m":-30.9}],"leaders":[{"Ticker":"MRNA","ret_3m":190.0,"ret_12m":492.2,"Short Name":"Moderna, Inc.","Sector":"healthcare","Industry":"biotechnology","Market Cap":57477992448},{"Ticker":"VEEV","ret_3m":62.4,"ret_12m":-4.4,"Short Name":"Veeva Systems Inc.","Sector":"healthcare","Industry":"health-information-services","Market Cap":42484879360},{"Ticker":"ZBRA","ret_3m":57.5,"ret_12m":14.4,"Short Name":"Zebra Technologies Corporation","Sector":"technology","Industry":"communication-equipment","Market Cap":16689311744},{"Ticker":"VLO","ret_3m":53.3,"ret_12m":151.5,"Short Name":"Valero Energy Corporation","Sector":"energy","Industry":"oil-gas-refining-marketing","Market Cap":112412639232},{"Ticker":"MPC","ret_3m":52.2,"ret_12m":121.6,"Short Name":"Marathon Petroleum Corporation","Sector":"energy","Industry":"oil-gas-refining-marketing","Market Cap":115586473984},{"Ticker":"CRM","ret_3m":48.8,"ret_12m":3.0,"Short Name":"Salesforce, Inc.","Sector":"technology","Industry":"software-application","Market Cap":203873566720},{"Ticker":"CRL","ret_3m":48.0,"ret_12m":81.5,"Short Name":"Charles River Laboratories Inte","Sector":"healthcare","Industry":"diagnostics-research","Market Cap":13283818496},{"Ticker":"PSX","ret_3m":46.5,"ret_12m":103.3,"Short Name":"Phillips 66","Sector":"energy","Industry":"oil-gas-refining-marketing","Market Cap":103533961216},{"Ticker":"DELL","ret_3m":45.2,"ret_12m":361.6,"Short Name":"Dell Technologies Inc.","Sector":"technology","Industry":"computer-hardware","Market Cap":360690188288},{"Ticker":"HPQ","ret_3m":45.2,"ret_12m":31.4,"Short Name":"HP Inc.","Sector":"technology","Industry":"computer-hardware","Market Cap":31995543552},{"Ticker":"IQV","ret_3m":44.6,"ret_12m":42.4,"Short Name":"IQVIA Holdings, Inc.","Sector":"healthcare","Industry":"diagnostics-research","Market Cap":43087339520},{"Ticker":"WDAY","ret_3m":42.3,"ret_12m":-18.0,"Short Name":"Workday, Inc.","Sector":"technology","Industry":"software-application","Market Cap":44753698816},{"Ticker":"GPN","ret_3m":35.8,"ret_12m":5.4,"Short Name":"Global Payments Inc.","Sector":"industrials","Industry":"specialty-business-services","Market Cap":23363158016},{"Ticker":"TECH","ret_3m":33.7,"ret_12m":42.3,"Short Name":"Bio-Techne Corp","Sector":"healthcare","Industry":"biotechnology","Market Cap":11309731840},{"Ticker":"HPE","ret_3m":33.1,"ret_12m":159.3,"Short Name":"Hewlett Packard Enterprise Comp","Sector":"technology","Industry":"communication-equipment","Market Cap":82422292480}],"laggards":[{"Ticker":"ON","ret_3m":-34.3,"ret_12m":58.2,"Short Name":"ON Semiconductor Corporation","Sector":"technology","Industry":"semiconductors","Market Cap":29642719232},{"Ticker":"APTV","ret_3m":-33.0,"ret_12m":-44.2,"Short Name":"Aptiv PLC","Sector":"consumer-cyclical","Industry":"auto-parts","Market Cap":9637198848},{"Ticker":"CASY","ret_3m":-32.8,"ret_12m":14.7,"Short Name":"Caseys General Stores, Inc.","Sector":"consumer-cyclical","Industry":"specialty-retail","Market Cap":22747873280},{"Ticker":"APP","ret_3m":-32.3,"ret_12m":-42.9,"Short Name":"Applovin Corporation","Sector":"communication-services","Industry":"advertising-agencies","Market Cap":108413378560},{"Ticker":"LII","ret_3m":-29.0,"ret_12m":-33.8,"Short Name":"Lennox International, Inc.","Sector":"industrials","Industry":"building-products-equipment","Market Cap":12650590208},{"Ticker":"DECK","ret_3m":-28.9,"ret_12m":-28.8,"Short Name":"Deckers Outdoor Corporation","Sector":"consumer-cyclical","Industry":"footwear-accessories","Market Cap":11067498496},{"Ticker":"GNRC","ret_3m":-27.3,"ret_12m":1.1,"Short Name":"Generac Holdlings Inc.","Sector":"industrials","Industry":"specialty-industrial-machinery","Market Cap":11033464832},{"Ticker":"ODFL","ret_3m":-27.3,"ret_12m":23.6,"Short Name":"Old Dominion Freight Line, Inc.","Sector":"industrials","Industry":"trucking","Market Cap":37280645120},{"Ticker":"ROL","ret_3m":-25.8,"ret_12m":-37.5,"Short Name":"Rollins, Inc.","Sector":"consumer-cyclical","Industry":"personal-services","Market Cap":16710179840},{"Ticker":"ALB","ret_3m":-25.7,"ret_12m":63.0,"Short Name":"Albemarle Corporation","Sector":"basic-materials","Industry":"specialty-chemicals","Market Cap":13867954176},{"Ticker":"KLAC","ret_3m":-25.0,"ret_12m":94.7,"Short Name":"KLA Corporation","Sector":"technology","Industry":"semiconductor-equipment-materials","Market Cap":236014616576},{"Ticker":"TJX","ret_3m":-24.9,"ret_12m":-8.8,"Short Name":"TJX Companies, Inc. (The)","Sector":"consumer-cyclical","Industry":"apparel-retail","Market Cap":139214848000},{"Ticker":"CDNS","ret_3m":-24.6,"ret_12m":-14.5,"Short Name":"Cadence Design Systems, Inc.","Sector":"technology","Industry":"software-application","Market Cap":79812878336},{"Ticker":"TTD","ret_3m":-24.1,"ret_12m":-68.9,"Short Name":"The Trade Desk, Inc.","Sector":"communication-services","Industry":"advertising-agencies","Market Cap":6738081792},{"Ticker":"BLDR","ret_3m":-23.2,"ret_12m":-57.0,"Short Name":"Builders FirstSource, Inc.","Sector":"industrials","Industry":"building-products-equipment","Market Cap":6495598080}]};</script>
+<script>
+(function () {
+  "use strict";
+  var D = window.__SPX__;
+  var NS = "http://www.w3.org/2000/svg";
+
+  /* ------------------------------------------------------------------ *
+   * labels
+   * ------------------------------------------------------------------ */
+  var SEC_TC = {
+    "technology": "科技", "industrials": "工業", "financial-services": "金融",
+    "healthcare": "醫療保健", "consumer-cyclical": "非必需消費", "consumer-defensive": "必需消費",
+    "utilities": "公用事業", "real-estate": "不動產", "communication-services": "通訊服務",
+    "energy": "能源", "basic-materials": "原物料", "unknown": "未分類"
+  };
+  var IND_TC = {
+    "oil-gas-refining-marketing": "石油煉製與行銷", "biotechnology": "生技",
+    "software-infrastructure": "基礎架構軟體", "diagnostics-research": "檢測與研究",
+    "agricultural-inputs": "農業投入", "credit-services": "信用卡與消費金融",
+    "software-application": "應用軟體", "oil-gas-e-p": "油氣探勘生產",
+    "banks-diversified": "綜合銀行", "medical-distribution": "醫材通路",
+    "specialty-business-services": "專業商業服務", "medical-care-facilities": "醫療院所",
+    "reit-healthcare-facilities": "醫療 REIT", "computer-hardware": "電腦硬體",
+    "insurance-property-casualty": "產物保險", "advertising-agencies": "廣告行銷",
+    "apparel-retail": "服飾零售", "semiconductor-equipment-materials": "半導體設備與材料",
+    "resorts-casinos": "度假村與博弈", "building-materials": "建材",
+    "residential-construction": "住宅營建", "discount-stores": "量販折扣",
+    "auto-manufacturers": "整車製造", "reit-industrial": "工業 REIT",
+    "building-products-equipment": "建築產品設備", "reit-residential": "住宅 REIT",
+    "integrated-freight-logistics": "綜合物流", "restaurants": "餐飲",
+    "auto-parts": "汽車零組件", "utilities-regulated-electric": "受管制電力",
+    "communication-equipment": "通訊設備", "farm-heavy-construction-machinery": "農機與工程機械",
+    "engineering-construction": "工程營建", "electronic-components": "電子零組件",
+    "scientific-technical-instruments": "科學儀器", "oil-gas-equipment-services": "油田服務",
+    "drug-manufacturers-general": "大型製藥", "semiconductors": "半導體",
+    "medical-devices": "醫療器材", "entertainment": "娛樂內容",
+    "utilities-independent-power-producers": "獨立電力業", "insurance-brokers": "保險經紀",
+    "information-technology-services": "資訊服務", "asset-management": "資產管理",
+    "banks-regional": "區域銀行", "aerospace-defense": "航太國防",
+    "specialty-retail": "專業零售", "internet-content-information": "網路內容",
+    "packaged-foods": "包裝食品", "insurance-diversified": "綜合保險",
+    "financial-data-stock-exchanges": "金融資訊與交易所"
+  };
+  var STATUS_TC = {
+    "bullish": "偏多", "bearish": "偏空", "neutral": "中性", "oversold": "超賣",
+    "overbought": "超買", "warning": "警訊", "none": "無", "narrow": "偏窄",
+    "broad": "廣泛", "extreme": "極高", "elevated": "偏高", "normal": "正常",
+    "thrust": "衝刺", "washed out": "洗盤", "cap-weight leading": "大型股領先",
+    "equal-weight leading": "中小型領先", "in line": "同步"
+  };
+  var STATUS_CLS = {
+    "bullish": "p-good", "broad": "p-good", "thrust": "p-good", "normal": "p-good",
+    "equal-weight leading": "p-good", "neutral": "p-neu", "none": "p-neu", "in line": "p-neu",
+    "oversold": "p-warn", "overbought": "p-warn", "washed out": "p-warn",
+    "elevated": "p-warn", "warning": "p-ser", "narrow": "p-ser",
+    "cap-weight leading": "p-ser", "bearish": "p-bad", "extreme": "p-bad"
+  };
+  var SIG_TC = {
+    "Primary trend (% > 200DMA)": "主要趨勢（%&gt;200日均線）",
+    "Intermediate trend (% > 50DMA)": "中期趨勢（%&gt;50日均線）",
+    "Short-term (% > 20DMA)": "短期（%&gt;20日均線）",
+    "Breadth vs index divergence": "廣度與指數背離",
+    "McClellan oscillator": "麥克連擺盪指標",
+    "Net new 52w highs (10d avg)": "52週淨新高（10日均）",
+    "Zweig breadth thrust": "Zweig 廣度衝刺",
+    "Participation in the 12M advance": "一年漲勢的參與度",
+    "Mega-cap concentration": "巨型股集中度",
+    "Equal-weight vs cap-weight": "等權 vs 市值加權"
+  };
+  var SIG_DETAIL_TC = {
+    "Primary trend (% > 200DMA)": function (s) { return s.latest.pct_above_200dma.toFixed(1) + "% 的成分股位於 200 日均線之上"; },
+    "Intermediate trend (% > 50DMA)": function (s) { return s.latest.pct_above_50dma.toFixed(1) + "% 位於 50 日均線之上"; },
+    "Short-term (% > 20DMA)": function (s) { return s.latest.pct_above_20dma.toFixed(1) + "% 位於 20 日均線之上"; },
+    "Breadth vs index divergence": function () { return "指數處於自身半年區間的第 82 百分位，%&gt;200日均線卻只在第 44 百分位"; },
+    "McClellan oscillator": function (s) { return s.latest.mcclellan_osc.toFixed(0) + "（淨上漲家數的 19／39 日 EMA 差）"; },
+    "Net new 52w highs (10d avg)": function (s) { return (s.latest.net_hl_10d >= 0 ? "+" : "") + s.latest.net_hl_10d.toFixed(1) + " 家／日（近 10 個交易日平均）"; },
+    "Zweig breadth thrust": function (s) {
+      var v = s.signals.filter(function (r) { return r.signal === "Zweig breadth thrust"; })[0].value;
+      return "上漲家數佔比的 10 日 EMA ＝ " + v.toFixed(3);
+    },
+    "Participation in the 12M advance": function (s) {
+      var p = s.participation.filter(function (r) { return r.horizon === "12M"; })[0];
+      return "僅 " + p.pct_beat_index.toFixed(0) + "% 個股跑贏指數；平均 " + p.mean_ret.toFixed(1) + "% vs 中位數 " + p.median_ret.toFixed(1) + "%";
+    },
+    "Mega-cap concentration": function (s) {
+      var c = s.concentration;
+      return "前十大佔指數市值 " + c.top10_weight.toFixed(1) + "%，並貢獻了 12 個月市值增幅的 " + c.top10_share_of_12m_gain.toFixed(0) + "%";
+    },
+    "Equal-weight vs cap-weight": function (s) {
+      var v = s.signals.filter(function (r) { return r.signal === "Equal-weight vs cap-weight"; })[0].value;
+      return "等權／市值加權比值 12 個月來 " + (v >= 0 ? "+" : "") + v.toFixed(1) + "%";
+    }
+  };
+
+  function secName(k) { return SEC_TC[k] || k; }
+  function indName(k) {
+    if (IND_TC[k]) return IND_TC[k];
+    return k.replace(/-/g, " ").replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+  }
+  function pct(v, d) { if (v === null || v === undefined || isNaN(v)) return "—"; return (v >= 0 ? "+" : "") + v.toFixed(d === undefined ? 1 : d) + "%"; }
+  function num(v, d) { if (v === null || v === undefined || isNaN(v)) return "—"; return v.toFixed(d === undefined ? 1 : d); }
+  function css(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+  function el(tag, attrs, text) {
+    var n = document.createElementNS(NS, tag);
+    for (var k in attrs) if (attrs[k] !== null && attrs[k] !== undefined) n.setAttribute(k, attrs[k]);
+    if (text !== undefined) n.textContent = text;
+    return n;
+  }
+  function mkSvg(w, h) {
+    var s = el("svg", { width: w, height: h, viewBox: "0 0 " + w + " " + h, role: "img" });
+    s.style.width = w + "px"; s.style.height = h + "px"; s.style.maxWidth = "100%";
+    return s;
+  }
+  function fmtDate(d) { var p = d.split("-"); return p[0].slice(2) + "/" + p[1]; }
+
+  /* tooltip ---------------------------------------------------------- */
+  var tip = document.getElementById("tip");
+  function showTip(html, ev) {
+    tip.innerHTML = html;
+    tip.style.opacity = "1";
+    var r = tip.getBoundingClientRect();
+    var x = ev.clientX + 14, y = ev.clientY - r.height - 12;
+    if (x + r.width > window.innerWidth - 10) x = ev.clientX - r.width - 14;
+    if (y < 8) y = ev.clientY + 18;
+    tip.style.left = Math.max(8, x) + "px"; tip.style.top = y + "px";
+  }
+  function hideTip() { tip.style.opacity = "0"; }
+
+  /* ------------------------------------------------------------------ *
+   * line chart (multi-series, crosshair)
+   * ------------------------------------------------------------------ */
+  function lineChart(host, opt) {
+    var w = Math.max(300, host.clientWidth), h = opt.height || 260;
+    var m = { t: 14, r: opt.right === undefined ? 52 : opt.right, b: 26, l: 42 };
+    var iw = w - m.l - m.r, ih = h - m.t - m.b;
+    var svg = mkSvg(w, h);
+    var n = opt.dates.length;
+    var all = [];
+    opt.series.forEach(function (s) { s.values.forEach(function (v) { if (v !== null) all.push(v); }); });
+    var lo = opt.min !== undefined ? opt.min : Math.min.apply(null, all);
+    var hi = opt.max !== undefined ? opt.max : Math.max.apply(null, all);
+    var pad = (hi - lo) * 0.12 || 1;
+    if (opt.min === undefined) lo -= pad;
+    if (opt.max === undefined) hi += pad;
+    var X = function (i) { return m.l + (n === 1 ? iw / 2 : iw * i / (n - 1)); };
+    var Y = function (v) { return m.t + ih * (1 - (v - lo) / (hi - lo)); };
+
+    // grid + y axis
+    var ticks = opt.yTicks || 5, gridC = css("--grid"), mutedC = css("--ink-3");
+    for (var g = 0; g <= ticks; g++) {
+      var v = lo + (hi - lo) * g / ticks, y = Y(v);
+      svg.appendChild(el("line", { x1: m.l, x2: m.l + iw, y1: y, y2: y, stroke: gridC, "stroke-width": 1 }));
+      svg.appendChild(el("text", { x: m.l - 8, y: y + 4, "text-anchor": "end", fill: mutedC,
+        "font-size": 11, "font-family": "IBM Plex Mono, monospace" }, opt.yFmt ? opt.yFmt(v) : v.toFixed(0)));
+    }
+    if (opt.zeroLine !== undefined && opt.zeroLine >= lo && opt.zeroLine <= hi) {
+      svg.appendChild(el("line", { x1: m.l, x2: m.l + iw, y1: Y(opt.zeroLine), y2: Y(opt.zeroLine),
+        stroke: css("--axis"), "stroke-width": 1.5 }));
+    }
+    // x labels
+    var step = Math.max(1, Math.round(n / (w < 460 ? 4 : 7)));
+    var xt = [];
+    for (var i = 0; i < n; i += step) xt.push(i);
+    if (n - 1 - xt[xt.length - 1] >= step * 0.55) xt.push(n - 1); else xt[xt.length - 1] = n - 1;
+    xt.forEach(function (i) {
+      svg.appendChild(el("text", { x: X(i), y: h - 8, "text-anchor": "middle", fill: mutedC,
+        "font-size": 11, "font-family": "IBM Plex Mono, monospace" }, fmtDate(opt.dates[i])));
+    });
+    // series
+    opt.series.forEach(function (s) {
+      var dstr = "", started = false;
+      s.values.forEach(function (v, i) {
+        if (v === null) { started = false; return; }
+        dstr += (started ? "L" : "M") + X(i).toFixed(1) + " " + Y(v).toFixed(1) + " ";
+        started = true;
+      });
+      svg.appendChild(el("path", { d: dstr, fill: "none", stroke: s.color, "stroke-width": 2,
+        "stroke-linejoin": "round", "stroke-linecap": "round" }));
+      // endpoint marker + direct label
+      var li = -1;
+      s.values.forEach(function (v, i) { if (v !== null) li = i; });
+      if (li >= 0) {
+        svg.appendChild(el("circle", { cx: X(li), cy: Y(s.values[li]), r: 4, fill: s.color,
+          stroke: css("--surface"), "stroke-width": 2 }));
+        if (m.r > 20) {
+          svg.appendChild(el("text", { x: X(li) + 9, y: Y(s.values[li]) + 4, fill: s.color,
+            "font-size": 12, "font-weight": 600, "font-family": "IBM Plex Mono, monospace" },
+            s.label !== undefined ? s.label : (opt.yFmt ? opt.yFmt(s.values[li]) : s.values[li].toFixed(0))));
+        }
+      }
+    });
+    // annotation
+    if (opt.mark) {
+      var mi = opt.dates.indexOf(opt.mark.date);
+      if (mi < 0) { // nearest
+        for (var k = 0; k < n; k++) if (opt.dates[k] >= opt.mark.date) { mi = k; break; }
+      }
+      if (mi >= 0) {
+        svg.appendChild(el("line", { x1: X(mi), x2: X(mi), y1: m.t, y2: m.t + ih,
+          stroke: css("--rule-strong"), "stroke-width": 1 }));
+        svg.appendChild(el("text", { x: X(mi) - 6, y: m.t + 12, "text-anchor": "end", fill: css("--ink-3"),
+          "font-size": 11, "font-family": "IBM Plex Mono, monospace" }, opt.mark.text));
+      }
+    }
+    // crosshair
+    var cross = el("line", { x1: 0, x2: 0, y1: m.t, y2: m.t + ih, stroke: css("--rule-strong"),
+      "stroke-width": 1, opacity: 0 });
+    svg.appendChild(cross);
+    var dots = opt.series.map(function (s) {
+      var c = el("circle", { r: 4.5, fill: s.color, stroke: css("--surface"), "stroke-width": 2, opacity: 0 });
+      svg.appendChild(c); return c;
+    });
+    var hit = el("rect", { x: m.l, y: m.t, width: iw, height: ih, fill: "transparent" });
+    hit.style.cursor = "crosshair";
+    svg.appendChild(hit);
+    function move(ev) {
+      var bb = svg.getBoundingClientRect();
+      var i = Math.round((ev.clientX - bb.left - m.l) / (iw / Math.max(1, n - 1)));
+      i = Math.max(0, Math.min(n - 1, i));
+      cross.setAttribute("x1", X(i)); cross.setAttribute("x2", X(i)); cross.setAttribute("opacity", 1);
+      var rows = "<div class='tt-h'>" + opt.dates[i] + "</div>";
+      opt.series.forEach(function (s, j) {
+        var v = s.values[i];
+        if (v === null) { dots[j].setAttribute("opacity", 0); return; }
+        dots[j].setAttribute("cx", X(i)); dots[j].setAttribute("cy", Y(v)); dots[j].setAttribute("opacity", 1);
+        rows += "<div class='tt-r'><span><i style='width:9px;height:9px;border-radius:50%;background:" +
+          s.color + ";display:inline-block'></i>" + s.name + "</span><b>" +
+          (opt.tipFmt ? opt.tipFmt(v) : (opt.yFmt ? opt.yFmt(v) : v.toFixed(1))) + "</b></div>";
+      });
+      showTip(rows, ev);
+    }
+    hit.addEventListener("mousemove", move);
+    hit.addEventListener("mouseleave", function () {
+      hideTip(); cross.setAttribute("opacity", 0);
+      dots.forEach(function (d) { d.setAttribute("opacity", 0); });
+    });
+    host.innerHTML = ""; host.appendChild(svg);
+  }
+
+  /* ------------------------------------------------------------------ *
+   * diverging column chart (net highs - lows)
+   * ------------------------------------------------------------------ */
+  function colChart(host, opt) {
+    var w = Math.max(300, host.clientWidth), h = opt.height || 180;
+    var m = { t: 12, r: 14, b: 26, l: 42 };
+    var iw = w - m.l - m.r, ih = h - m.t - m.b;
+    var svg = mkSvg(w, h);
+    var vals = opt.values.filter(function (v) { return v !== null; });
+    var mx = Math.max(Math.abs(Math.min.apply(null, vals)), Math.abs(Math.max.apply(null, vals))) * 1.15;
+    var n = opt.values.length;
+    var Y = function (v) { return m.t + ih * (1 - (v + mx) / (2 * mx)); };
+    var bw = Math.max(2, iw / n - 2);
+    [mx, mx / 2, 0, -mx / 2, -mx].forEach(function (v) {
+      svg.appendChild(el("line", { x1: m.l, x2: m.l + iw, y1: Y(v), y2: Y(v),
+        stroke: v === 0 ? css("--axis") : css("--grid"), "stroke-width": v === 0 ? 1.5 : 1 }));
+      svg.appendChild(el("text", { x: m.l - 8, y: Y(v) + 4, "text-anchor": "end", fill: css("--ink-3"),
+        "font-size": 11, "font-family": "IBM Plex Mono, monospace" }, (v > 0 ? "+" : "") + v.toFixed(0)));
+    });
+    var step = Math.max(1, Math.round(n / (w < 460 ? 4 : 7)));
+    var xt = [];
+    for (var i = 0; i < n; i += step) xt.push(i);
+    if (n - 1 - xt[xt.length - 1] >= step * 0.55) xt.push(n - 1); else xt[xt.length - 1] = n - 1;
+    xt.forEach(function (i) {
+      svg.appendChild(el("text", { x: m.l + iw * i / (n - 1), y: h - 8, "text-anchor": "middle",
+        fill: css("--ink-3"), "font-size": 11, "font-family": "IBM Plex Mono, monospace" }, fmtDate(opt.dates[i])));
+    });
+    opt.values.forEach(function (v, i) {
+      if (v === null) return;
+      var x = m.l + iw * i / (n - 1) - bw / 2;
+      var y0 = Y(0), y1 = Y(v);
+      var r = el("rect", { x: x, y: Math.min(y0, y1), width: bw, height: Math.max(1.5, Math.abs(y1 - y0)),
+        fill: v >= 0 ? css("--pos") : css("--neg"), rx: 1.5 });
+      r.addEventListener("mousemove", function (ev) {
+        showTip("<div class='tt-h'>" + opt.dates[i] + "</div><div class='tt-r'><span>淨新高（10日均）</span><b>" +
+          (v >= 0 ? "+" : "") + v.toFixed(1) + "</b></div>", ev);
+      });
+      r.addEventListener("mouseleave", hideTip);
+      svg.appendChild(r);
+    });
+    host.innerHTML = ""; host.appendChild(svg);
+  }
+
+  /* ------------------------------------------------------------------ *
+   * horizontal bars (sector returns / top10 weights / drawdown buckets)
+   * ------------------------------------------------------------------ */
+  function hbarChart(host, opt) {
+    var w = Math.max(300, host.clientWidth);
+    var rowH = opt.rowH || 30, labelW = opt.labelW || (w < 460 ? 84 : 112);
+    var noteW = opt.rows.some(function (r) { return r.note; }) ? (w < 460 ? 62 : 76) : 0;
+    var valW = 58 + noteW;
+    var h = opt.rows.length * rowH + 34;
+    var m = { t: 8, r: valW + 8, l: labelW + 10, b: 26 };
+    var iw = w - m.l - m.r;
+    var svg = mkSvg(w, h);
+    var vals = opt.rows.map(function (r) { return r.value; });
+    var mn = Math.min.apply(null, vals), mx = Math.max.apply(null, vals);
+    var diverging = opt.diverging && mn < 0;
+    var lo = diverging ? -Math.max(Math.abs(mn), Math.abs(mx)) * 1.08 : 0;
+    var hi = diverging ? Math.max(Math.abs(mn), Math.abs(mx)) * 1.08 : mx * 1.08;
+    var X = function (v) { return m.l + iw * (v - lo) / (hi - lo); };
+    var zero = X(diverging ? 0 : lo);
+
+    opt.rows.forEach(function (r, i) {
+      var y = m.t + i * rowH;
+      var x0 = zero, x1 = X(r.value);
+      var fill = r.color || (diverging ? (r.value >= 0 ? css("--pos") : css("--neg")) : css("--s1"));
+      svg.appendChild(el("rect", { x: Math.min(x0, x1), y: y + 6, width: Math.max(2, Math.abs(x1 - x0)),
+        height: rowH - 14, fill: fill, rx: 3 }));
+      svg.appendChild(el("text", { x: m.l - 12, y: y + rowH / 2 + 4, "text-anchor": "end", fill: css("--ink"),
+        "font-size": 12.5 }, r.label));
+      svg.appendChild(el("text", { x: w - noteW - 8, y: y + rowH / 2 + 4, "text-anchor": "end",
+        fill: css("--ink-2"), "font-size": 12, "font-weight": 600,
+        "font-family": "IBM Plex Mono, monospace" }, r.display));
+      if (r.note) {
+        svg.appendChild(el("text", { x: w - 2, y: y + rowH / 2 + 4, "text-anchor": "end",
+          fill: css("--ink-3"), "font-size": 11, "font-family": "IBM Plex Mono, monospace" }, r.note));
+      }
+      var hit = el("rect", { x: m.l, y: y, width: iw, height: rowH, fill: "transparent" });
+      hit.addEventListener("mousemove", function (ev) { showTip(r.tip, ev); });
+      hit.addEventListener("mouseleave", hideTip);
+      svg.appendChild(hit);
+    });
+    // baseline + reference
+    svg.appendChild(el("line", { x1: zero, x2: zero, y1: m.t, y2: m.t + opt.rows.length * rowH,
+      stroke: css("--axis"), "stroke-width": 1.5 }));
+    if (opt.ref !== undefined) {
+      var rx = X(opt.ref);
+      svg.appendChild(el("line", { x1: rx, x2: rx, y1: m.t, y2: m.t + opt.rows.length * rowH,
+        stroke: css("--ink-3"), "stroke-width": 1, "stroke-dasharray": "0" , opacity: .55 }));
+      svg.appendChild(el("text", { x: rx, y: h - 9, "text-anchor": "middle", fill: css("--ink-3"),
+        "font-size": 11, "font-family": "IBM Plex Mono, monospace" }, opt.refLabel));
+    }
+    host.innerHTML = ""; host.appendChild(svg);
+  }
+
+  /* ------------------------------------------------------------------ *
+   * scatter (sector leadership map)
+   * ------------------------------------------------------------------ */
+  function scatter(host, opt) {
+    var w = Math.max(300, host.clientWidth), h = opt.height || 340;
+    var m = { t: 16, r: 18, b: 44, l: 48 };
+    var iw = w - m.l - m.r, ih = h - m.t - m.b;
+    var svg = mkSvg(w, h);
+    var xs = opt.points.map(function (p) { return p.x; }), ys = opt.points.map(function (p) { return p.y; });
+    var xlo = Math.min.apply(null, xs), xhi = Math.max.apply(null, xs);
+    var xpad = (xhi - xlo) * 0.16 || 1; xlo -= xpad; xhi += xpad;
+    var ylo = Math.max(0, Math.min.apply(null, ys) - 10), yhi = Math.min(100, Math.max.apply(null, ys) + 10);
+    var X = function (v) { return m.l + iw * (v - xlo) / (xhi - xlo); };
+    var Y = function (v) { return m.t + ih * (1 - (v - ylo) / (yhi - ylo)); };
+
+    for (var g = 0; g <= 4; g++) {
+      var yv = ylo + (yhi - ylo) * g / 4;
+      svg.appendChild(el("line", { x1: m.l, x2: m.l + iw, y1: Y(yv), y2: Y(yv), stroke: css("--grid"), "stroke-width": 1 }));
+      svg.appendChild(el("text", { x: m.l - 8, y: Y(yv) + 4, "text-anchor": "end", fill: css("--ink-3"),
+        "font-size": 11, "font-family": "IBM Plex Mono, monospace" }, yv.toFixed(0) + "%"));
+    }
+    // quadrant dividers: x = 0 (index performance), y = 50%
+    svg.appendChild(el("line", { x1: X(0), x2: X(0), y1: m.t, y2: m.t + ih, stroke: css("--axis"), "stroke-width": 1.5 }));
+    if (50 >= ylo && 50 <= yhi) {
+      svg.appendChild(el("line", { x1: m.l, x2: m.l + iw, y1: Y(50), y2: Y(50), stroke: css("--axis"), "stroke-width": 1.5 }));
+    }
+    svg.appendChild(el("text", { x: m.l + iw - 4, y: m.t + 14, "text-anchor": "end", fill: css("--ink-3"),
+      "font-size": 11 }, "價格強 · 廣度強"));
+    svg.appendChild(el("text", { x: m.l + 4, y: m.t + ih - 6, fill: css("--ink-3"), "font-size": 11 }, "價格弱 · 廣度弱"));
+    // x ticks
+    [-6, -3, 0, 3, 6, 9, 12].forEach(function (xv) {
+      if (xv < xlo || xv > xhi) return;
+      svg.appendChild(el("text", { x: X(xv), y: h - 24, "text-anchor": "middle", fill: css("--ink-3"),
+        "font-size": 11, "font-family": "IBM Plex Mono, monospace" }, (xv > 0 ? "+" : "") + xv));
+    });
+    svg.appendChild(el("text", { x: m.l + iw / 2, y: h - 6, "text-anchor": "middle", fill: css("--ink-3"),
+      "font-size": 11.5 }, "近三個月相對指數超額報酬 →"));
+
+    // place labels first, nudging any that would collide with one already placed
+    var placed = [];
+    var slots = opt.points.map(function (p) {
+      var anchor = X(p.x) > m.l + iw * 0.72 ? "end" : "start";
+      var lx = X(p.x) + (anchor === "end" ? -(p.r + 6) : (p.r + 6));
+      var ly = Y(p.y) + 4;
+      var approxW = p.label.length * 12.5;
+      var x0 = anchor === "end" ? lx - approxW : lx;
+      for (var guard = 0; guard < 14; guard++) {
+        var hitAny = placed.some(function (q) {
+          return Math.abs(q.y - ly) < 15 && x0 < q.x1 && (x0 + approxW) > q.x0;
+        });
+        if (!hitAny) break;
+        ly += 16;
+        if (ly > m.t + ih - 4) { ly = Y(p.y) + 4 - 16 * (guard + 1); }
+      }
+      placed.push({ y: ly, x0: x0, x1: x0 + approxW });
+      return { anchor: anchor, lx: lx, ly: ly };
+    });
+    opt.points.forEach(function (p, pi) {
+      var g = el("g", {});
+      g.appendChild(el("circle", { cx: X(p.x), cy: Y(p.y), r: p.r, fill: p.color, opacity: .82,
+        stroke: css("--surface"), "stroke-width": 2 }));
+      var sl = slots[pi];
+      if (Math.abs(sl.ly - (Y(p.y) + 4)) > 6) {
+        g.appendChild(el("line", { x1: X(p.x) + (sl.anchor === "end" ? -p.r : p.r), y1: Y(p.y),
+          x2: sl.lx, y2: sl.ly - 4, stroke: css("--rule-strong"), "stroke-width": 1 }));
+      }
+      g.appendChild(el("text", { x: sl.lx, y: sl.ly, "text-anchor": sl.anchor,
+        fill: css("--ink"), "font-size": 12 }, p.label));
+      g.addEventListener("mousemove", function (ev) { showTip(p.tip, ev); });
+      g.addEventListener("mouseleave", hideTip);
+      g.style.cursor = "default";
+      svg.appendChild(g);
+    });
+    host.innerHTML = ""; host.appendChild(svg);
+  }
+
+  /* ------------------------------------------------------------------ *
+   * tables
+   * ------------------------------------------------------------------ */
+  function fillTable(id, head, rows) {
+    var t = document.getElementById(id);
+    var cap = t.querySelector("caption");
+    t.innerHTML = ""; if (cap) t.appendChild(cap);
+    var thead = document.createElement("thead"), tr = document.createElement("tr");
+    head.forEach(function (hh) {
+      var th = document.createElement("th");
+      th.innerHTML = hh; tr.appendChild(th);
+    });
+    thead.appendChild(tr); t.appendChild(thead);
+    var tb = document.createElement("tbody");
+    rows.forEach(function (r) {
+      var trr = document.createElement("tr");
+      r.forEach(function (c, i) {
+        var td = document.createElement("td");
+        if (typeof c === "object" && c !== null) {
+          td.innerHTML = c.html; if (c.cls) td.className = c.cls;
+          if (c.color) td.style.color = c.color;
+        } else {
+          td.innerHTML = c;
+          if (i > 0) td.className = "n";
+        }
+        trr.appendChild(td);
+      });
+      tb.appendChild(trr);
+    });
+    t.appendChild(tb);
+  }
+  function signed(v, d) {
+    if (v === null || v === undefined || isNaN(v)) return { html: "—", cls: "n" };
+    return { html: pct(v, d), cls: "n", color: v >= 0 ? css("--pos") : css("--neg") };
+  }
+  function heat(v) {
+    // % of members above a moving average: one hue, light -> dark
+    if (v === null || v === undefined) return { html: "—", cls: "n" };
+    var a = Math.max(0.06, Math.min(0.55, v / 160));
+    return { html: "<span style='display:inline-block;min-width:48px;padding:1px 6px;border-radius:2px;" +
+      "background:color-mix(in srgb," + css("--s1") + " " + (a * 100).toFixed(0) + "%,transparent)'>" +
+      v.toFixed(0) + "%</span>", cls: "n" };
+  }
+
+  /* ------------------------------------------------------------------ *
+   * render everything
+   * ------------------------------------------------------------------ */
+  function renderStatic() {
+    document.getElementById("st-asof").textContent = D.asof;
+    document.getElementById("st-gen").textContent = D.generated || D.asof;
+    document.getElementById("st-n").textContent = D.sector.reduce(function (a, s) { return a + s.n; }, 0);
+
+    var p12 = D.participation.filter(function (r) { return r.horizon === "12M"; })[0];
+    var c = D.concentration;
+    document.getElementById("v-body").innerHTML =
+      "過去 12 個月標普 500 市值加權上漲 <b>" + pct(p12.index_ret) + "</b>，但成分股報酬中位數只有 <b>" +
+      pct(p12.median_ret) + "</b>，僅 <b>" + p12.pct_beat_index.toFixed(0) + "%</b> 的股票跑贏指數，前十大市值股就吃掉了 <b>" +
+      c.top10_share_of_12m_gain.toFixed(0) + "%</b> 的指數市值增幅。眼下 <b>" + D.latest.pct_above_200dma.toFixed(0) +
+      "%</b> 的成分股仍站在 200 日均線之上（長線結構完好），但站上 50 日均線的只剩 <b>" +
+      D.latest.pct_above_50dma.toFixed(0) + "%</b>（近一年第 " + D.pctile.pct_above_50dma.toFixed(0) +
+      " 百分位），20 日更只有 <b>" + D.latest.pct_above_20dma.toFixed(0) + "%</b>。騰落線 " +
+      D.adline_peak.date + " 見高後已走低，指數卻還在高點附近——這是典型的廣度背離，而非崩盤訊號。";
+
+    var stats = [
+      { k: "站上 200 日均線", v: D.latest.pct_above_200dma.toFixed(1) + "%", n: "近一年第 " + D.pctile.pct_above_200dma.toFixed(0) + " 百分位" },
+      { k: "站上 50 日均線", v: D.latest.pct_above_50dma.toFixed(1) + "%", n: "近一年第 " + D.pctile.pct_above_50dma.toFixed(0) + " 百分位" },
+      { k: "12 個月跑贏指數比例", v: p12.pct_beat_index.toFixed(0) + "%", n: "中位數 " + pct(p12.median_ret) + " vs 平均 " + pct(p12.mean_ret) },
+      { k: "前十大市值權重", v: c.top10_weight.toFixed(1) + "%", n: "貢獻 12 個月漲幅的 " + c.top10_share_of_12m_gain.toFixed(0) + "%" },
+      { k: "位於 52 週高點", v: D.drawdown[D.drawdown.length - 1].count + " 檔", n: "距高點逾 20% 者 " +
+        (D.drawdown[0].pct + D.drawdown[1].pct).toFixed(0) + "%" }
+    ];
+    document.getElementById("statrow").innerHTML = stats.map(function (s) {
+      return "<div class='stat'><div class='stat-k'>" + s.k + "</div><div class='stat-v'>" + s.v +
+        "</div><div class='stat-n'>" + s.n + "</div></div>";
+    }).join("");
+
+    document.getElementById("concrow").innerHTML = [
+      { k: "前 5 大權重", v: c.top5_weight.toFixed(1) + "%", n: "NVDA · AAPL · GOOGL · GOOG · MSFT" },
+      { k: "前 10 大權重", v: c.top10_weight.toFixed(1) + "%", n: "接近指數的一半" },
+      { k: "前 25 大權重", v: c.top25_weight.toFixed(1) + "%", n: "其餘 471 檔合計 " + (100 - c.top25_weight).toFixed(1) + "%" },
+      { k: "前 10 大對漲幅貢獻", v: c.top10_share_of_12m_gain.toFixed(0) + "%", n: "12 個月指數市值增幅中的占比" }
+    ].map(function (s) {
+      return "<div class='stat'><div class='stat-k'>" + s.k + "</div><div class='stat-v'>" + s.v +
+        "</div><div class='stat-n'>" + s.n + "</div></div>";
+    }).join("");
+
+    // signals
+    fillTable("t-signals", ["訊號", "狀態", "讀數", "說明"], D.signals.map(function (s) {
+      var cls = STATUS_CLS[s.status] || "p-neu";
+      var detail = SIG_DETAIL_TC[s.signal] ? SIG_DETAIL_TC[s.signal](D) : s.detail;
+      return [
+        { html: SIG_TC[s.signal] || s.signal },
+        { html: "<span class='pill " + cls + "'><i style='background:currentColor'></i>" +
+            (STATUS_TC[s.status] || s.status) + "</span>" },
+        { html: s.value === null ? "—" : String(s.value), cls: "n" },
+        { html: "<span class='sub'>" + detail + "</span>" }
+      ];
+    }));
+
+    // participation
+    fillTable("t-part", ["期間", "指數報酬", "上漲家數占比", "贏過指數", "平均", "中位數", "平均−中位數", "P10", "P90"],
+      D.participation.map(function (r) {
+        return [
+          { html: r.horizon === "1W" ? "1 週" : r.horizon.replace("M", " 個月") },
+          signed(r.index_ret), heat(r.pct_positive), heat(r.pct_beat_index),
+          signed(r.mean_ret), signed(r.median_ret),
+          { html: pct(r.mean_minus_median), cls: "n" },
+          signed(r.p10), signed(r.p90)
+        ];
+      }));
+
+    // sector table
+    var sec = D.sector.slice().sort(function (a, b) { return b.cw_3M - a.cw_3M; });
+    fillTable("t-sector",
+      ["類股", "權重", "家數", "1 個月", "3 個月", "12 個月<br><span class='sub'>市值加權</span>",
+       "12 個月<br><span class='sub'>等權</span>", "12 個月<br><span class='sub'>中位數</span>",
+       "&gt;50日均", "&gt;200日均", "距 52 週高<br><span class='sub'>中位數</span>"],
+      sec.map(function (s) {
+        return [
+          { html: secName(s.Sector) + " <span class='tag " + (s.style === "defensive" ? "def" : "cyc") + "'>" +
+              (s.style === "defensive" ? "防禦" : "景氣") + "</span>" },
+          { html: s.weight_pct.toFixed(1) + "%", cls: "n" },
+          { html: String(s.n), cls: "n" },
+          signed(s.cw_1M), signed(s.cw_3M), signed(s.cw_12M), signed(s.ew_12M), signed(s.med_12M),
+          heat(s.pct_above_50dma), heat(s.pct_above_200dma),
+          { html: num(s.median_pct_from_52wh) + "%", cls: "n" }
+        ];
+      }));
+
+    fillTable("t-secval",
+      ["類股", "本益比", "預估本益比", "殖利率", "今年成長", "明年成長", "下季成長", "預估PE ÷ 明年成長"],
+      D.sector.slice().sort(function (a, b) { return a.median_fwd_pe - b.median_fwd_pe; }).map(function (s) {
+        var peg = s.fwd_pe_over_ny_growth;
+        return [
+          { html: secName(s.Sector) },
+          { html: num(s.median_pe), cls: "n" },
+          { html: num(s.median_fwd_pe), cls: "n" },
+          { html: num(s.median_div_yield, 2) + "%", cls: "n" },
+          signed(s.median_cy_growth), signed(s.median_ny_growth), signed(s.median_nq_growth),
+          { html: (peg === null || peg < 0) ? "—" : num(peg, 2), cls: "n" }
+        ];
+      }));
+
+    // rotation
+    fillTable("t-rot", ["類股", "12 個月", "3 個月", "1 個月", "排名 12M", "排名 3M", "排名 1M", "12M→3M", "趨勢"],
+      D.rotation.map(function (r) {
+        var tone = r.trend === "improving" ? "p-good" : (r.trend === "deteriorating" ? "p-bad" : "p-neu");
+        var txt = r.trend === "improving" ? "改善" : (r.trend === "deteriorating" ? "轉弱" : "持平");
+        var ch = r.rank_change_12m_to_3m;
+        return [
+          { html: secName(r.Sector) },
+          signed(r.cw_12M), signed(r.cw_3M), signed(r.cw_1M),
+          { html: String(r.rank_12M), cls: "n" }, { html: String(r.rank_3M), cls: "n" },
+          { html: String(r.rank_1M), cls: "n" },
+          { html: (ch > 0 ? "+" : "") + ch, cls: "n", color: ch > 0 ? css("--pos") : (ch < 0 ? css("--neg") : css("--ink-3")) },
+          { html: "<span class='pill " + tone + "'><i style='background:currentColor'></i>" + txt + "</span>" }
+        ];
+      }));
+
+    // industries
+    var indHead = ["產業", "類股", "家數", "3 個月", "12 個月", "&gt;50日均", "&gt;200日均"];
+    function indRow(r) {
+      return [
+        { html: indName(r.Industry) + "<div class='sub'>" + r.Industry + "</div>" },
+        { html: "<span class='sub'>" + secName(r.Sector) + "</span>" },
+        { html: String(r.n), cls: "n" },
+        signed(r.cw_3M), signed(r.cw_12M), heat(r.pct_above_50dma), heat(r.pct_above_200dma)
+      ];
+    }
+    var byQ = D.industry.slice().sort(function (a, b) { return b.cw_3M - a.cw_3M; });
+    fillTable("t-indup", indHead, byQ.slice(0, 12).map(indRow));
+    fillTable("t-inddn", indHead, byQ.slice(-12).reverse().map(indRow));
+
+    var byY = D.industry.slice().sort(function (a, b) { return b.cw_12M - a.cw_12M; });
+    var ext = byY.slice(0, 8).concat(byY.slice(-8).reverse());
+    fillTable("t-ind12", ["產業", "類股", "家數", "12 個月", "3 個月", "&gt;200日均", "解讀"],
+      ext.map(function (r) {
+        var note;
+        if (r.cw_12M > 30 && r.cw_3M < 0) note = "漲多回檔";
+        else if (r.cw_12M > 30 && r.cw_3M > 0) note = "持續領先";
+        else if (r.cw_12M < 0 && r.cw_3M > 5) note = "落底反轉";
+        else if (r.cw_12M < 0 && r.cw_3M < 0) note = "持續弱勢";
+        else note = "震盪";
+        return [
+          { html: indName(r.Industry) + "<div class='sub'>" + r.Industry + "</div>" },
+          { html: "<span class='sub'>" + secName(r.Sector) + "</span>" },
+          { html: String(r.n), cls: "n" },
+          signed(r.cw_12M), signed(r.cw_3M), heat(r.pct_above_200dma),
+          { html: "<span class='sub'>" + note + "</span>" }
+        ];
+      }));
+
+    // stocks
+    var shead = ["代號", "名稱", "類股", "3 個月", "12 個月"];
+    function srow(r) {
+      return [
+        { html: "<span class='mono'>" + r.Ticker + "</span>" },
+        { html: "<span class='sub'>" + (r["Short Name"] || "").slice(0, 24) + "</span>" },
+        { html: "<span class='sub'>" + secName(r.Sector) + "</span>" },
+        signed(r.ret_3m), signed(r.ret_12m)
+      ];
+    }
+    fillTable("t-lead", shead, D.leaders.map(srow));
+    fillTable("t-lag", shead, D.laggards.map(srow));
+
+    document.getElementById("method-list").innerHTML = [
+      ["資料", "496 檔成分股的日線收盤價（2024-09 至 " + D.asof + "，504 個交易日），報告產出於 " +
+        (D.generated || D.asof) + "。已排除市值為零或歷史不足 60 根日線的 4 檔（AVB、EA、EQR、SATS），它們在指數中沒有權重，留著只會製造雜訊。"],
+      ["廣度", "均線比例、騰落線、麥克連擺盪指標、52 週新高低皆以未調整的收盤價計算；指數點位也由成分股自行重建，不引用官方指數，因此與官方數字會有小幅差異。"],
+      ["權重", "以最新市值除以最新收盤價回推股數，再把該股數套用到整段歷史。此法忽略期間的庫藏股買回、增資與成分股調整，長期會有偏誤，用於相對比較足夠，不宜當作精確的指數重建。"],
+      ["等權指數", "以成分股每日報酬的橫斷面平均複利累積。等權的一年報酬會被少數飆股拉高，因此類股表同時列出中位數作為對照。"],
+      ["評價", "本益比、預估本益比與成長預估來自 yfinance 的快照，取類股／產業內個股的中位數；負值或缺漏不納入。這些是市場共識預估，不是已實現數字。"],
+      ["限制", "無成交量資料，因此沒有量能確認、OBV 或 volume thrust 一類的指標；新高新低以收盤價而非盤中高低點認定，數字會略低於券商口徑。"]
+    ].map(function (x, i) {
+      return "<li data-i='" + String(i + 1).padStart(2, "0") + "'><span><b>" + x[0] + "</b>　" + x[1] + "</span></li>";
+    }).join("");
+  }
+
+  /* charts (re-rendered on resize / theme change) --------------------- */
+  function renderCharts() {
+    var s1 = css("--s1"), s2 = css("--s2"), s3 = css("--s3");
+
+    lineChart(document.getElementById("c-ma"), {
+      dates: D.dates, height: 280, right: 58,
+      min: 0, max: 100, yTicks: 4,
+      yFmt: function (v) { return v.toFixed(0) + "%"; },
+      tipFmt: function (v) { return v.toFixed(1) + "%"; },
+      series: [
+        { name: "% > 200 日均線", color: s1, values: D.ma200, label: D.latest.pct_above_200dma.toFixed(0) + "%" },
+        { name: "% > 50 日均線", color: s2, values: D.ma50, label: D.latest.pct_above_50dma.toFixed(0) + "%" }
+      ]
+    });
+    document.getElementById("lg-ma").innerHTML =
+      "<span><i class='swatch' style='background:" + s1 + "'></i>% &gt; 200 日均線（長期趨勢）</span>" +
+      "<span><i class='swatch' style='background:" + s2 + "'></i>% &gt; 50 日均線（中期趨勢）</span>";
+    document.getElementById("cap-ma").textContent =
+      "近一年區間：%>200日均線 " + D.range1y.pct_above_200dma.min + "–" + D.range1y.pct_above_200dma.max +
+      "（中位 " + D.range1y.pct_above_200dma.med + "），目前 " + D.latest.pct_above_200dma.toFixed(1) +
+      "；%>50日均線 " + D.range1y.pct_above_50dma.min + "–" + D.range1y.pct_above_50dma.max +
+      "（中位 " + D.range1y.pct_above_50dma.med + "），目前 " + D.latest.pct_above_50dma.toFixed(1) + "。";
+
+    lineChart(document.getElementById("c-idx"), {
+      dates: D.dates, height: 250, right: 50,
+      yFmt: function (v) { return v.toFixed(0); },
+      tipFmt: function (v) { return v.toFixed(1); },
+      series: [
+        { name: "市值加權", color: s1, values: D.capw, label: D.capw[D.capw.length - 1].toFixed(0) },
+        { name: "等權", color: s3, values: D.eqw, label: D.eqw[D.eqw.length - 1].toFixed(0) }
+      ]
+    });
+    document.getElementById("lg-idx").innerHTML =
+      "<span><i class='swatch' style='background:" + s1 + "'></i>市值加權（一年前 = 100）</span>" +
+      "<span><i class='swatch' style='background:" + s3 + "'></i>等權（一年前 = 100）</span>";
+    var gap = D.capw[D.capw.length - 1] - D.eqw[D.eqw.length - 1];
+    document.getElementById("cap-idx").textContent =
+      "一年下來市值加權領先等權 " + gap.toFixed(1) + " 個百分點。等權指數代表「平均一檔股票」的表現，兩線分岔就是漲勢集中的直接證據。";
+
+    lineChart(document.getElementById("c-ad"), {
+      dates: D.dates, height: 250, right: 14,
+      yFmt: function (v) { return (v / 1000).toFixed(1) + "k"; },
+      tipFmt: function (v) { return v.toFixed(0); },
+      mark: { date: D.adline_peak.date, text: "高點 " + D.adline_peak.date.slice(5) },
+      series: [{ name: "騰落線", color: s1, values: D.adline }]
+    });
+    document.getElementById("cap-ad").textContent =
+      "騰落線在 " + D.adline_peak.date + " 見高 " + D.adline_peak.val.toLocaleString() +
+      "，目前 " + D.adline_peak.now.toLocaleString() + "；同期市值加權指數的高點落在 " + D.cap_peak.date +
+      "，現在距高點不到 2%。價格撐住、參與家數卻退潮。";
+
+    colChart(document.getElementById("c-hl"), { dates: D.dates, values: D.nethl, height: 190 });
+    document.getElementById("cap-hl").textContent =
+      "目前 10 日均為 " + (D.latest.net_hl_10d >= 0 ? "+" : "") + D.latest.net_hl_10d.toFixed(1) +
+      "，最新一日新高 " + D.latest.new_highs + " 家、新低 " + D.latest.new_lows +
+      " 家。新低尚未擴大到足以稱為崩跌，但新高已經明顯縮手。";
+
+    // drawdown buckets — ordered categories, so an ordinal ramp of one hue
+    var ramp = ["#184f95", "#256abf", "#3987e5", "#6da7ec", "#9ec5f4", "#cde2fb"];
+    hbarChart(document.getElementById("c-dd"), {
+      rowH: 34, labelW: 110,
+      rows: D.drawdown.map(function (b, i) {
+        var lbl = { "<-30%": "跌逾 30%", "-30~-20%": "跌 20–30%", "-20~-10%": "跌 10–20%",
+          "-10~-5%": "跌 5–10%", "-5~0%": "跌 0–5%", "at 52w high": "位於 52 週高" }[b.bucket] || b.bucket;
+        return { label: lbl, value: b.pct, display: b.pct.toFixed(1) + "%", note: b.count + " 檔",
+          color: ramp[i], tip: "<div class='tt-h'>" + lbl + "</div><div class='tt-r'><span>檔數</span><b>" +
+            b.count + "</b></div><div class='tt-r'><span>占比</span><b>" + b.pct.toFixed(1) + "%</b></div>" };
+      })
+    });
+    var deep = D.drawdown[0].pct + D.drawdown[1].pct;
+    document.getElementById("cap-dd").textContent =
+      "只有 " + D.drawdown[5].count + " 檔（" + D.drawdown[5].pct.toFixed(1) +
+      "%）正站在 52 週高點，卻有 " + deep.toFixed(1) + "% 的成分股距高點超過 20%——已經是個股層面的熊市區間。";
+
+    // top-10 weights
+    hbarChart(document.getElementById("c-top10"), {
+      rowH: 28, labelW: 72,
+      rows: D.concentration.top10_names.map(function (t) {
+        return { label: t.ticker, value: t.weight, display: t.weight.toFixed(2) + "%",
+          tip: "<div class='tt-h'>" + t.ticker + "</div><div class='tt-r'><span>指數權重</span><b>" +
+            t.weight.toFixed(2) + "%</b></div>" };
+      })
+    });
+    document.getElementById("cap-top10").textContent =
+      "前十大合計 " + D.concentration.top10_weight.toFixed(1) + "%，赫芬達爾指數（HHI）" +
+      D.concentration.hhi.toFixed(0) + "。權重前兩名 NVDA 與 AAPL 單獨就各超過整個能源類股。";
+
+    // sector 3M bars
+    var ref3 = D.participation.filter(function (r) { return r.horizon === "3M"; })[0].index_ret;
+    var secSorted = D.sector.slice().sort(function (a, b) { return b.cw_3M - a.cw_3M; });
+    hbarChart(document.getElementById("c-sec"), {
+      diverging: true, rowH: 32, ref: ref3, refLabel: "指數 " + pct(ref3),
+      rows: secSorted.map(function (s) {
+        return { label: secName(s.Sector), value: s.cw_3M, display: pct(s.cw_3M),
+          note: s.pct_above_50dma.toFixed(0) + "%↑50日",
+          tip: "<div class='tt-h'>" + secName(s.Sector) + " · " + s.n + " 檔</div>" +
+            "<div class='tt-r'><span>3 個月（市值加權）</span><b>" + pct(s.cw_3M) + "</b></div>" +
+            "<div class='tt-r'><span>3 個月（中位數）</span><b>" + pct(s.med_3M) + "</b></div>" +
+            "<div class='tt-r'><span>上漲家數占比</span><b>" + s.pct_positive_3M.toFixed(0) + "%</b></div>" +
+            "<div class='tt-r'><span>指數權重</span><b>" + s.weight_pct.toFixed(1) + "%</b></div>" };
+      })
+    });
+    document.getElementById("cap-sec").textContent =
+      "右側百分比為該類股中站上 50 日均線的成分股比例——報酬與廣度不一定同向，能源兩者都強，科技則是報酬勉強為正、廣度已在滑落。";
+
+    // leadership quadrant
+    var maxCap = Math.max.apply(null, D.sector.map(function (s) { return s.weight_pct; }));
+    scatter(document.getElementById("c-quad"), {
+      height: 360,
+      points: D.sector.filter(function (s) { return s.Sector !== "unknown"; }).map(function (s) {
+        return {
+          x: s.rs_3m, y: s.pct_above_200dma, r: 6 + 16 * Math.sqrt(s.weight_pct / maxCap),
+          color: s.style === "defensive" ? s2 : s1,
+          label: secName(s.Sector),
+          tip: "<div class='tt-h'>" + secName(s.Sector) + "</div>" +
+            "<div class='tt-r'><span>3 個月超額報酬</span><b>" + pct(s.rs_3m) + "</b></div>" +
+            "<div class='tt-r'><span>&gt;200 日均線</span><b>" + s.pct_above_200dma.toFixed(0) + "%</b></div>" +
+            "<div class='tt-r'><span>&gt;50 日均線</span><b>" + s.pct_above_50dma.toFixed(0) + "%</b></div>" +
+            "<div class='tt-r'><span>指數權重</span><b>" + s.weight_pct.toFixed(1) + "%</b></div>"
+        };
+      })
+    });
+    document.getElementById("lg-quad").innerHTML =
+      "<span><i class='swatch dot' style='background:" + s1 + "'></i>景氣循環</span>" +
+      "<span><i class='swatch dot' style='background:" + s2 + "'></i>防禦型</span>" +
+      "<span class='sub' style='color:var(--ink-3)'>圓面積 ∝ 指數權重</span>";
+    document.getElementById("cap-quad").textContent =
+      "能源孤懸右上（超額報酬 +12.0%、85.7% 站上 200 日均線），但只有 3.3% 的指數權重；權重最大的科技落在中間偏左。防禦型類股這回沒有接棒——公用事業、必需消費、不動產全數在指數之下，代表這不是典型的避險輪動，而是全面性的縮手。";
+  }
+
+  renderStatic();
+  renderCharts();
+
+  var rt;
+  window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(function () { renderStatic(); renderCharts(); }, 180); });
+  if (window.matchMedia) {
+    var mq = window.matchMedia("(prefers-color-scheme: dark)");
+    (mq.addEventListener ? mq.addEventListener.bind(mq, "change") : mq.addListener.bind(mq))(function () {
+      renderStatic(); renderCharts();
+    });
+  }
+  new MutationObserver(function () { renderStatic(); renderCharts(); })
+    .observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+})();
+
+</script>

@@ -9,6 +9,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import datetime as dt
 import json
 from pathlib import Path
 
@@ -54,6 +55,7 @@ def main() -> None:
     ma_cols = ["pct_above_20dma", "pct_above_50dma", "pct_above_150dma", "pct_above_200dma"]
     payload = {
         "asof": str(b.index[-1].date()),
+        "generated": dt.date.today().isoformat(),
         "dates": [x.strftime("%Y-%m-%d") for x in wk.index],
         "ma20": series("pct_above_20dma"),
         "ma50": series("pct_above_50dma"),
