@@ -42,6 +42,13 @@ def main() -> None:
 
     b = pd.read_csv(d / "breadth_daily.csv", index_col=0, parse_dates=True)
     read = lambda n: pd.read_csv(d / n).replace({np.nan: None})
+    bundle = json.load(open(d / "analysis_bundle.json", encoding="utf-8"))
+
+    # The two halves of the breadth-vs-index divergence, so the report can state
+    # them rather than repeat a number that was true on some earlier run.
+    cw = b["cap_weighted"]
+    idx_pctile = float(100 * (cw.tail(126) <= cw.iloc[-1]).mean())
+    brd_pctile = float(100 * (b["pct_above_200dma"].tail(126) <= b["pct_above_200dma"].iloc[-1]).mean())
 
     tail = b.tail(CHART_DAYS)
     wk = tail.resample("W-FRI").last().dropna(how="all")
@@ -56,6 +63,12 @@ def main() -> None:
     payload = {
         "asof": str(b.index[-1].date()),
         "generated": dt.date.today().isoformat(),
+        "n_tickers": bundle["n_tickers"],
+        "n_daily_bars": bundle["n_daily_bars"],
+        "daily_start": bundle["daily_start"],
+        "excluded": bundle["excluded"],
+        "divergence": {"index_pctile": round(idx_pctile, 1), "breadth_pctile": round(brd_pctile, 1)},
+        "cap_off_high": round(float(100 * (cw.iloc[-1] / cw.max() - 1)), 2),
         "dates": [x.strftime("%Y-%m-%d") for x in wk.index],
         "ma20": series("pct_above_20dma"),
         "ma50": series("pct_above_50dma"),

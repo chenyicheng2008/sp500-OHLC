@@ -64,19 +64,27 @@ def load(data_dir: Path):
         fund.loc[m & fund["Sector"].isna(), "Sector"] = sec
         fund.loc[m & fund["Industry"].isna(), "Industry"] = ind
 
-    # Drop names with no market cap or no usable price history -- they have no
-    # index weight and would show up as phantom sectors in the group tables.
+    # Drop names with no usable price history -- nothing can be computed from a
+    # stub series, and they would show up as phantom members in the group tables.
     bars = ohlc[ohlc["Interval"] == "1d"].groupby("Ticker").size()
     usable = set(bars[bars >= MIN_DAILY_BARS].index)
-    dropped = fund[(fund["Market Cap"] <= 0) | (~fund["Ticker"].isin(usable))]["Ticker"].tolist()
+    dropped = fund[~fund["Ticker"].isin(usable)]["Ticker"].tolist()
     if dropped:
-        print(f"excluding {len(dropped)} ticker(s) with no cap / too little history: {dropped}")
+        print(f"excluding {len(dropped)} ticker(s) with too little price history: {dropped}")
     fund = fund[~fund["Ticker"].isin(dropped)].copy()
     ohlc = ohlc[~ohlc["Ticker"].isin(dropped)].copy()
 
+    # A missing market cap is a separate problem: yfinance intermittently returns 0
+    # for a perfectly good name. Such a ticker keeps its price history and stays in
+    # breadth, equal-weight and median stats -- it only drops out of anything
+    # cap-weighted, where its implied share count is 0 and contributes nothing.
+    no_cap = fund[fund["Market Cap"] <= 0]["Ticker"].tolist()
+    if no_cap:
+        print(f"no market cap (excluded from cap-weighted figures only): {no_cap}")
+
     fund["Sector"] = fund["Sector"].fillna("unknown")
     fund["Industry"] = fund["Industry"].fillna("unknown")
-    return ohlc, fund
+    return ohlc, fund, {"no_history": dropped, "no_cap": no_cap}
 
 
 def pivot(ohlc: pd.DataFrame, interval: str, field: str) -> pd.DataFrame:
@@ -423,7 +431,7 @@ def main() -> None:
     data_dir, out_dir = Path(args.data_dir), Path(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    ohlc, fund = load(data_dir)
+    ohlc, fund, excluded = load(data_dir)
     daily = pivot(ohlc, "1d", "Close")
     weekly = pivot(ohlc, "1wk", "Close")
 
@@ -518,6 +526,9 @@ def main() -> None:
     bundle = {
         "asof": asof,
         "n_tickers": int(daily.shape[1]),
+        "n_daily_bars": int(len(daily)),
+        "daily_start": daily.index[0].date().isoformat(),
+        "excluded": excluded,
         "breadth_dates": list(tail.index),
         "breadth": {c: [None if pd.isna(v) else round(float(v), 4) for v in tail[c]] for c in tail.columns},
         "participation": part.round(2).to_dict("records"),

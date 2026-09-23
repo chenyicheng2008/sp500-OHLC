@@ -46,6 +46,11 @@ Needs `pandas` and `numpy` (not in `requirements.txt`, which covers only the fet
   the method section. Never ship a report where you cannot tell those two apart.
 - **Never overwrite an older dated report.** Each run writes a new file; the
   directory is the archive.
+- **No figure is ever typed into the template.** Every number, ticker, sector name
+  and date in the prose and chart captions is derived from `report_data.json` at
+  render time. Prose baked into `report_template.html` goes stale silently and then
+  ships, dated and wrong, on the next daily rebuild. If a caption needs a figure the
+  payload lacks, add it to `build_report_data.py` — do not hardcode it.
 - Prose, labels and tables are Traditional Chinese. Metric names keep their standard
   English term in parentheses on first use (例如「騰落線（A/D Line）」).
 - Charts are hand-built inline SVG re-rendered on resize and on theme change; there
@@ -61,10 +66,16 @@ Needs `pandas` and `numpy` (not in `requirements.txt`, which covers only the fet
   which silently broke the combine step — do not reintroduce a per-file encoding.
 - There is **no volume column**, so volume-confirmed indicators (OBV, volume thrust)
   are not possible. Say so rather than approximating.
-- Known bad rows, handled in `breadth_sector.py` and worth re-checking after a refresh:
-  `SATS` has zero market cap and no OHLC; `EA`, `EQR`, `AVB` return only a handful of
-  daily bars; `FISV` comes back with a null sector/industry (patched via
-  `SECTOR_OVERRIDES`). Names with no cap or <60 daily bars are dropped.
+- Known bad rows, handled in `breadth_sector.py` and worth re-checking after a refresh
+  (the script prints what it excluded every run — read that line):
+  `SATS` has no OHLC at all; `EA`, `EQR`, `AVB` return only a handful of daily bars;
+  `FISV` comes back with a null sector/industry (patched via `SECTOR_OVERRIDES`);
+  `AZO` started returning a zero market cap on 2026-09-22 with its price history intact.
+  The two failures are handled differently on purpose: **no usable price history** (<60
+  daily bars) drops the name entirely, while a **missing market cap** only removes it
+  from cap-weighted figures — it stays in breadth, equal-weight and median stats, where
+  no weight is needed. Do not collapse these back into one filter; doing so silently
+  deleted AutoZone from the whole analysis.
 - Index weights are reconstructed as `latest market cap / latest close`, held constant
   through history. This ignores buybacks, issuance and index changes — good enough for
   relative comparison, not a precise index replication. State this limitation in any

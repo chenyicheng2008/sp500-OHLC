@@ -1,16 +1,16 @@
 ﻿Ticker,ret_3m,ret_12m,Short Name,Sector,Industry,Market Cap
-ON,-34.33942739669805,58.196546228811606,ON Semiconductor Corporation,technology,semiconductors,29642719232
-APTV,-32.989991864299164,-44.19801424465255,Aptiv PLC,consumer-cyclical,auto-parts,9637198848
-CASY,-32.779120014201645,14.691341343185726,"Caseys General Stores, Inc.",consumer-cyclical,specialty-retail,22747873280
-APP,-32.306666423497035,-42.876288220425685,Applovin Corporation,communication-services,advertising-agencies,108413378560
-LII,-29.033666411581336,-33.804130321501226,"Lennox International, Inc.",industrials,building-products-equipment,12650590208
-DECK,-28.941160539147436,-28.791729958065392,Deckers Outdoor Corporation,consumer-cyclical,footwear-accessories,11067498496
-GNRC,-27.334545039253733,1.0702183909610197,Generac Holdlings Inc.,industrials,specialty-industrial-machinery,11033464832
-ODFL,-27.32110047490075,23.646610067487295,"Old Dominion Freight Line, Inc.",industrials,trucking,37280645120
-ROL,-25.82524181671131,-37.494213196979786,"Rollins, Inc.",consumer-cyclical,personal-services,16710179840
-ALB,-25.677776896411764,63.001098625966215,Albemarle Corporation,basic-materials,specialty-chemicals,13867954176
-KLAC,-25.0119575620091,94.7336929313356,KLA Corporation,technology,semiconductor-equipment-materials,236014616576
-TJX,-24.903397368342084,-8.796326562704992,"TJX Companies, Inc. (The)",consumer-cyclical,apparel-retail,139214848000
-CDNS,-24.592171136385755,-14.521609263396185,"Cadence Design Systems, Inc.",technology,software-application,79812878336
-TTD,-24.126981788251413,-68.9206754610294,"The Trade Desk, Inc.",communication-services,advertising-agencies,6738081792
-BLDR,-23.164058589322323,-56.95543748172209,"Builders FirstSource, Inc.",industrials,building-products-equipment,6495598080
+ON,-37.12626002979283,44.11591719978063,ON Semiconductor Corporation,technology,semiconductors,28653850624
+WDC,-30.712014455434854,336.52517483464914,Western Digital Corporation,technology,computer-hardware,167507312640
+NCLH,-30.25992794169482,-43.63852348382412,Norwegian Cruise Line Holdings ,consumer-cyclical,travel-services,6529651200
+CASY,-29.64591948601829,7.2685566384198985,"Caseys General Stores, Inc.",consumer-cyclical,specialty-retail,21615415296
+APP,-29.611147548396556,-49.39423368649265,Applovin Corporation,communication-services,advertising-agencies,110433402880
+LII,-28.843037774411705,-30.40016330163725,"Lennox International, Inc.",industrials,building-products-equipment,12845511680
+APTV,-27.36893204124693,-47.6899610120757,Aptiv PLC,consumer-cyclical,auto-parts,9262523392
+TTD,-26.491912544077522,-70.3620419532622,"The Trade Desk, Inc.",communication-services,advertising-agencies,6231439360
+ROL,-26.030210302553847,-39.943521873561174,"Rollins, Inc.",consumer-cyclical,personal-services,15810438144
+NRG,-25.094632513049554,-36.71227562063817,"NRG Energy, Inc.",utilities,utilities-independent-power-producers,21599127552
+TPR,-24.920740774356375,-0.13148291327805817,"Tapestry, Inc.",consumer-cyclical,luxury-goods,22449508352
+GNRC,-24.903477907770753,13.106209978953443,Generac Holdlings Inc.,industrials,specialty-industrial-machinery,12177211392
+CMI,-24.45628083383038,26.008644195617194,Cummins Inc.,industrials,specialty-industrial-machinery,72429412352
+PNR,-23.82116707855395,-49.07588710580855,Pentair plc.,industrials,specialty-industrial-machinery,8856204288
+RCL,-23.663032642937253,-26.86373867935079,Royal Caribbean Cruises Ltd.,consumer-cyclical,travel-services,62821818368

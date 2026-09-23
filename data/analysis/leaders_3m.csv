@@ -1,16 +1,16 @@
 ﻿Ticker,ret_3m,ret_12m,Short Name,Sector,Industry,Market Cap
-MRNA,190.02820908721762,492.2254396689765,"Moderna, Inc.",healthcare,biotechnology,57477992448
-VEEV,62.42648649930138,-4.4428302752594355,Veeva Systems Inc.,healthcare,health-information-services,42484879360
-ZBRA,57.51213418075724,14.428946838078339,Zebra Technologies Corporation,technology,communication-equipment,16689311744
-VLO,53.33678722009958,151.5442554632688,Valero Energy Corporation,energy,oil-gas-refining-marketing,112412639232
-MPC,52.22350178372701,121.55495692866327,Marathon Petroleum Corporation,energy,oil-gas-refining-marketing,115586473984
-CRM,48.8254765770479,2.9874430081158865,"Salesforce, Inc.",technology,software-application,203873566720
-CRL,47.96342304478001,81.54890194364135,Charles River Laboratories Inte,healthcare,diagnostics-research,13283818496
-PSX,46.461063712265414,103.28221020978515,Phillips 66,energy,oil-gas-refining-marketing,103533961216
-DELL,45.15963105365797,361.6464417021975,Dell Technologies Inc.,technology,computer-hardware,360690188288
-HPQ,45.15721945330786,31.43520475338346,HP Inc.,technology,computer-hardware,31995543552
-IQV,44.57637940095476,42.36688745590909,"IQVIA Holdings, Inc.",healthcare,diagnostics-research,43087339520
-WDAY,42.26614470611312,-18.00600474593623,"Workday, Inc.",technology,software-application,44753698816
-GPN,35.81833609922469,5.43369970718699,Global Payments Inc.,industrials,specialty-business-services,23363158016
-TECH,33.65396157635927,42.32444777252209,Bio-Techne Corp,healthcare,biotechnology,11309731840
-HPE,33.05910051461063,159.34252496506173,Hewlett Packard Enterprise Comp,technology,communication-equipment,82422292480
+MRNA,199.27868452228478,623.2963518783189,"Moderna, Inc.",healthcare,biotechnology,72884502528
+WDAY,63.493442385147716,-19.428987389063224,"Workday, Inc.",technology,software-application,45363429376
+VEEV,63.364844213894365,-6.076534203382911,Veeva Systems Inc.,healthcare,health-information-services,42243637248
+PLTR,58.517575261985044,1.425520101001343,Palantir Technologies Inc.,technology,software-infrastructure,444541796352
+IQV,57.68916292784165,44.26343049720245,"IQVIA Holdings, Inc.",healthcare,diagnostics-research,44456812544
+MPC,57.229589744407505,113.62491352722755,Marathon Petroleum Corporation,energy,oil-gas-refining-marketing,109431791616
+VLO,55.36668457761631,136.8319644437494,Valero Energy Corporation,energy,oil-gas-refining-marketing,108588965888
+CRL,52.792055748057635,83.48026672980062,Charles River Laboratories Inte,healthcare,diagnostics-research,13733100544
+CRM,52.3206974282334,-4.788275538740006,"Salesforce, Inc.",technology,software-application,191989432320
+ZBRA,52.11592776993044,13.521057214565468,Zebra Technologies Corporation,technology,communication-equipment,17108006912
+PSX,51.54566667963443,103.81114924655685,Phillips 66,energy,oil-gas-refining-marketing,102952091648
+CRWD,46.89537909571839,99.0329349378942,"CrowdStrike Holdings, Inc.",technology,software-infrastructure,256045137920
+ACN,46.389326807403506,-21.774790849781912,Accenture plc,technology,information-technology-services,112426000384
+EPAM,45.06438002461965,-28.591547314506805,"EPAM Systems, Inc.",technology,information-technology-services,5754011648
+CTSH,44.13692746214002,-10.361375827807429,Cognizant Technology Solutions ,technology,information-technology-services,26432067584
