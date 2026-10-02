@@ -51,6 +51,12 @@ SECTOR_OVERRIDES = {"FISV": ("financial-services", "financial-data-stock-exchang
 # below it the series is a stub (delisted, or a Yahoo glitch) and only adds noise.
 MIN_DAILY_BARS = 60
 
+# A real trading session has a close for nearly every constituent. yfinance
+# sometimes emits a row for every ticker with all prices blank -- a refresh that
+# ran before the consolidated bar existed. Such a session is not a quiet day, it
+# is no data at all, and left in it silently poisons every "latest" reading.
+MIN_SESSION_COVERAGE = 0.5
+
 
 # --------------------------------------------------------------------------- #
 # loading
@@ -90,6 +96,17 @@ def load(data_dir: Path):
 def pivot(ohlc: pd.DataFrame, interval: str, field: str) -> pd.DataFrame:
     sub = ohlc[ohlc["Interval"] == interval]
     return sub.pivot_table(index="Date", columns="Ticker", values=field).sort_index()
+
+
+def drop_empty_sessions(close: pd.DataFrame) -> tuple:
+    """Remove dates where almost nothing priced -- see MIN_SESSION_COVERAGE."""
+    coverage = close.notna().sum(axis=1) / close.shape[1]
+    keep = coverage >= MIN_SESSION_COVERAGE
+    dropped = [
+        {"date": d.date().isoformat(), "priced": int(close.loc[d].notna().sum())}
+        for d in close.index[~keep]
+    ]
+    return close[keep], dropped
 
 
 # --------------------------------------------------------------------------- #
@@ -432,8 +449,11 @@ def main() -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
 
     ohlc, fund, excluded = load(data_dir)
-    daily = pivot(ohlc, "1d", "Close")
-    weekly = pivot(ohlc, "1wk", "Close")
+    daily, empty_sessions = drop_empty_sessions(pivot(ohlc, "1d", "Close"))
+    weekly, _ = drop_empty_sessions(pivot(ohlc, "1wk", "Close"))
+    for e in empty_sessions:
+        print(f"dropping {e['date']}: only {e['priced']} of {daily.shape[1]} tickers priced")
+    excluded["empty_sessions"] = empty_sessions
 
     # Share counts implied by the latest market cap; used as a static proxy for
     # index weights through time (ignores buybacks/issuance).

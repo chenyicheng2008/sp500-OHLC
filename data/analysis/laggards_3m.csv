@@ -1,16 +1,16 @@
 ﻿Ticker,ret_3m,ret_12m,Short Name,Sector,Industry,Market Cap
-ON,-37.12626002979283,44.11591719978063,ON Semiconductor Corporation,technology,semiconductors,28653850624
-WDC,-30.712014455434854,336.52517483464914,Western Digital Corporation,technology,computer-hardware,167507312640
-NCLH,-30.25992794169482,-43.63852348382412,Norwegian Cruise Line Holdings ,consumer-cyclical,travel-services,6529651200
-CASY,-29.64591948601829,7.2685566384198985,"Caseys General Stores, Inc.",consumer-cyclical,specialty-retail,21615415296
-APP,-29.611147548396556,-49.39423368649265,Applovin Corporation,communication-services,advertising-agencies,110433402880
-LII,-28.843037774411705,-30.40016330163725,"Lennox International, Inc.",industrials,building-products-equipment,12845511680
-APTV,-27.36893204124693,-47.6899610120757,Aptiv PLC,consumer-cyclical,auto-parts,9262523392
-TTD,-26.491912544077522,-70.3620419532622,"The Trade Desk, Inc.",communication-services,advertising-agencies,6231439360
-ROL,-26.030210302553847,-39.943521873561174,"Rollins, Inc.",consumer-cyclical,personal-services,15810438144
-NRG,-25.094632513049554,-36.71227562063817,"NRG Energy, Inc.",utilities,utilities-independent-power-producers,21599127552
-TPR,-24.920740774356375,-0.13148291327805817,"Tapestry, Inc.",consumer-cyclical,luxury-goods,22449508352
-GNRC,-24.903477907770753,13.106209978953443,Generac Holdlings Inc.,industrials,specialty-industrial-machinery,12177211392
-CMI,-24.45628083383038,26.008644195617194,Cummins Inc.,industrials,specialty-industrial-machinery,72429412352
-PNR,-23.82116707855395,-49.07588710580855,Pentair plc.,industrials,specialty-industrial-machinery,8856204288
-RCL,-23.663032642937253,-26.86373867935079,Royal Caribbean Cruises Ltd.,consumer-cyclical,travel-services,62821818368
+FICO,-50.89960148214288,-61.160714714409046,Fair Isaac Corporation,technology,software-application,14292235264
+APP,-48.56095354124125,-59.22988395643127,Applovin Corporation,communication-services,advertising-agencies,94503149568
+LII,-37.597948299604646,-30.833918571475117,"Lennox International, Inc.",industrials,building-products-equipment,12457741312
+TTD,-36.449084497538145,-75.48348060851954,"The Trade Desk, Inc.",communication-services,advertising-agencies,5720820736
+MGM,-34.659093144037016,-15.001367986199021,MGM Resorts International,consumer-cyclical,resorts-casinos,7795786752
+BLDR,-32.747433550599034,-52.33676278687409,"Builders FirstSource, Inc.",industrials,building-products-equipment,6170656768
+NRG,-31.825618309419536,-41.43463102011163,"NRG Energy, Inc.",utilities,utilities-independent-power-producers,20375701504
+PNR,-30.320087923729876,-51.0774366329864,Pentair plc.,industrials,specialty-industrial-machinery,8439648256
+GLW,-30.177439311564758,93.24806443944999,Corning Incorporated,technology,electronic-components,138183917568
+NCLH,-29.075956491043254,-40.767677384193505,Norwegian Cruise Line Holdings ,consumer-cyclical,travel-services,6722510336
+AXON,-28.86390103993849,-40.990478270387044,"Axon Enterprise, Inc.",industrials,aerospace-defense,34299248640
+APTV,-28.63304358171478,-49.84259981168907,Aptiv PLC,consumer-cyclical,auto-parts,9129637888
+ROL,-28.175693063601326,-47.78273394321768,"Rollins, Inc.",consumer-cyclical,personal-services,14708615168
+KLAC,-26.68759175577352,84.17068005908195,KLA Corporation,technology,semiconductor-equipment-materials,261431951360
+EIX,-26.030166044325608,2.645387548182665,Edison International,utilities,utilities-regulated-electric,20702992384

@@ -70,12 +70,21 @@ Needs `pandas` and `numpy` (not in `requirements.txt`, which covers only the fet
   (the script prints what it excluded every run — read that line):
   `SATS` has no OHLC at all; `EA`, `EQR`, `AVB` return only a handful of daily bars;
   `FISV` comes back with a null sector/industry (patched via `SECTOR_OVERRIDES`);
-  `AZO` started returning a zero market cap on 2026-09-22 with its price history intact.
+  `AZO` returned a zero market cap on 2026-09-22 with its price history intact (back to
+  normal on 2026-09-30 — these glitches come and go, so check the printed lines, not this list).
   The two failures are handled differently on purpose: **no usable price history** (<60
   daily bars) drops the name entirely, while a **missing market cap** only removes it
   from cap-weighted figures — it stays in breadth, equal-weight and median stats, where
   no weight is needed. Do not collapse these back into one filter; doing so silently
   deleted AutoZone from the whole analysis.
+- **A phantom final session** appears whenever the daily fetch runs before the US
+  consolidated close exists: `sp500_ohlc.csv` gets a row for every ticker at that
+  date with all four OHLC fields blank (seen 2026-10-01, where only HUBB priced).
+  Row counts look perfectly normal, so this does not show up in a `groupby(Date).size()`
+  check — only in the non-null count. `drop_empty_sessions()` rejects any session
+  priced for under `MIN_SESSION_COVERAGE` (50%) of constituents and the script prints
+  what it dropped. Left in, it silently poisons every "latest" reading, the whole
+  leaders/laggards table, and the distance-from-high figure.
 - Index weights are reconstructed as `latest market cap / latest close`, held constant
   through history. This ignores buybacks, issuance and index changes — good enough for
   relative comparison, not a precise index replication. State this limitation in any
