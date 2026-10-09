@@ -17,6 +17,12 @@ on:
 permissions:
   contents: write
 
+# Only one fetch at a time: the retry attempts above would otherwise overlap and
+# race each other's pushes. A queued attempt runs after, finds no new data, and exits.
+concurrency:
+  group: daily-fetch
+  cancel-in-progress: false
+
 jobs:
   fetch:
     runs-on: ubuntu-latest
@@ -40,7 +46,24 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/weekly_reutin/*.csv
-          git diff --cached --quiet && echo "No changes to commit" && exit 0
-          git commit -m "Daily CSV refresh ($(date -u +%Y-%m-%d))"
-          git push
+          # main can move during the ~7min fetch, which makes a plain push fail.
+          # Re-point HEAD at the current remote tip, keeping the freshly generated
+          # files in the working tree, so our commit always applies on top. These
+          # CSVs are whole-file regenerations, so there is nothing to merge.
+          for attempt in 1 2 3; do
+            git fetch --quiet origin main
+            git reset --soft FETCH_HEAD
+            git add data/weekly_reutin/*.csv
+            if git diff --cached --quiet; then
+              echo "No changes to commit"
+              exit 0
+            fi
+            git commit -q -m "Daily CSV refresh ($(date -u +%Y-%m-%d))"
+            if git push --quiet; then
+              echo "Pushed on attempt $attempt"
+              exit 0
+            fi
+            echo "Push rejected; remote moved. Retrying (attempt $attempt)"
+          done
+          echo "Could not push after 3 attempts"
+          exit 1
