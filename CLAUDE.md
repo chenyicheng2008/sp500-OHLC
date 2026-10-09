@@ -50,7 +50,9 @@ Needs `pandas` and `numpy` (not in `requirements.txt`, which covers only the fet
   and date in the prose and chart captions is derived from `report_data.json` at
   render time. Prose baked into `report_template.html` goes stale silently and then
   ships, dated and wrong, on the next daily rebuild. If a caption needs a figure the
-  payload lacks, add it to `build_report_data.py` — do not hardcode it.
+  payload lacks, add it to `build_report_data.py` — do not hardcode it. The same goes for
+  connective words: a clause like 「20 日更只有」 or 「仍站在」 asserts an ordering or a
+  state, so it must be chosen from the data too, not written once.
 - Prose, labels and tables are Traditional Chinese. Metric names keep their standard
   English term in parentheses on first use (例如「騰落線（A/D Line）」).
 - Charts are hand-built inline SVG re-rendered on resize and on theme change; there
@@ -69,6 +71,7 @@ Needs `pandas` and `numpy` (not in `requirements.txt`, which covers only the fet
 - Known bad rows, handled in `breadth_sector.py` and worth re-checking after a refresh
   (the script prints what it excluded every run — read that line):
   `SATS` has no OHLC at all; `EA`, `EQR`, `AVB` return only a handful of daily bars;
+  `PSKY` (Paramount Skydance) and `WBD` (post-split) are too new to have 60 bars as of 2026-10;
   `FISV` comes back with a null sector/industry (patched via `SECTOR_OVERRIDES`);
   `AZO` returned a zero market cap on 2026-09-22 with its price history intact (back to
   normal on 2026-09-30 — these glitches come and go, so check the printed lines, not this list).
@@ -85,6 +88,19 @@ Needs `pandas` and `numpy` (not in `requirements.txt`, which covers only the fet
   priced for under `MIN_SESSION_COVERAGE` (50%) of constituents and the script prints
   what it dropped. Left in, it silently poisons every "latest" reading, the whole
   leaders/laggards table, and the distance-from-high figure.
+  Note `pivot_table` drops an all-NaN date by default, so a session where *zero*
+  tickers priced (2026-10-07) vanished before the check could see or report it.
+  `pivot()` uses `dropna=False` so every session goes through the same gate.
+- **Unadjusted corporate actions.** yfinance does not back-adjust spin-offs/splits, so
+  the series shows a cliff (CTVA, 2026-10-01: -83.8% in one session — Corteva's
+  separation; market cap / last close = 693M shares, which only fits the post-event
+  price). Every return, moving average and 52-week range spanning that cliff is junk,
+  and it faked a -59.6% quarter for the whole agricultural-inputs industry. A single-day
+  drop past `CORP_ACTION_DROP` (-60%) marks a break; only bars after it count toward
+  `MIN_DAILY_BARS`. Large *rises* are only printed, never dropped — MRNA's +177% on
+  2026-08-19 is real (opened +84%, wide range, implied share count consistent). The
+  code cannot tell a real surge from a reverse split, so the report must say "flagged,
+  check it" — never claim it was verified.
 - Index weights are reconstructed as `latest market cap / latest close`, held constant
   through history. This ignores buybacks, issuance and index changes — good enough for
   relative comparison, not a precise index replication. State this limitation in any

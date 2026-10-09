@@ -57,6 +57,15 @@ MIN_DAILY_BARS = 60
 # is no data at all, and left in it silently poisons every "latest" reading.
 MIN_SESSION_COVERAGE = 0.5
 
+# yfinance does not back-adjust a spin-off or split, so the price series shows a
+# cliff and every return, moving average and 52-week range spanning it is junk.
+# An S&P 500 constituent does not fall this far in one session on news, so a drop
+# past this is read as a corporate action and only the bars after it are usable.
+# Large *rises* are left alone -- a biotech readout really can double a stock in a
+# day -- but they are printed so they can be eyeballed.
+CORP_ACTION_DROP = -0.60
+BIG_RISE = 1.0
+
 
 # --------------------------------------------------------------------------- #
 # loading
@@ -70,13 +79,39 @@ def load(data_dir: Path):
         fund.loc[m & fund["Sector"].isna(), "Sector"] = sec
         fund.loc[m & fund["Industry"].isna(), "Industry"] = ind
 
-    # Drop names with no usable price history -- nothing can be computed from a
-    # stub series, and they would show up as phantom members in the group tables.
-    bars = ohlc[ohlc["Interval"] == "1d"].groupby("Ticker").size()
+    # Count only bars that are actually priced, and only those after the most
+    # recent unadjusted corporate action -- earlier bars belong to a different
+    # company and cannot be compared with the current one.
+    daily_px = (
+        ohlc[ohlc["Interval"] == "1d"]
+        .pivot_table(index="Date", columns="Ticker", values="Close", dropna=False)
+        .sort_index()
+    )
+    chg = daily_px.pct_change()
+    breaks, rises = {}, {}
+    for t in daily_px.columns:
+        col = chg[t].dropna()
+        drops = col[col <= CORP_ACTION_DROP]
+        if len(drops):
+            breaks[t] = drops.index[-1]
+        ups = col[col >= BIG_RISE]
+        if len(ups):
+            rises[t] = {"date": ups.index[-1].date().isoformat(), "move": round(100 * float(ups.iloc[-1]), 1)}
+    for t, info in rises.items():
+        print(f"note: {t} rose {info['move']}% on {info['date']} -- left in; check it is news, not a reverse split")
+    if breaks:
+        for t, when in breaks.items():
+            print(f"{t}: suspected unadjusted corporate action on {when.date()} -- only later bars are usable")
+
+    bars = daily_px.notna().sum()
+    for t, when in breaks.items():
+        bars[t] = int(daily_px.loc[daily_px.index >= when, t].notna().sum())
     usable = set(bars[bars >= MIN_DAILY_BARS].index)
     dropped = fund[~fund["Ticker"].isin(usable)]["Ticker"].tolist()
+    history = {t: int(bars.get(t, 0)) for t in dropped}
     if dropped:
-        print(f"excluding {len(dropped)} ticker(s) with too little price history: {dropped}")
+        shown = ", ".join(f"{t} ({history[t]} bars)" for t in dropped)
+        print(f"excluding {len(dropped)} ticker(s) with too little price history: {shown}")
     fund = fund[~fund["Ticker"].isin(dropped)].copy()
     ohlc = ohlc[~ohlc["Ticker"].isin(dropped)].copy()
 
@@ -90,12 +125,20 @@ def load(data_dir: Path):
 
     fund["Sector"] = fund["Sector"].fillna("unknown")
     fund["Industry"] = fund["Industry"].fillna("unknown")
-    return ohlc, fund, {"no_history": dropped, "no_cap": no_cap}
+    return ohlc, fund, {
+        "no_history": dropped,
+        "no_history_bars": history,
+        "corporate_actions": {t: when.date().isoformat() for t, when in breaks.items() if t in dropped},
+        "big_rises": rises,
+        "no_cap": no_cap,
+    }
 
 
 def pivot(ohlc: pd.DataFrame, interval: str, field: str) -> pd.DataFrame:
     sub = ohlc[ohlc["Interval"] == interval]
-    return sub.pivot_table(index="Date", columns="Ticker", values=field).sort_index()
+    # dropna=False keeps dates where nothing priced; drop_empty_sessions() is the
+    # single place that decides what counts as a session, and reports it.
+    return sub.pivot_table(index="Date", columns="Ticker", values=field, dropna=False).sort_index()
 
 
 def drop_empty_sessions(close: pd.DataFrame) -> tuple:

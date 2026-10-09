@@ -1,16 +1,16 @@
 ﻿Ticker,ret_3m,ret_12m,Short Name,Sector,Industry,Market Cap
-FICO,-50.89960148214288,-61.160714714409046,Fair Isaac Corporation,technology,software-application,14292235264
-APP,-48.56095354124125,-59.22988395643127,Applovin Corporation,communication-services,advertising-agencies,94503149568
-LII,-37.597948299604646,-30.833918571475117,"Lennox International, Inc.",industrials,building-products-equipment,12457741312
-TTD,-36.449084497538145,-75.48348060851954,"The Trade Desk, Inc.",communication-services,advertising-agencies,5720820736
-MGM,-34.659093144037016,-15.001367986199021,MGM Resorts International,consumer-cyclical,resorts-casinos,7795786752
-BLDR,-32.747433550599034,-52.33676278687409,"Builders FirstSource, Inc.",industrials,building-products-equipment,6170656768
-NRG,-31.825618309419536,-41.43463102011163,"NRG Energy, Inc.",utilities,utilities-independent-power-producers,20375701504
-PNR,-30.320087923729876,-51.0774366329864,Pentair plc.,industrials,specialty-industrial-machinery,8439648256
-GLW,-30.177439311564758,93.24806443944999,Corning Incorporated,technology,electronic-components,138183917568
-NCLH,-29.075956491043254,-40.767677384193505,Norwegian Cruise Line Holdings ,consumer-cyclical,travel-services,6722510336
-AXON,-28.86390103993849,-40.990478270387044,"Axon Enterprise, Inc.",industrials,aerospace-defense,34299248640
-APTV,-28.63304358171478,-49.84259981168907,Aptiv PLC,consumer-cyclical,auto-parts,9129637888
-ROL,-28.175693063601326,-47.78273394321768,"Rollins, Inc.",consumer-cyclical,personal-services,14708615168
-KLAC,-26.68759175577352,84.17068005908195,KLA Corporation,technology,semiconductor-equipment-materials,261431951360
-EIX,-26.030166044325608,2.645387548182665,Edison International,utilities,utilities-regulated-electric,20702992384
+APP,-46.61227877560796,-59.16866910893107,Applovin Corporation,communication-services,advertising-agencies,94496432128
+FICO,-45.06981817010802,-62.42077038888824,Fair Isaac Corporation,technology,software-application,14724620288
+TTD,-37.49344380152693,-76.87681813247367,"The Trade Desk, Inc.",communication-services,advertising-agencies,5716092928
+MGM,-34.463515202715136,-9.991156378301936,MGM Resorts International,consumer-cyclical,resorts-casinos,7675536896
+ROL,-32.15154035787784,-47.55427155334881,"Rollins, Inc.",consumer-cyclical,personal-services,14852959232
+LII,-31.75098748033299,-32.81343264331513,"Lennox International, Inc.",industrials,building-products-equipment,12387582976
+AXON,-30.206734972178527,-41.49348165592929,"Axon Enterprise, Inc.",industrials,aerospace-defense,32982390784
+CHRW,-28.59567317695486,1.262231539965275,"C.H. Robinson Worldwide, Inc.",industrials,integrated-freight-logistics,15768536064
+EIX,-27.453863485460072,3.526325873719438,Edison International,utilities,utilities-regulated-electric,20937728000
+PNR,-27.421114756293175,-52.2515554823394,Pentair plc.,industrials,specialty-industrial-machinery,8329523712
+PCG,-26.384012246565934,-20.355212640498866,Pacific Gas & Electric Co.,utilities,utilities-regulated-electric,38400274432
+CASY,-26.311765558211984,9.776821812753166,"Caseys General Stores, Inc.",consumer-cyclical,specialty-retail,23405027328
+IBM,-26.21174855603089,-21.266829752396344,International Business Machines,technology,information-technology-services,207750053888
+WDC,-25.28221872267209,213.61421399223332,Western Digital Corporation,technology,computer-hardware,151758143488
+NRG,-24.37609294699722,-36.92554254992123,"NRG Energy, Inc.",utilities,utilities-independent-power-producers,22830960640
