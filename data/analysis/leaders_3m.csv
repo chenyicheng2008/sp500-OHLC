@@ -1,16 +1,16 @@
 ﻿Ticker,ret_3m,ret_12m,Short Name,Sector,Industry,Market Cap
-MRNA,154.010838701994,557.9852868370516,"Moderna, Inc.",healthcare,biotechnology,78441865216
-LITE,60.28851132046385,591.8991766718345,Lumentum Holdings Inc.,technology,communication-equipment,99662970880
-HPE,58.17836469691009,193.69991848340993,Hewlett Packard Enterprise Comp,technology,communication-equipment,95696936960
-PTC,57.409672163157666,-4.926108374384242,PTC Inc.,technology,software-application,21031198720
-MPC,54.46197409194973,127.59742280863992,Marathon Petroleum Corporation,energy,oil-gas-refining-marketing,124197568512
-SMCI,54.27759661614551,-16.358737778615694,"Super Micro Computer, Inc.",technology,computer-hardware,29524023296
-VEEV,50.66163722096879,-4.313486847560332,Veeva Systems Inc.,healthcare,health-information-services,45739249664
-VLO,48.76984125694857,166.90045956148433,Valero Energy Corporation,energy,oil-gas-refining-marketing,122110033920
-ZBRA,45.95187200721189,26.481094530548987,Zebra Technologies Corporation,technology,communication-equipment,18264279040
-CRWD,45.9083259083259,127.69656452360856,"CrowdStrike Holdings, Inc.",technology,software-infrastructure,271793274880
-PLTR,45.265470844772814,10.978216441862498,Palantir Technologies Inc.,technology,software-infrastructure,466481676288
-PSX,44.41293523479794,108.84073685603055,Phillips 66,energy,oil-gas-refining-marketing,108901965824
-ACN,42.66745159307796,-19.539667018014185,Accenture plc,technology,information-technology-services,120332288000
-SWKS,41.54556084755019,10.861186333961403,"Skyworks Solutions, Inc.",technology,semiconductors,19619862528
-RVTY,40.27995898557506,63.44907954979171,"Revvity, Inc.",healthcare,diagnostics-research,17139672064
+MRNA,156.6353213075363,613.4349644003154,"Moderna, Inc.",healthcare,biotechnology,78649475072
+SMCI,59.135973763960045,-17.722446895774336,"Super Micro Computer, Inc.",technology,computer-hardware,27666759680
+MPC,56.53758847245438,132.351710398093,Marathon Petroleum Corporation,energy,oil-gas-refining-marketing,135265918976
+PTC,56.393896656989014,-5.560972632431415,PTC Inc.,technology,software-application,21045319680
+VLO,51.37385993670729,165.01761710281616,Valero Energy Corporation,energy,oil-gas-refining-marketing,127782199296
+PLTR,50.433978004591594,8.126773484706963,Palantir Technologies Inc.,technology,software-infrastructure,477679943680
+VEEV,48.91934873202839,-5.757942755312884,Veeva Systems Inc.,healthcare,health-information-services,46118117376
+HPE,47.164190355390836,196.04641380947126,Hewlett Packard Enterprise Comp,technology,communication-equipment,94250000384
+PSX,43.85292951574247,110.39972890519945,Phillips 66,energy,oil-gas-refining-marketing,112364298240
+ZBRA,41.59178303137554,27.856522710297305,Zebra Technologies Corporation,technology,communication-equipment,18202626048
+ACN,41.40658912840338,-19.131214274374074,Accenture plc,technology,information-technology-services,127504252928
+LITE,41.398872274596286,591.8243487319149,Lumentum Holdings Inc.,technology,communication-equipment,94985183232
+IT,40.00301518910132,-27.555274508259142,"Gartner, Inc.",technology,information-technology-services,12339941376
+SWKS,39.165970381023676,11.994181602775278,"Skyworks Solutions, Inc.",technology,semiconductors,18989619200
+CRM,38.43388756376811,-7.858782068531833,"Salesforce, Inc.",technology,software-application,187479408640

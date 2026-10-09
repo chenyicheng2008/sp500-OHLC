@@ -91,11 +91,19 @@ Needs `pandas` and `numpy` (not in `requirements.txt`, which covers only the fet
   Note `pivot_table` drops an all-NaN date by default, so a session where *zero*
   tickers priced (2026-10-07) vanished before the check could see or report it.
   `pivot()` uses `dropna=False` so every session goes through the same gate.
+  Since 2026-10-09 the fetch step also drops rows with every price blank
+  (`flatten_and_save_ohlc`). Keep the analysis-side gate anyway: the fetch fix removes
+  blank *rows*, but a session where one ticker priced and the rest were blank (the
+  2026-10-01 HUBB case) still survives as a one-ticker session, and only the coverage
+  check catches that. CSVs written before the fix (anything committed before
+  2026-10-09 01:25 UTC) still carry placeholder rows.
 - **Unadjusted corporate actions.** yfinance does not back-adjust spin-offs/splits, so
   the series shows a cliff (CTVA, 2026-10-01: -83.8% in one session — Corteva's
   separation; market cap / last close = 693M shares, which only fits the post-event
   price). Every return, moving average and 52-week range spanning that cliff is junk,
-  and it faked a -59.6% quarter for the whole agricultural-inputs industry. A single-day
+  and it faked a -59.6% quarter for the whole agricultural-inputs industry. Yahoo
+  back-adjusted CTVA a week later (by 2026-10-09), the cliff disappeared and the name
+  re-entered on its own — so the break is detected fresh each run, never hard-listed. A single-day
   drop past `CORP_ACTION_DROP` (-60%) marks a break; only bars after it count toward
   `MIN_DAILY_BARS`. Large *rises* are only printed, never dropped — MRNA's +177% on
   2026-08-19 is real (opened +84%, wide range, implied share count consistent). The
@@ -105,6 +113,13 @@ Needs `pandas` and `numpy` (not in `requirements.txt`, which covers only the fet
   through history. This ignores buybacks, issuance and index changes — good enough for
   relative comparison, not a precise index replication. State this limitation in any
   output that uses it.
+
+## Fetch schedule
+
+`daily-fetch.yml` now fires five attempts on odd minutes across 20:07-22:07 UTC, runs
+serialized, and re-points onto the remote tip before committing so overlapping runs
+don't reject each other. Runs are idempotent (no new data, no commit), so several
+"Daily CSV refresh" commits a day is normal, not a bug.
 
 ## Git
 
