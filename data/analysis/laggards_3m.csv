@@ -1,16 +1,16 @@
 ﻿Ticker,ret_3m,ret_12m,Short Name,Sector,Industry,Market Cap
-FICO,-46.71215628159609,-63.15115287488845,Fair Isaac Corporation,technology,software-application,15278815232
-APP,-45.950461636794905,-52.080066687406834,Applovin Corporation,communication-services,advertising-agencies,93742301184
-TTD,-38.78480935398536,-77.2487762675003,"The Trade Desk, Inc.",communication-services,advertising-agencies,5834291712
-MGM,-35.400514885575085,-11.556598999271694,MGM Resorts International,consumer-cyclical,resorts-casinos,7550298624
-LII,-33.062586670733616,-34.48981574763219,"Lennox International, Inc.",industrials,building-products-equipment,12495067136
-ROL,-30.711600433554175,-46.29896949632134,"Rollins, Inc.",consumer-cyclical,personal-services,15521750016
-AXON,-30.240549828178697,-43.7353642802882,"Axon Enterprise, Inc.",industrials,aerospace-defense,33901185024
-WDC,-29.841682252940828,224.2148655147289,Western Digital Corporation,technology,computer-hardware,147225083904
-PNR,-29.706293630122815,-52.852387976263834,Pentair plc.,industrials,specialty-industrial-machinery,8451969536
-CHRW,-29.568862337336064,2.144265425138192,"C.H. Robinson Worldwide, Inc.",industrials,integrated-freight-logistics,16487091200
-BLDR,-28.159379421330797,-57.871136039708624,"Builders FirstSource, Inc.",industrials,building-products-equipment,5789765632
-APTV,-26.127629853287736,-49.52054567242183,Aptiv PLC,consumer-cyclical,auto-parts,9355743232
-EIX,-25.904237341581126,6.483443960757929,Edison International,utilities,utilities-regulated-electric,20895399936
-POOL,-25.39718867636367,-48.576608578303734,Pool Corporation,industrials,industrial-distribution,5746926080
-PCG,-25.246095667788737,-19.218740080248264,Pacific Gas & Electric Co.,utilities,utilities-regulated-electric,38039990272
+APP,-44.747329471192586,-55.6666921040201,Applovin Corporation,communication-services,advertising-agencies,93742301184
+FICO,-43.44632033985686,-62.361736889270134,Fair Isaac Corporation,technology,software-application,15278815232
+TTD,-36.81515761017917,-76.93026777833222,"The Trade Desk, Inc.",communication-services,advertising-agencies,5834291712
+MGM,-35.98549585082515,-9.390093005132671,MGM Resorts International,consumer-cyclical,resorts-casinos,7550298624
+LII,-34.25893812497177,-32.51091810772624,"Lennox International, Inc.",industrials,building-products-equipment,12495067136
+WDC,-32.46773349072719,228.561465113909,Western Digital Corporation,technology,computer-hardware,147225083904
+PNR,-31.055922516246714,-52.15954830112188,Pentair plc.,industrials,specialty-industrial-machinery,8451969536
+BLDR,-28.907385866519363,-57.589846675503885,"Builders FirstSource, Inc.",industrials,building-products-equipment,5789765632
+ROL,-27.103244482789744,-43.55186074110049,"Rollins, Inc.",consumer-cyclical,personal-services,15521750016
+APTV,-27.010072136007533,-48.14684731788669,Aptiv PLC,consumer-cyclical,auto-parts,9355743232
+CHRW,-26.64101372696527,7.253879950928543,"C.H. Robinson Worldwide, Inc.",industrials,integrated-freight-logistics,16487091200
+EIX,-26.604695160641477,6.826327073913108,Edison International,utilities,utilities-regulated-electric,20895399936
+AXON,-26.244254761049735,-41.60229333671336,"Axon Enterprise, Inc.",industrials,aerospace-defense,33901185024
+PCG,-25.904334723060206,-20.767015643576592,Pacific Gas & Electric Co.,utilities,utilities-regulated-electric,38039990272
+POOL,-24.359569465676934,-46.155759253834894,Pool Corporation,industrials,industrial-distribution,5746926080

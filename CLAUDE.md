@@ -96,7 +96,8 @@ Needs `pandas` and `numpy` (not in `requirements.txt`, which covers only the fet
   blank *rows*, but a session where one ticker priced and the rest were blank (the
   2026-10-01 HUBB case) still survives as a one-ticker session, and only the coverage
   check catches that. CSVs written before the fix (anything committed before
-  2026-10-09 01:25 UTC) still carry placeholder rows.
+  2026-10-09 01:25 UTC) still carry placeholder rows. The first post-fix refresh
+  (2026-10-09 01:34 UTC) had zero blank rows and the 2026-10-08 bar fully priced.
 - **Unadjusted corporate actions.** yfinance does not back-adjust spin-offs/splits, so
   the series shows a cliff (CTVA, 2026-10-01: -83.8% in one session — Corteva's
   separation; market cap / last close = 693M shares, which only fits the post-event
