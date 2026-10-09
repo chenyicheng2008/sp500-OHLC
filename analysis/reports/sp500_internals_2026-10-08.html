@@ -545,6 +545,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
         "font-size": 11, "font-family": "IBM Plex Mono, monospace" }, fmtDate(opt.dates[i])));
     });
     // series
+    var endLabels = [];
     opt.series.forEach(function (s) {
       var dstr = "", started = false;
       s.values.forEach(function (v, i) {
@@ -561,11 +562,18 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
         svg.appendChild(el("circle", { cx: X(li), cy: Y(s.values[li]), r: 4, fill: s.color,
           stroke: css("--surface"), "stroke-width": 2 }));
         if (m.r > 20) {
-          svg.appendChild(el("text", { x: X(li) + 9, y: Y(s.values[li]) + 4, fill: s.color,
-            "font-size": 12, "font-weight": 600, "font-family": "IBM Plex Mono, monospace" },
-            s.label !== undefined ? s.label : (opt.yFmt ? opt.yFmt(s.values[li]) : s.values[li].toFixed(0))));
+          endLabels.push({ x: X(li) + 9, y: Y(s.values[li]) + 4, color: s.color,
+            text: s.label !== undefined ? s.label : (opt.yFmt ? opt.yFmt(s.values[li]) : s.values[li].toFixed(0)) });
         }
       }
+    });
+    endLabels.sort(function (a, b) { return a.y - b.y; });
+    for (var q = 1; q < endLabels.length; q++) {
+      if (endLabels[q].y - endLabels[q - 1].y < 14) endLabels[q].y = endLabels[q - 1].y + 14;
+    }
+    endLabels.forEach(function (lb) {
+      svg.appendChild(el("text", { x: lb.x, y: lb.y, fill: lb.color, "font-size": 12, "font-weight": 600,
+        "font-family": "IBM Plex Mono, monospace" }, lb.text));
     });
     // annotation
     if (opt.mark) {
@@ -1060,17 +1068,21 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
       tipFmt: function (v) { return v.toFixed(1) + "%"; },
       series: [
         { name: "% > 200 日均線", color: s1, values: D.ma200, label: D.latest.pct_above_200dma.toFixed(0) + "%" },
-        { name: "% > 50 日均線", color: s2, values: D.ma50, label: D.latest.pct_above_50dma.toFixed(0) + "%" }
+        { name: "% > 50 日均線", color: s2, values: D.ma50, label: D.latest.pct_above_50dma.toFixed(0) + "%" },
+        { name: "% > 20 日均線", color: s3, values: D.ma20, label: D.latest.pct_above_20dma.toFixed(0) + "%" }
       ]
     });
     document.getElementById("lg-ma").innerHTML =
       "<span><i class='swatch' style='background:" + s1 + "'></i>% &gt; 200 日均線（長期趨勢）</span>" +
-      "<span><i class='swatch' style='background:" + s2 + "'></i>% &gt; 50 日均線（中期趨勢）</span>";
+      "<span><i class='swatch' style='background:" + s2 + "'></i>% &gt; 50 日均線（中期趨勢）</span>" +
+      "<span><i class='swatch' style='background:" + s3 + "'></i>% &gt; 20 日均線（短期趨勢）</span>";
     document.getElementById("cap-ma").textContent =
       "近一年區間：%>200日均線 " + D.range1y.pct_above_200dma.min + "–" + D.range1y.pct_above_200dma.max +
       "（中位 " + D.range1y.pct_above_200dma.med + "），目前 " + D.latest.pct_above_200dma.toFixed(1) +
       "；%>50日均線 " + D.range1y.pct_above_50dma.min + "–" + D.range1y.pct_above_50dma.max +
-      "（中位 " + D.range1y.pct_above_50dma.med + "），目前 " + D.latest.pct_above_50dma.toFixed(1) + "。";
+      "（中位 " + D.range1y.pct_above_50dma.med + "），目前 " + D.latest.pct_above_50dma.toFixed(1) +
+      "；%>20日均線 " + D.range1y.pct_above_20dma.min + "–" + D.range1y.pct_above_20dma.max +
+      "（中位 " + D.range1y.pct_above_20dma.med + "），目前 " + D.latest.pct_above_20dma.toFixed(1) + "。";
 
     lineChart(document.getElementById("c-idx"), {
       dates: D.dates, height: 250, right: 50,
