@@ -2,12 +2,26 @@ name: Daily sp500/memory/software CSV refresh
 
 on:
   schedule:
-    # 21:30 UTC = 05:30 next day Taipei time, well after US market close.
-    - cron: "30 21 * * *"
+    # Goal: fresh US close data committed before 23:00 UTC (07:00 Taipei).
+    # US close is 20:00 UTC (EDT) or 21:00 UTC (EST), so attempts start at 20:07.
+    # GitHub delays scheduled runs under load — worst on round minutes — so these
+    # use odd minutes and retry several times. A run that finds no new data makes
+    # no commit, so the extra attempts are harmless (and free on a public repo).
+    - cron: "7 20 * * *"
+    - cron: "37 20 * * *"
+    - cron: "7 21 * * *"
+    - cron: "37 21 * * *"
+    - cron: "7 22 * * *"
   workflow_dispatch: {}
 
 permissions:
   contents: write
+
+# Only one fetch at a time: the retry attempts above would otherwise overlap and
+# race each other's pushes. A queued attempt runs after, finds no new data, and exits.
+concurrency:
+  group: daily-fetch
+  cancel-in-progress: false
 
 jobs:
   fetch:
@@ -32,7 +46,24 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/weekly_reutin/*.csv
-          git diff --cached --quiet && echo "No changes to commit" && exit 0
-          git commit -m "Daily CSV refresh ($(date -u +%Y-%m-%d))"
-          git push
+          # main can move during the ~7min fetch, which makes a plain push fail.
+          # Re-point HEAD at the current remote tip, keeping the freshly generated
+          # files in the working tree, so our commit always applies on top. These
+          # CSVs are whole-file regenerations, so there is nothing to merge.
+          for attempt in 1 2 3; do
+            git fetch --quiet origin main
+            git reset --soft FETCH_HEAD
+            git add data/weekly_reutin/*.csv
+            if git diff --cached --quiet; then
+              echo "No changes to commit"
+              exit 0
+            fi
+            git commit -q -m "Daily CSV refresh ($(date -u +%Y-%m-%d))"
+            if git push --quiet; then
+              echo "Pushed on attempt $attempt"
+              exit 0
+            fi
+            echo "Push rejected; remote moved. Retrying (attempt $attempt)"
+          done
+          echo "Could not push after 3 attempts"
+          exit 1

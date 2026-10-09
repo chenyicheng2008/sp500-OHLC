@@ -154,6 +154,17 @@ def flatten_and_save_ohlc(ohlc_dict, output_filename):
     combined_df = pd.concat(all_frames, ignore_index=True)
     final_order = ["Ticker", "Date", "Close", "High", "Low", "Open", "Interval"]
     combined_df = combined_df[[c for c in final_order if c in combined_df.columns]]
+
+    # Yahoo hands back a placeholder row for a session it has not settled yet:
+    # every price is NaN. Those rows would poison any downstream indicator, and
+    # the real bar arrives on a later run, so drop them.
+    price_cols = [c for c in ["Close", "High", "Low", "Open"] if c in combined_df.columns]
+    before = len(combined_df)
+    combined_df = combined_df.dropna(subset=price_cols, how="all")
+    dropped = before - len(combined_df)
+    if dropped:
+        print(f"已略過 {dropped} 列無價格資料（尚未結算的交易日）")
+
     combined_df.to_csv(output_filename, index=False, encoding="utf-8-sig")
     print(f"已儲存至: {output_filename}")
     return combined_df
