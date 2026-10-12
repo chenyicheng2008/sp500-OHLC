@@ -1,6 +1,6 @@
 ﻿stock,Short Name,Market Cap,Sector,Industry,PE Ratio,Dividend Yield,Forward P/E Ratio,50日均差%,200日均差%,CurrentY成長,NextY成長,CurrentQ成長,NextQ成長,ethnic_group
-005930.KS,SamsungElec,1713873010819072,technology,consumer-electronics,0.0,0.0,3.624447,0.0076441974,0.12476365,6.2272997,0.5085,6.5152,4.1082,Memory_concept
-000660.KS,SK hynix,1168297139634176,technology,semiconductors,0.0,0.0,3.4933343,-0.02529603,0.12972596,4.8838,0.324,3.8314002,3.6707,Memory_concept
+005930.KS,SamsungElec,1681040267542528,technology,consumer-electronics,0.0,0.0,3.5550132,-0.011659332,0.103216454,6.2272997,0.5085,6.5152,4.1082,Memory_concept
+000660.KS,SK hynix,1151942306824192,technology,semiconductors,0.0,0.0,3.4444318,-0.038940698,0.11391117,4.8838,0.324,3.8314002,3.6707,Memory_concept
 285A.T,KIOXIA HOLDINGS CORPORATION,27964500606976,technology,semiconductors,21.0018,0.0,0.0,-0.0121387355,0.17400028,9.2782,0.407,33.6516,19.0005,NandFlash_concept
 2408.TW,NANYA TECHNOLOGY CORPORATION,1835509612544,technology,semiconductors,20.05277,0.0029182879,4.6712837,0.06353205,0.51881754,34.1472,0.5213,48.36,6.3451,Taiwan_Dram_concept
 MU,"Micron Technology, Inc.",1164234457088,technology,semiconductors,13.84367,0.00054545107,4.9870977,0.05410216,0.46647906,1.3842,0.1713,11.6108,7.8117,Memory_concept
