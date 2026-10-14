@@ -1,6 +1,6 @@
 ﻿stock,Short Name,Market Cap,Sector,Industry,PE Ratio,Dividend Yield,Forward P/E Ratio,50日均差%,200日均差%,CurrentY成長,NextY成長,CurrentQ成長,NextQ成長,name,ethnic_group,Main_business_direction,Featured_Growth_Focus
 GOOG,Alphabet Inc.,4202817126400,communication-services,internet-content-information,17.24285,0.0024319068,22.53184,0.002543323,0.014556236,0.0998,0.2886,0.0481,0.20969999,,CSP,,
-MSFT,Microsoft Corporation,3962939637760,technology,software-infrastructure,29.732033,0.0066979486,22.530933,0.06082116,0.22813685,0.1441,0.1981,0.1425,0.16479999,,CSP,,
+MSFT,Microsoft Corporation,3962939637760,technology,software-infrastructure,29.732033,0.0066979486,22.51943,0.06082116,0.22813685,0.1441,0.1981,0.1425,0.16479999,,CSP,,
 AMZN,"Amazon.com, Inc.",2740586545152,consumer-cyclical,internet-retail,20.440868,0.0,24.305107,-0.01651195,0.048100535,0.7977,-0.1833,0.0005,0.25129998,,CSP,,
 PLTR,Palantir Technologies Inc.,482942648320,technology,software-infrastructure,173.25,0.0,85.46314,0.114278905,0.31802598,1.1597,0.4518,0.96699995,0.8553,PALANTIR,Cloud data platform,AI data analysis platform,AIP Enterprise AI Transformation Engine
 ORCL,Oracle Corporation,395762466816,technology,software-infrastructure,20.462383,0.013966481,11.869272,-0.1053586,-0.1900327,0.0669,0.3511,-0.16229999,0.13,ORACLE,Enterprise Cloud and AI Platform,Cloud database and infrastructure,GENERATIVE_AI database integration
