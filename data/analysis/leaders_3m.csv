@@ -1,16 +1,16 @@
 ﻿Ticker,ret_3m,ret_12m,Short Name,Sector,Industry,Market Cap
-MRNA,188.5601430888712,620.5559579389864,"Moderna, Inc.",healthcare,biotechnology,78649475072
-MPC,63.74452759500628,145.9429929356727,Marathon Petroleum Corporation,energy,oil-gas-refining-marketing,135265918976
-VLO,58.721408878024505,177.75293148292528,Valero Energy Corporation,energy,oil-gas-refining-marketing,127782199296
-PLTR,56.77892368794302,9.11785737349977,Palantir Technologies Inc.,technology,software-infrastructure,477679943680
-PTC,55.30703787498423,-4.217343523663864,PTC Inc.,technology,software-application,21045319680
-ACN,54.07824239686778,-15.355022361824467,Accenture plc,technology,information-technology-services,127504252928
-SMCI,51.07736229107678,-22.33520847144034,"Super Micro Computer, Inc.",technology,computer-hardware,27666759680
-PSX,50.294449437536095,119.03665799379075,Phillips 66,energy,oil-gas-refining-marketing,112364298240
-VEEV,49.82116750125043,-6.981909998557933,Veeva Systems Inc.,healthcare,health-information-services,46118117376
-IT,46.660158815540534,-20.32861733673883,"Gartner, Inc.",technology,information-technology-services,12339941376
-HPE,46.64107963471275,190.16564358213063,Hewlett Packard Enterprise Comp,technology,communication-equipment,94250000384
-CTSH,41.79437803767625,-9.678958262162652,Cognizant Technology Solutions ,technology,information-technology-services,28384729088
-CRWD,40.51181753233139,117.08556181387087,"CrowdStrike Holdings, Inc.",technology,software-infrastructure,269305118720
-ZBRA,40.22458170188248,28.822814110675598,Zebra Technologies Corporation,technology,communication-equipment,18202626048
-CRM,39.72615394032295,-4.174445874461464,"Salesforce, Inc.",technology,software-application,187479408640
+MRNA,266.46493251948857,686.4718611367593,"Moderna, Inc.",healthcare,biotechnology,87037419520
+ACN,59.96858507429694,-1.4253154544745406,Accenture plc,technology,information-technology-services,140550848512
+VEEV,57.21593617047922,7.996374166017839,Veeva Systems Inc.,healthcare,health-information-services,50250027008
+PTC,54.5942424872498,-4.842212611659846,PTC Inc.,technology,software-application,20963846144
+MPC,52.0341929945705,164.40472051282921,Marathon Petroleum Corporation,energy,oil-gas-refining-marketing,134253895680
+CTSH,48.78397110924091,1.1534840144778125,Cognizant Technology Solutions ,technology,information-technology-services,29742831616
+IT,45.57635733562022,-13.277582699462176,"Gartner, Inc.",technology,information-technology-services,12967642112
+RVTY,43.40473119932018,66.15505611632197,"Revvity, Inc.",healthcare,diagnostics-research,17032548352
+VLO,42.48783956379074,182.10877819646578,Valero Energy Corporation,energy,oil-gas-refining-marketing,128044220416
+APA,42.066396780775484,118.8649457406163,APA Corporation,energy,oil-gas-e-p,17219778560
+PSX,41.15231398464494,132.96394490280767,Phillips 66,energy,oil-gas-refining-marketing,117542125568
+ZBRA,39.412144909897684,25.791717091497503,Zebra Technologies Corporation,technology,communication-equipment,17458106368
+CRM,38.7441522269363,2.604437617380828,"Salesforce, Inc.",technology,software-application,198096093184
+PLTR,37.95327427459936,3.5686470528670133,Palantir Technologies Inc.,technology,software-infrastructure,447040946176
+EPAM,36.677852747055596,-14.534516753076588,"EPAM Systems, Inc.",technology,information-technology-services,6303413248

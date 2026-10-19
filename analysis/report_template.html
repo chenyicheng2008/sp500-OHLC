@@ -203,7 +203,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
 <header class="mast">
   <div class="mast-in">
     <p class="kicker">S&amp;P 500 · Market Internals</p>
-    <h1>指數在高點附近，內部卻在退潮</h1>
+    <h1 id="h-title">—</h1>
     <p class="dek">用 <b id="st-dek-n">—</b> 檔成分股的日線資料，重算市場廣度（breadth）與類股／產業結構——不看指數點位，只看有多少股票真的在漲。</p>
     <div class="stamp">
       <span>資料日 <b id="st-asof">—</b></span>
@@ -249,7 +249,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
   <figure class="panel">
     <div class="panel-head">
       <h3>站上均線的成分股比例</h3>
-      <p>近一年，%&gt;50日均線（中期）跌破 %&gt;200日均線（長期）——長線結構還在，短中期已經在崩。</p>
+      <p id="sub-ma">—</p>
     </div>
     <div class="legend" id="lg-ma"></div>
     <div class="panel-body"><div id="c-ma"></div></div>
@@ -469,6 +469,20 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
       return "等權／市值加權比值 12 個月來 " + (v >= 0 ? "+" : "") + v.toFixed(1) + "%";
     }
   };
+
+  // Direction, not just level: the four-week change in %>50DMA (weekly series) plus
+  // the sign of the McClellan oscillator. Every state word in the prose keys off this.
+  function breadthDirection() {
+    var m50 = D.ma50.filter(function (v) { return v !== null; });
+    var then = m50[Math.max(0, m50.length - 5)];
+    var d50 = m50[m50.length - 1] - then;
+    return {
+      p50Then: then,
+      improving: d50 > 3 && D.latest.mcclellan_osc > 0,
+      deteriorating: d50 < -3 && D.latest.mcclellan_osc <= 0,
+      nearHigh: Math.abs(D.cap_off_high) < 5
+    };
+  }
 
   function secName(k) { return SEC_TC[k] || k; }
   function indName(k) {
@@ -850,12 +864,31 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
 
     var byName = {};
     D.signals.forEach(function (x) { byName[x.signal] = x; });
+
+    // Direction, not just level: the four-week change in %>50DMA (weekly series)
+    // plus the sign of the McClellan oscillator. Every state word below keys off these.
+    var bd = breadthDirection();
+    var p50Then = bd.p50Then, improving = bd.improving, deteriorating = bd.deteriorating, nearHigh = bd.nearHigh;
+    var narrow = byName["Participation in the 12M advance"].status === "narrow";
+
+    document.getElementById("h-title").textContent = nearHigh
+      ? (improving ? "指數在高點附近，參與家數正在回補"
+                   : deteriorating ? "指數在高點附近，內部卻在退潮" : "指數在高點附近，內部沒有跟上")
+      : (improving ? "指數回檔，內部反而在改善"
+                   : deteriorating ? "指數離開高點，內部持續退潮" : "指數離開高點，內部原地踏步");
+
+    document.getElementById("sub-ma").textContent =
+      "%>50日均線（中期）目前在 %>200日均線（長期）之" +
+      (D.latest.pct_above_50dma < D.latest.pct_above_200dma ? "下" : "上") + "，過去四週由 " +
+      p50Then.toFixed(0) + "% 變為 " + D.latest.pct_above_50dma.toFixed(0) + "%；%>20日均線位於近一年第 " +
+      D.pctile.pct_above_20dma.toFixed(0) + " 百分位。";
     var p200 = D.latest.pct_above_200dma;
     var longTerm = p200 >= 60 ? "長線多頭未破" : (p200 >= 45 ? "長線結構正在鬆動" : "長線趨勢已經轉空");
     var divergent = byName["Breadth vs index divergence"].status === "warning";
     document.getElementById("v-title").textContent =
-      longTerm + "，中短線廣度" + (D.latest.pct_above_50dma < 40 ? "已明顯轉弱" : "走平") +
-      (divergent ? "，指數與內部走向相反" : "") + "，而且這波漲勢從頭到尾就很窄";
+      longTerm + "，中短線廣度" +
+      (D.latest.pct_above_50dma < 40 && !improving ? "已明顯轉弱" : improving ? "正在回升" : "走平") +
+      (divergent ? "，指數與內部走向相反" : "") + (narrow ? "，而且這波漲勢從頭到尾就很窄" : "");
     document.getElementById("st-n").textContent = D.sector.reduce(function (a, s) { return a + s.n; }, 0);
 
     var p12 = D.participation.filter(function (r) { return r.horizon === "12M"; })[0];
@@ -866,13 +899,18 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
       c.top10_share_of_12m_gain.toFixed(0) + "%</b> 的指數市值增幅。眼下 <b>" + D.latest.pct_above_200dma.toFixed(0) +
       "%</b> 的成分股" + (p200 >= 50 ? "仍站在" : "站在") + " 200 日均線之上（" +
       (p200 >= 60 ? "長線結構完好" : (p200 >= 45 ? "長線結構已在鬆動" : "長線結構已經破壞")) +
-      "），但站上 50 日均線的只剩 <b>" +
+      "），" + (D.latest.pct_above_50dma < D.latest.pct_above_200dma ? "但站上 50 日均線的只剩" : "站上 50 日均線的有") + " <b>" +
       D.latest.pct_above_50dma.toFixed(0) + "%</b>（近一年第 " + D.pctile.pct_above_50dma.toFixed(0) +
       " 百分位），" + (D.latest.pct_above_20dma < D.latest.pct_above_50dma
         ? "20 日更只有 <b>" + D.latest.pct_above_20dma.toFixed(0) + "%</b>。"
         : "20 日則反彈到 <b>" + D.latest.pct_above_20dma.toFixed(0) + "%</b>（短線止跌，但中長線結構未修復）。") +
-      "騰落線 " +
-      D.adline_peak.date + " 見高後已走低，指數卻還在高點附近——這是典型的廣度背離，而非崩盤訊號。";
+      "騰落線 " + D.adline_peak.date + " 見高 " + D.adline_peak.val.toLocaleString() + " 後回落，目前低於高點 " +
+      (100 * (1 - D.adline_peak.now / D.adline_peak.val)).toFixed(1) + "%" +
+      (improving
+        ? "，但近四週淨上漲家數轉正（麥克連 " + D.latest.mcclellan_osc.toFixed(0) + "），參與面正在修復。"
+        : nearHigh
+          ? "，指數卻還在高點附近——這是典型的廣度背離，而非崩盤訊號。"
+          : "，指數也已離開高點，內外同步轉弱。");
 
     var stats = [
       { k: "站上 200 日均線", v: D.latest.pct_above_200dma.toFixed(1) + "%", n: "近一年第 " + D.pctile.pct_above_200dma.toFixed(0) + " 百分位" },
@@ -1098,7 +1136,11 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
       "<span><i class='swatch' style='background:" + s3 + "'></i>等權（一年前 = 100）</span>";
     var gap = D.capw[D.capw.length - 1] - D.eqw[D.eqw.length - 1];
     document.getElementById("cap-idx").textContent =
-      "一年下來市值加權領先等權 " + gap.toFixed(1) + " 個百分點。等權指數代表「平均一檔股票」的表現，兩線分岔就是漲勢集中的直接證據。";
+      (Math.abs(gap) < 1
+        ? "一年下來市值加權與等權幾乎同步（差 " + gap.toFixed(1) + " 個百分點）。等權指數代表「平均一檔股票」的表現，兩線貼近代表漲勢沒有特別集中。"
+        : (gap > 0 ? "一年下來市值加權領先等權 " : "一年下來等權領先市值加權 ") + Math.abs(gap).toFixed(1) +
+          " 個百分點。等權指數代表「平均一檔股票」的表現，" +
+          (gap > 0 ? "市值加權在上方代表漲勢集中在大型股。" : "等權在上方代表一般個股表現優於權值股。"));
 
     lineChart(document.getElementById("c-ad"), {
       dates: D.dates, height: 250, right: 14,
@@ -1108,20 +1150,24 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
       series: [{ name: "騰落線", color: s1, values: D.adline }]
     });
     var offHigh = Math.abs(D.cap_off_high === undefined ? 0 : D.cap_off_high);
+    var bdc = breadthDirection();
     document.getElementById("cap-ad").textContent =
       "騰落線在 " + D.adline_peak.date + " 見高 " + D.adline_peak.val.toLocaleString() +
       "，目前 " + D.adline_peak.now.toLocaleString() + "（-" +
       (100 * (1 - D.adline_peak.now / D.adline_peak.val)).toFixed(1) +
       "%）；" + (offHigh < 0.05
-        ? "市值加權指數卻在 " + D.cap_peak.date + " 創下新高。指數創高、參與家數退潮，是最典型的負背離。"
-        : "同期市值加權指數的高點落在 " + D.cap_peak.date + "，現在距高點僅 " + offHigh.toFixed(1) +
-          "%。價格撐住、參與家數卻退潮。");
+        ? "市值加權指數卻在 " + D.cap_peak.date + " 創下新高。" +
+          (bdc.improving ? "近四週參與家數已在回升，背離正在收斂。" : "指數創高、參與家數退潮，是最典型的負背離。")
+        : "同期市值加權指數的高點落在 " + D.cap_peak.date + "，現在距高點 " + offHigh.toFixed(1) + "%。" +
+          (bdc.improving ? "近四週參與家數回升，騰落線開始修復。"
+            : bdc.nearHigh ? "價格撐住、參與家數卻退潮。" : "價格與參與家數同步走弱。"));
 
     colChart(document.getElementById("c-hl"), { dates: D.dates, values: D.nethl, height: 190 });
     document.getElementById("cap-hl").textContent =
       "目前 10 日均為 " + (D.latest.net_hl_10d >= 0 ? "+" : "") + D.latest.net_hl_10d.toFixed(1) +
       "，最新一日新高 " + D.latest.new_highs + " 家、新低 " + D.latest.new_lows +
-      " 家。新低尚未擴大到足以稱為崩跌，但新高已經明顯縮手。";
+      " 家。" + (D.latest.net_hl_10d > 5 ? "新高已重新多於新低。"
+        : D.latest.net_hl_10d < -5 ? "新低持續多於新高。" : "新高與新低大致相抵。");
 
     // drawdown buckets — ordered categories, so an ordinal ramp of one hue
     var ramp = ["#184f95", "#256abf", "#3987e5", "#6da7ec", "#9ec5f4", "#cde2fb"];
@@ -1137,8 +1183,8 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     });
     var deep = D.drawdown[0].pct + D.drawdown[1].pct;
     document.getElementById("cap-dd").textContent =
-      "只有 " + D.drawdown[5].count + " 檔（" + D.drawdown[5].pct.toFixed(1) +
-      "%）正站在 52 週高點，卻有 " + deep.toFixed(1) + "% 的成分股距高點超過 20%——已經是個股層面的熊市區間。";
+      (D.drawdown[5].pct < 10 ? "只有 " : "有 ") + D.drawdown[5].count + " 檔（" + D.drawdown[5].pct.toFixed(1) +
+      "%）正站在 52 週高點，" + deep.toFixed(1) + "% 的成分股距高點超過 20%，即個股層面的熊市區間。";
 
     // top-10 weights
     hbarChart(document.getElementById("c-top10"), {

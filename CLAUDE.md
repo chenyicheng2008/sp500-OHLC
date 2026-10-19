@@ -33,6 +33,9 @@ python analysis/build_report.py          # analysis/reports/sp500_internals_<aso
 ```
 
 Needs `pandas` and `numpy` (not in `requirements.txt`, which covers only the fetch step).
+Install with `python3 -m pip install pandas numpy`: on these containers bare `pip` can
+belong to a different interpreter than `python3` (seen 2026-10-19: pip on 3.13, python3
+on 3.11), so it reports "already satisfied" while the import still fails.
 
 ## Report conventions
 
@@ -52,7 +55,12 @@ Needs `pandas` and `numpy` (not in `requirements.txt`, which covers only the fet
   ships, dated and wrong, on the next daily rebuild. If a caption needs a figure the
   payload lacks, add it to `build_report_data.py` — do not hardcode it. The same goes for
   connective words: a clause like 「20 日更只有」 or 「仍站在」 asserts an ordering or a
-  state, so it must be chosen from the data too, not written once.
+  state, so it must be chosen from the data too, not written once. **Direction counts as
+  a state.** The original headline 「指數在高點附近，內部卻在退潮」 was hardcoded and turned
+  false on 2026-10-16, when the index fell 2% on the week while 72% of stocks rose.
+  `breadthDirection()` (four-week change in %>50DMA plus the McClellan sign, and whether
+  the index is within 5% of its high) is the single source every headline, subtitle and
+  caption reads from — add new prose through it, never with a fixed adjective.
 - Prose, labels and tables are Traditional Chinese. Metric names keep their standard
   English term in parentheses on first use (例如「騰落線（A/D Line）」).
 - Charts are hand-built inline SVG re-rendered on resize and on theme change; there
@@ -121,6 +129,17 @@ Needs `pandas` and `numpy` (not in `requirements.txt`, which covers only the fet
 serialized, and re-points onto the remote tip before committing so overlapping runs
 don't reject each other. Runs are idempotent (no new data, no commit), so several
 "Daily CSV refresh" commits a day is normal, not a bug.
+
+## Git history on main
+
+`main` was rewritten around 2026-10-10 into a fresh orphan history (root commit
+"Daily CSV refresh (2026-10-10)"), almost certainly to drop the bloat of committing
+a ~45MB CSV every day. This branch predates that and shares **no merge base** with it,
+so `git merge origin/main` refuses and GitHub cannot open a PR between them. Until the
+branch is rebuilt on the new main, refresh data with
+`git checkout origin/main -- data/weekly_reutin data/tableau` (the code outside `data/`
+was verified identical) instead of merging — and do not `--allow-unrelated-histories`,
+which would re-attach the old history the cleanup removed.
 
 ## Git
 
