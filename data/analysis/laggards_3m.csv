@@ -1,16 +1,16 @@
 ﻿Ticker,ret_3m,ret_12m,Short Name,Sector,Industry,Market Cap
-FICO,-38.97992378271845,-52.87996878150537,Fair Isaac Corporation,technology,software-application,16655881216
-MGM,-38.28226092512747,-11.097289371069397,MGM Resorts International,consumer-cyclical,resorts-casinos,7317345280
-APP,-37.32218533743234,-55.814376510615084,Applovin Corporation,communication-services,advertising-agencies,89403588608
-TTD,-34.388412324583285,-76.06653638467319,"The Trade Desk, Inc.",communication-services,advertising-agencies,5782283776
-LII,-32.702513122958756,-31.316326188618504,"Lennox International, Inc.",industrials,building-products-equipment,12363390976
-CHRW,-31.92824778858062,10.629452531901373,"C.H. Robinson Worldwide, Inc.",industrials,integrated-freight-logistics,16271292416
-WDC,-31.864392618791182,176.1702020985707,Western Digital Corporation,technology,computer-hardware,124275326976
-VRT,-29.21089478802997,14.475550672703342,"Vertiv Holdings, LLC",industrials,electrical-equipment-parts,79469256704
-AKAM,-28.685129929899155,19.193701291021583,"Akamai Technologies, Inc.",technology,software-infrastructure,12619754496
-EIX,-26.40766531669464,4.118373153837007,Edison International,utilities,utilities-regulated-electric,21522647040
-AXON,-26.008564685604362,-39.48898208434224,"Axon Enterprise, Inc.",industrials,aerospace-defense,31706150912
-ROL,-24.870391030148518,-39.42178231994359,"Rollins, Inc.",consumer-cyclical,personal-services,16094314496
-BLDR,-24.828055268301785,-56.726580782564795,"Builders FirstSource, Inc.",industrials,building-products-equipment,5880146432
-PCG,-24.590031718000105,-20.49616551979797,Pacific Gas & Electric Co.,utilities,utilities-regulated-electric,39300984832
-NCLH,-22.780911403410308,-36.1747233272702,Norwegian Cruise Line Holdings ,consumer-cyclical,travel-services,6910776832
+MGM,-39.39524853494613,-14.137089339321985,MGM Resorts International,consumer-cyclical,resorts-casinos,7301994496
+APP,-36.94425094553618,-53.92337441569931,Applovin Corporation,communication-services,advertising-agencies,87592869888
+FICO,-36.33225581146395,-48.1994213305148,Fair Isaac Corporation,technology,software-application,15292638208
+HWM,-35.40325230718236,-2.5795887741424273,Howmet Aerospace Inc.,industrials,aerospace-defense,77511041024
+FIX,-32.879815057088145,47.11112857443629,"Comfort Systems USA, Inc.",industrials,engineering-construction,43788427264
+VRT,-32.41736926841855,13.367281617674355,"Vertiv Holdings, LLC",industrials,electrical-equipment-parts,76912934912
+NRG,-32.1335756182787,-41.74622807705954,"NRG Energy, Inc.",utilities,utilities-independent-power-producers,19677802496
+LII,-31.04316258072185,-22.840156497805808,"Lennox International, Inc.",industrials,building-products-equipment,12636766208
+WDC,-30.956714241229644,185.8065868193946,Western Digital Corporation,technology,computer-hardware,133307744256
+KLAC,-28.316988241374276,31.376536793241016,KLA Corporation,technology,semiconductor-equipment-materials,194720022528
+PCG,-27.942832916684303,-22.827368687509086,Pacific Gas & Electric Co.,utilities,utilities-regulated-electric,38580416512
+TTD,-27.293061464312572,-75.87678577243196,"The Trade Desk, Inc.",communication-services,advertising-agencies,6037593600
+AMAT,-26.939316853592565,71.98337960544299,"Applied Materials, Inc.",technology,semiconductor-equipment-materials,307590430720
+WYNN,-26.872563711240403,-38.51158021186936,"Wynn Resorts, Limited",consumer-cyclical,resorts-casinos,7640662016
+EIX,-25.87304285845864,4.298643773903699,Edison International,utilities,utilities-regulated-electric,22234552320

@@ -60,7 +60,10 @@ on 3.11), so it reports "already satisfied" while the import still fails.
   false on 2026-10-16, when the index fell 2% on the week while 72% of stocks rose.
   `breadthDirection()` (four-week change in %>50DMA plus the McClellan sign, and whether
   the index is within 5% of its high) is the single source every headline, subtitle and
-  caption reads from — add new prose through it, never with a fixed adjective.
+  caption reads from — add new prose through it, never with a fixed adjective. Level bands
+  need it too: 「長線結構正在鬆動」 for any %>200DMA in 45-60 read wrong on 2026-10-23 when
+  the reading was 58% and climbing from 41%; the same band now says 「正在修復」 when
+  improving.
 - Prose, labels and tables are Traditional Chinese. Metric names keep their standard
   English term in parentheses on first use (例如「騰落線（A/D Line）」).
 - Charts are hand-built inline SVG re-rendered on resize and on theme change; there
@@ -80,6 +83,8 @@ on 3.11), so it reports "already satisfied" while the import still fails.
   (the script prints what it excluded every run — read that line):
   `SATS` has no OHLC at all; `EA`, `EQR`, `AVB` return only a handful of daily bars;
   `PSKY` (Paramount Skydance) and `WBD` (post-split) are too new to have 60 bars as of 2026-10;
+  PSKY also stopped receiving bars after 2026-10-16 while every other name kept updating,
+  so it may never reach 60 — check whether the ticker changed before assuming it will;
   `FISV` comes back with a null sector/industry (patched via `SECTOR_OVERRIDES`);
   `AZO` returned a zero market cap on 2026-09-22 with its price history intact (back to
   normal on 2026-09-30 — these glitches come and go, so check the printed lines, not this list).
@@ -106,6 +111,10 @@ on 3.11), so it reports "already satisfied" while the import still fails.
   check catches that. CSVs written before the fix (anything committed before
   2026-10-09 01:25 UTC) still carry placeholder rows. The first post-fix refresh
   (2026-10-09 01:34 UTC) had zero blank rows and the 2026-10-08 bar fully priced.
+  The partial case does recur: on 2026-10-26 only 57 of 494 tickers priced, and they were
+  all late in the alphabet (TSCO, TSLA … UBER) — the fetch walks tickers in order and the
+  bar settled mid-run, so early names got blank rows (dropped at fetch) and late names got
+  real ones. The coverage gate dropped the session; the next refresh fills it in.
 - **Unadjusted corporate actions.** yfinance does not back-adjust spin-offs/splits, so
   the series shows a cliff (CTVA, 2026-10-01: -83.8% in one session — Corteva's
   separation; market cap / last close = 693M shares, which only fits the post-event

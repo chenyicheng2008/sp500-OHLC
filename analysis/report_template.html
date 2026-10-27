@@ -883,7 +883,9 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
       p50Then.toFixed(0) + "% 變為 " + D.latest.pct_above_50dma.toFixed(0) + "%；%>20日均線位於近一年第 " +
       D.pctile.pct_above_20dma.toFixed(0) + " 百分位。";
     var p200 = D.latest.pct_above_200dma;
-    var longTerm = p200 >= 60 ? "長線多頭未破" : (p200 >= 45 ? "長線結構正在鬆動" : "長線趨勢已經轉空");
+    var longTerm = p200 >= 60 ? "長線多頭未破"
+      : p200 >= 45 ? (improving ? "長線結構正在修復" : "長線結構正在鬆動")
+      : (improving ? "長線趨勢偏空但正在回升" : "長線趨勢已經轉空");
     var divergent = byName["Breadth vs index divergence"].status === "warning";
     document.getElementById("v-title").textContent =
       longTerm + "，中短線廣度" +
@@ -897,13 +899,17 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
       "過去 12 個月標普 500 市值加權上漲 <b>" + pct(p12.index_ret) + "</b>，但成分股報酬中位數只有 <b>" +
       pct(p12.median_ret) + "</b>，僅 <b>" + p12.pct_beat_index.toFixed(0) + "%</b> 的股票跑贏指數，前十大市值股就吃掉了 <b>" +
       c.top10_share_of_12m_gain.toFixed(0) + "%</b> 的指數市值增幅。眼下 <b>" + D.latest.pct_above_200dma.toFixed(0) +
-      "%</b> 的成分股" + (p200 >= 50 ? "仍站在" : "站在") + " 200 日均線之上（" +
-      (p200 >= 60 ? "長線結構完好" : (p200 >= 45 ? "長線結構已在鬆動" : "長線結構已經破壞")) +
+      "%</b> 的成分股" + (p200 >= 50 && !improving ? "仍站在" : improving ? "回到" : "站在") + " 200 日均線之上（" +
+      (p200 >= 60 ? "長線結構完好"
+        : p200 >= 45 ? (improving ? "長線結構正在修復" : "長線結構已在鬆動")
+        : (improving ? "長線結構仍弱但正在回升" : "長線結構已經破壞")) +
       "），" + (D.latest.pct_above_50dma < D.latest.pct_above_200dma ? "但站上 50 日均線的只剩" : "站上 50 日均線的有") + " <b>" +
       D.latest.pct_above_50dma.toFixed(0) + "%</b>（近一年第 " + D.pctile.pct_above_50dma.toFixed(0) +
       " 百分位），" + (D.latest.pct_above_20dma < D.latest.pct_above_50dma
         ? "20 日更只有 <b>" + D.latest.pct_above_20dma.toFixed(0) + "%</b>。"
-        : "20 日則反彈到 <b>" + D.latest.pct_above_20dma.toFixed(0) + "%</b>（短線止跌，但中長線結構未修復）。") +
+        : "20 日則反彈到 <b>" + D.latest.pct_above_20dma.toFixed(0) + "%</b>（" +
+          (improving && D.latest.pct_above_50dma >= D.latest.pct_above_200dma
+            ? "短中期同步轉強" : "短線止跌，但中長線結構未修復") + "）。") +
       "騰落線 " + D.adline_peak.date + " 見高 " + D.adline_peak.val.toLocaleString() + " 後回落，目前低於高點 " +
       (100 * (1 - D.adline_peak.now / D.adline_peak.val)).toFixed(1) + "%" +
       (improving

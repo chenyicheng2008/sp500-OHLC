@@ -1,11 +1,11 @@
 ﻿signal,status,detail,value
-Primary trend (% > 200DMA),neutral,54.3% of constituents are above their 200-day average,54.3
-Intermediate trend (% > 50DMA),neutral,45.3% above the 50-day average,45.3
-Short-term (% > 20DMA),neutral,69.6% above the 20-day average,69.6
-Breadth vs index divergence,warning,index sits at the 68th percentile of its own 6-month range while % > 200DMA sits at the 19th,49.2
-McClellan oscillator,neutral,57 (19/39-day EMA spread of ratio-adjusted net advances),56.8
-Net new 52w highs (10d avg),bullish,+7.1 per day over the last 10 sessions,7.1
-Zweig breadth thrust,neutral,10-day EMA of advances/(advances+declines) = 0.566,0.566
-Participation in the 12M advance,narrow,only 38% of names beat the index; mean 17.9% vs median 9.6%,38.3
-Mega-cap concentration,elevated,the 10 largest names are 42.9% of index cap and drove 46% of the 12-month cap gain,46.5
-Equal-weight vs cap-weight,in line,the equal-weight/cap-weight ratio is +0.1% over 12 months,0.1
+Primary trend (% > 200DMA),neutral,58.1% of constituents are above their 200-day average,58.1
+Intermediate trend (% > 50DMA),neutral,58.9% above the 50-day average,58.9
+Short-term (% > 20DMA),neutral,71.3% above the 20-day average,71.3
+Breadth vs index divergence,none,index sits at the 49th percentile of its own 6-month range while % > 200DMA sits at the 40th,9.5
+McClellan oscillator,neutral,38 (19/39-day EMA spread of ratio-adjusted net advances),38.0
+Net new 52w highs (10d avg),bullish,+16.6 per day over the last 10 sessions,16.6
+Zweig breadth thrust,neutral,10-day EMA of advances/(advances+declines) = 0.534,0.534
+Participation in the 12M advance,narrow,only 42% of names beat the index; mean 18.1% vs median 10.4%,41.8
+Mega-cap concentration,elevated,the 10 largest names are 42.3% of index cap and drove 40% of the 12-month cap gain,40.1
+Equal-weight vs cap-weight,in line,the equal-weight/cap-weight ratio is +1.6% over 12 months,1.6
