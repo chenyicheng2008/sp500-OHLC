@@ -218,6 +218,26 @@ def index_series(close: pd.DataFrame, shares: pd.Series) -> pd.DataFrame:
     return df
 
 
+def index_ohlc(ohlc: pd.DataFrame, close: pd.DataFrame, shares: pd.Series) -> pd.DataFrame:
+    """Daily OHLC for the reconstructed cap-weighted index.
+
+    Open and close are exact for this reconstruction (shares x each name's open or
+    close). High and low are the sums of each name's own high and low, which
+    constituents do not all reach at the same moment -- so the range is an outer
+    bound, wider than the true index range. Only names priced on all four fields
+    that day are counted, so a missing field cannot drop out of one leg only.
+    """
+    px = {f: pivot(ohlc, "1d", f).reindex(index=close.index) for f in ("Open", "High", "Low", "Close")}
+    cols = [c for c in close.columns if c in shares.index]
+    full = px["Open"][cols].notna() & px["High"][cols].notna() & px["Low"][cols].notna() & px["Close"][cols].notna()
+    out = pd.DataFrame({f: (px[f][cols].where(full) * shares[cols]).sum(axis=1, min_count=1) for f in px})
+    chg = close.diff()
+    out["advances"] = (chg > 0).sum(axis=1)
+    out["declines"] = (chg < 0).sum(axis=1)
+    out["n_priced"] = full.sum(axis=1)
+    return out
+
+
 def participation(close: pd.DataFrame) -> pd.DataFrame:
     """Share of constituents with a positive return over each horizon, plus the
     mean/median gap that shows how top-heavy the move is."""
@@ -517,6 +537,10 @@ def main() -> None:
     breadth = pd.concat([ma_b, ad, nhnl, idx], axis=1)
     breadth.index.name = "Date"
     breadth.to_csv(out_dir / "breadth_daily.csv", encoding=ENC)
+
+    candles = index_ohlc(ohlc, daily, shares)
+    candles.index.name = "Date"
+    candles.to_csv(out_dir / "index_ohlc_daily.csv", encoding=ENC)
 
     part = participation(daily)
     # % of names beating the cap-weighted index over the same window.

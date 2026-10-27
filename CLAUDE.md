@@ -16,6 +16,8 @@ fetch_sp500_memory_software.py   fetch step (yfinance -> data/weekly_reutin/*.cs
 data/weekly_reutin/              fetched CSVs (sp500_ohlc.csv, sp500_stocks.csv, ...)
 data/tableau/                    ticker lists
 analysis/breadth_sector.py       breadth + sector/industry analysis -> data/analysis/*.csv
+analysis/kd_signals.py           weekly/monthly KD(9,3,3) crosses + their factors -> kd_crosses.csv, kd_bundle.json
+data/events/market_events.csv    hand-curated, sourced market events (the only non-computed input)
 analysis/build_report_data.py    condenses those CSVs -> data/analysis/report_data.json
 analysis/build_report.py         bakes the JSON into the template -> analysis/reports/*.html
 analysis/report_template.html    report page; `__REPORT_DATA__` is the data placeholder
@@ -27,7 +29,8 @@ analysis/reports/                dated standalone reports (one file per data dat
 Always in this order — each step consumes the previous one's output:
 
 ```bash
-python analysis/breadth_sector.py        # data/analysis/*.csv + analysis_bundle.json
+python analysis/breadth_sector.py        # data/analysis/*.csv + analysis_bundle.json + index_ohlc_daily.csv
+python analysis/kd_signals.py            # data/analysis/kd_crosses.csv + kd_bundle.json (reads market_events.csv)
 python analysis/build_report_data.py     # data/analysis/report_data.json
 python analysis/build_report.py          # analysis/reports/sp500_internals_<asof>.html
 ```
@@ -68,6 +71,54 @@ on 3.11), so it reports "already satisfied" while the import still fails.
   English term in parentheses on first use (例如「騰落線（A/D Line）」).
 - Charts are hand-built inline SVG re-rendered on resize and on theme change; there
   is no chart library and the CSP on published artifacts would block one anyway.
+
+## Event timeline (`data/events/market_events.csv`)
+
+The two-week K-line section annotates economic / industry / stock events. These cannot
+be computed, so they live in a hand-maintained CSV — and it is the one place where the
+"no figure typed in" rule bends, so it has stricter rules of its own:
+
+- **Every row needs a `source_url`** that says what the row says. Model knowledge does
+  not cover the current period; never add an event from memory or inference.
+- `detail` restates the source. Price moves are **not** copied from articles: the report
+  shows each listed ticker's move as computed from our own closes (`event_moves` in
+  `kd_bundle.json`). When they disagree, ours is what the page prints — e.g. GS was
+  reported "rising" on 2026-10-13 in early trading but closed -0.2%.
+- List in `tickers` only the names the source itself ties to the event. Same-day moves in
+  other names are shown as 「同日」 co-occurrence, never as a cause.
+- A headline that contradicts our data is about a different date (one result claimed LRCX
+  +20% on its October 2026 report; our data shows -11.8% that day) — drop it.
+- Add the new two weeks of events on each refresh; rows dated after the data date render
+  as 「即將」.
+- Sources reachable from this container: WebSearch works. Yahoo (`yfinance` direct) is
+  blocked by the proxy (403), Alpha Vantage needs a premium plan for recent US prices, and
+  some recap sites fail WebFetch DNS — so the candles are built from our own data.
+
+## KD crosses (`kd_signals.py`)
+
+KD(9,3,3), Taiwan convention: RSV over 9 bars, K = 2/3·K' + 1/3·RSV, D = 2/3·D' + 1/3·K,
+seeded at 50. Weekly and monthly bars are resampled from the daily slice with the older
+`1wk` bars spliced in front, so the monthly KD has years of warm-up.
+
+- 「同步」 = the monthly KD crosses on the current month's bar **and** the weekly KD crosses
+  the same way on a week ending in that month. The stricter "both on the latest bar"
+  test found nothing on 2026-10-23 (a month holds four weekly bars, so it almost never
+  lines up), which is why the same-month reading is used.
+- Zone is checked on the bar **before** the cross, in both timeframes: ≥80 / ≤20 is the
+  main list, ≥70 / ≤30 the watch list.
+- The current monthly bar is unfinished until the month's last session; the report says so
+  whenever `month_complete` is false. Rerun after month-end to confirm a list.
+- Group read-outs are generated: "concentrated in one sector" needs ≥50% of the group
+  *and* ≥2× that sector's universe share (3 of 10 industrials at 2× is not concentration).
+
+## Index K-line
+
+`index_ohlc_daily.csv` is the reconstructed cap-weighted index. Open and close are exact
+for the reconstruction; high and low are sums of each name's own high/low, which names do
+not hit simultaneously — so the wicks are an outer bound (2-3.5% daily range vs a far
+narrower real one). The chart draws wicks muted and the page says this; do not present
+them as the true index range. Validated against reported S&P 500 closes: 10-16 -1.21% vs
+-1.09%, 10-22 -1.33% vs -1.21%, 10-23 -0.57% vs -0.52%.
 
 ## Data facts worth remembering
 

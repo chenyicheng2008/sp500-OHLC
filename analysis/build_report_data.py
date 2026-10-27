@@ -22,6 +22,9 @@ ENC = "utf-8-sig"
 # Chart window: one year of sessions, sampled weekly so the lines stay readable.
 CHART_DAYS = 260
 
+# Candlestick window: the last two weeks of sessions, plus the close before them as the base.
+CANDLE_DAYS = 10
+
 
 def pct_rank(series: pd.Series, window: int = 252) -> float:
     """Where today's reading sits inside its own trailing range, 0-100."""
@@ -107,6 +110,38 @@ def main() -> None:
         "leaders": read("leaders_3m.csv").round(1).to_dict("records"),
         "laggards": read("laggards_3m.csv").round(1).to_dict("records"),
     }
+
+    # --- two-week candles, rebased so the close before the window = 100 ---------
+    c = pd.read_csv(d / "index_ohlc_daily.csv", index_col=0, parse_dates=True).tail(CANDLE_DAYS + 1)
+    base = float(c["Close"].iloc[0])
+    payload["candles"] = {
+        "base_date": c.index[0].date().isoformat(),
+        "bars": [
+            {"date": t.date().isoformat(),
+             **{k.lower()[0]: round(100 * float(c.at[t, k]) / base, 3) for k in ("Open", "High", "Low", "Close")},
+             "chg": round(100 * (float(c.at[t, "Close"]) / float(c["Close"].iloc[i]) - 1), 2),
+             "adv": int(c.at[t, "advances"]), "dec": int(c.at[t, "declines"])}
+            for i, t in enumerate(c.index[1:])
+        ],
+    }
+
+    # --- catalogued events: inside the candle window, plus anything still ahead -----
+    ev_path = REPO / "data" / "events" / "market_events.csv"
+    events = pd.read_csv(ev_path, encoding=ENC).replace({np.nan: None}) if ev_path.exists() else pd.DataFrame()
+    first = payload["candles"]["bars"][0]["date"]
+    if len(events):
+        events = events[events["date"] >= first].sort_values(["date", "id"])
+        events["upcoming"] = events["date"] > payload["asof"]
+        payload["events"] = events.to_dict("records")
+    else:
+        payload["events"] = []
+
+    # --- weekly + monthly KD crosses (kd_signals.py) ------------------------------
+    kd_csv, kd_json = d / "kd_crosses.csv", d / "kd_bundle.json"
+    if kd_csv.exists() and kd_json.exists():
+        kb = json.load(open(kd_json, encoding="utf-8"))
+        kb["crosses"] = pd.read_csv(kd_csv, encoding=ENC).round(2).replace({np.nan: None}).to_dict("records")
+        payload["kd"] = kb
 
     txt = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
     out.write_text(txt, encoding="utf-8")

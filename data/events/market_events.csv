@@ -1,0 +1,13 @@
+id,date,category,title,detail,tickers,source_name,source_url
+E01,2026-10-12,industry,光通訊股集體重挫,Ciena、Lumentum 單日約跌 10%、Coherent 約跌 8%；三家公司前一週皆無公告，報導歸因於漲多後獲利了結與資金轉向防禦類股。,CIEN|LITE|COHR,TIKR；247 Wall St.,https://www.tikr.com/blog/coherent-stock-falls-nearly-8-as-ciena-and-lumentum-drop-about-10-heres-where-the-stock-could-go-by-2031
+E02,2026-10-13,stock,大型銀行財報分歧,Goldman Sachs 第三季 EPS 17.01 美元遠優於預期（股票交易收入年增 72%）；JPMorgan EPS 5.57 美元低於預期，約三年來首次不如預期；Wells Fargo 營收低於預期。,GS|JPM|WFC,24/7 Wall St.,https://247wallst.com/investing/2026/10/13/goldman-sachs-rises-on-equities-led-earnings-beat-jpmorgan-chase-treads-water-wells-fargo-declines-3/
+E03,2026-10-14,macro,9 月 CPI 高於預期,CPI 年增 3.7%（預期 3.6%）、核心 CPI 月增 0.3%（預期 0.2%），汽油單月漲 9.1%；市場一度定價 10 月升息機率逾五成。,,investingLive,https://investinglive.com/news/us-september-cpi-vs-3-6-expected-0/
+E04,2026-10-14,industry,Barclays 下調 AI 硬體股評等,Barclays 將 Dell、HPE、NetApp 降評，認為企業客戶的 AI 支出未見「實質拐點」；Oracle 同日重挫約 9%，AI 相關股市值估計蒸發約 800 億美元。,DELL|HPE|NTAP|ORCL,Barchart,https://www.barchart.com/story/news/36602262/why-dell-dell-shares-are-falling-today
+E05,2026-10-16,macro,油價逼近 100 美元、科技股領跌,WTI 收 99.04 美元；科技類 ETF 約跌 3%、能源類 ETF 約漲 2.5%，那斯達克約跌 2.1%。,,Thrive in Markets,https://thriveinmarkets.com/market-insights/evening-review-2026-10-16/
+E06,2026-10-20,stock,Equifax、Hasbro 財報後大漲,兩家公司公布財報後同列當日最大漲幅（3M、KeyCorp 亦在列）。,EFX|HAS|MMM|KEY,Cantech Letter,https://www.cantechletter.com/newswires/outside-big-tech-tuesdays-earnings-winners-jumped-as-much-as-11/
+E07,2026-10-21,macro,伊朗供應疑慮推升油價,原油連續四週上漲，報導歸因於伊朗供應減少與全球需求強勁；OPEC 官員表示增產能否補足缺口仍不確定。,,Oil & Gas 360,https://www.oilandgas360.com/?p=821937
+E08,2026-10-22,industry,半導體設備股重挫,Lam Research 財報與財測皆優於預期但幅度有限，股價跳空走低；同日那斯達克約跌 2.6%，必需消費與公用事業逆勢上漲。,LRCX|AMAT|KLAC|TER,XTB；Tapeboard,https://www.xtb.com/en/market-analysis/lam-research-strong-numbers-limited-upside-surprise
+E09,2026-10-22,stock,Moderna 重挫,癌症疫苗三期早期結果外洩，加上多家券商調整目標價，其中 Citi 給予賣出評等。,MRNA,Trefis,https://www.trefis.com/articles/620111/how-much-downside-is-left-in-moderna-stock/2026-10-23
+E10,2026-10-22,stock,Pool Corp 財報後大漲,第三季財報於盤前公布，股價當日大漲；Goldman Sachs 下調目標價但維持買進。,POOL,StocksToTrade,https://stockstotrade.com/news/pool-corporation-pool-news-2026_10_22/
+E11,2026-10-23,macro,AI 交易疑慮未散、等待巨頭財報,路透：標普 500 收 7623.86 點、跌 0.52%；市場仍在消化對 AI 交易的質疑，下週約三分之一成分股公布財報，含三家 AI 雲端巨頭的資本支出計畫。,,Reuters（Virginia Business 轉載）,https://virginiabusiness.com/sp-500-closes-lower-ai-trade-earnings-outlook/
+E12,2026-10-28,macro,FOMC 利率決議（即將）,聯準會 9 月已升息至 3.75%–4.00%，9 月會議紀錄顯示多數委員認為年底前可能再升息；市場預期 10 月按兵不動。,,Scotsman Guide,https://www.scotsmanguide.com/news/fed-policymakers-saw-multiple-2026-rate-hikes-as-likely-september-fomc-minutes-show/

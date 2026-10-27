@@ -140,6 +140,7 @@ th:first-child{background:var(--sunken); z-index:2}
 tbody tr:hover td{background:var(--sunken)}
 tbody tr:hover td:first-child{background:var(--sunken)}
 tbody tr:last-child td{border-bottom:none}
+#t-kd-down td:last-child,#t-kd-down th:last-child,#t-kd-up td:last-child,#t-kd-up th:last-child{text-align:left; white-space:normal}
 #t-signals td:last-child,#t-signals th:last-child{text-align:left; white-space:normal; min-width:280px}
 #t-signals td:nth-child(2),#t-signals th:nth-child(2){text-align:left}
 td.n{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums}
@@ -186,6 +187,39 @@ ul.take b{color:var(--ink); font-weight:500}
 #tip .tt-r span{display:inline-flex; align-items:center; gap:6px}
 #tip b{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums; font-weight:600}
 
+/* ---------- event timeline ---------- */
+.ev-list{list-style:none; margin:0; padding:0 20px 14px; display:flex; flex-direction:column}
+.ev-list li{display:grid; grid-template-columns:30px 76px 1fr; gap:4px 14px; padding:13px 0;
+  border-top:1px solid var(--rule); align-items:start}
+.ev-date{font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--ink-3); padding-top:3px}
+.ev-body{min-width:0}
+.ev-body b{font-weight:600; font-size:14px}
+.ev-body p{margin:4px 0 0; color:var(--ink-2); font-size:13px; line-height:1.7}
+.ev-meta{display:flex; flex-wrap:wrap; gap:4px 14px; margin-top:7px; font-size:12px; color:var(--ink-3)}
+.ev-meta a{color:var(--accent); text-decoration:none; overflow-wrap:anywhere}
+.ev-meta a:hover{text-decoration:underline}
+.ev-meta a:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:2px}
+.cat{display:inline-block; font-size:11px; padding:0 6px; border-radius:2px; margin-left:8px;
+  border:1px solid var(--rule-strong); color:var(--ink-2); vertical-align:2px}
+.cat.soon{border-color:color-mix(in srgb,var(--warn) 55%,transparent); color:var(--ink)}
+.mv{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums}
+.ev-badge{display:block}
+@media (max-width:520px){
+  .ev-list li{grid-template-columns:30px 1fr}
+  .ev-body{grid-column:1/-1}
+}
+/* ---------- KD small multiples ---------- */
+.kd-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:14px; padding:8px 16px 18px}
+.kd-cell{border:1px solid var(--rule); border-radius:3px; padding:10px 10px 4px; background:var(--raised)}
+.kd-cell h4{margin:0 0 2px; font-size:13px; font-weight:600; display:flex; justify-content:space-between;
+  gap:8px; font-family:"IBM Plex Mono",monospace}
+.kd-cell h4 span{font-family:"Noto Sans TC",sans-serif; font-weight:400; font-size:11.5px; color:var(--ink-3)}
+.note-box{margin-top:18px; padding:12px 16px; border:1px solid color-mix(in srgb,var(--warn) 45%,transparent);
+  background:color-mix(in srgb,var(--warn) 9%,transparent); border-radius:3px; font-size:13px; color:var(--ink-2); max-width:78ch}
+.note-box b{color:var(--ink)}
+.zone{font-size:11px; padding:0 6px; border-radius:2px; border:1px solid var(--rule-strong); color:var(--ink-2); margin-left:6px}
+.zone.main{border-color:color-mix(in srgb,var(--accent) 50%,transparent); color:var(--accent)}
+
 footer{margin-top:56px; padding-top:24px; border-top:1px solid var(--rule);
   font-size:12.5px; color:var(--ink-3); line-height:1.8}
 footer b{color:var(--ink-2); font-weight:500}
@@ -222,14 +256,16 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
 
 <nav aria-label="章節導覽"><div class="nav-in">
   <a href="#breadth">01 廣度總覽</a>
-  <a href="#trend">02 趨勢與背離</a>
-  <a href="#partic">03 參與度</a>
-  <a href="#conc">04 集中度</a>
-  <a href="#sector">05 類股</a>
-  <a href="#rotation">06 輪動</a>
-  <a href="#industry">07 產業</a>
-  <a href="#stocks">08 個股</a>
-  <a href="#method">09 方法</a>
+  <a href="#events">02 近兩週大事</a>
+  <a href="#trend">03 趨勢與背離</a>
+  <a href="#partic">04 參與度</a>
+  <a href="#conc">05 集中度</a>
+  <a href="#sector">06 類股</a>
+  <a href="#rotation">07 輪動</a>
+  <a href="#industry">08 產業</a>
+  <a href="#stocks">09 個股</a>
+  <a href="#kd">10 週月KD</a>
+  <a href="#method">11 方法</a>
 </div></nav>
 
 <div class="wrap">
@@ -242,8 +278,26 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
   </table></div>
 </section>
 
+<section id="events">
+  <div class="sec-head"><span class="sec-no">02</span><h2>近兩週K線與大事記</h2></div>
+  <p class="sec-sub" id="ev-sub">—</p>
+  <figure class="panel">
+    <div class="panel-head"><h3>標普 500 日K線（成分股重建）</h3><p id="ev-axis-note">—</p></div>
+    <div class="legend" id="lg-candle"></div>
+    <div class="panel-body"><div id="c-candle"></div></div>
+    <figcaption id="cap-candle"></figcaption>
+  </figure>
+  <div class="panel">
+    <div class="panel-head">
+      <h3>事件時間序列</h3>
+      <p>經濟、產業、個股三類，依日期排列；編號對應上圖K線上方的標記。漲跌幅為本資料計算的當日收盤變化，事件內容與原因引自所列來源。</p>
+    </div>
+    <ol class="ev-list" id="ev-list"></ol>
+  </div>
+</section>
+
 <section id="trend">
-  <div class="sec-head"><span class="sec-no">02</span><h2>趨勢與背離</h2></div>
+  <div class="sec-head"><span class="sec-no">03</span><h2>趨勢與背離</h2></div>
   <p class="sec-sub">廣度和指數在同一段時間裡走了不同方向。四張圖分別看：站上均線的比例、市值加權與等權指數的落差、騰落線的高點、以及創新高減創新低。</p>
 
   <figure class="panel">
@@ -278,7 +332,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
 </section>
 
 <section id="partic">
-  <div class="sec-head"><span class="sec-no">03</span><h2>參與度</h2></div>
+  <div class="sec-head"><span class="sec-no">04</span><h2>參與度</h2></div>
   <p class="sec-sub">指數漲了多少是一回事，多少股票跟著漲是另一回事。平均報酬遠高於中位數，代表少數極端贏家把平均拉了上去。</p>
   <div class="tw"><table id="t-part">
     <caption>各期間的個股參與度<small>「贏過指數」以同期市值加權指數報酬為基準。P10／P90 為個股報酬的十分位與九十分位。</small></caption>
@@ -292,7 +346,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
 </section>
 
 <section id="conc">
-  <div class="sec-head"><span class="sec-no">04</span><h2>集中度</h2></div>
+  <div class="sec-head"><span class="sec-no">05</span><h2>集中度</h2></div>
   <p class="sec-sub">前十大市值股佔指數的份量，以及它們在過去一年貢獻了多少指數漲幅。</p>
   <div class="stats" id="concrow" style="margin-top:22px"></div>
   <figure class="panel">
@@ -303,7 +357,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
 </section>
 
 <section id="sector">
-  <div class="sec-head"><span class="sec-no">05</span><h2>類股</h2></div>
+  <div class="sec-head"><span class="sec-no">06</span><h2>類股</h2></div>
   <p class="sec-sub">11 個類股的報酬、廣度與評價。特別注意「市值加權／等權／中位數」三欄的落差——那是判斷一個類股是全面走強還是被兩三檔權值股撐著的關鍵。</p>
 
   <figure class="panel">
@@ -332,7 +386,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
 </section>
 
 <section id="rotation">
-  <div class="sec-head"><span class="sec-no">06</span><h2>輪動</h2></div>
+  <div class="sec-head"><span class="sec-no">07</span><h2>輪動</h2></div>
   <p class="sec-sub">同一批類股在 12 個月、3 個月、1 個月三個期間的排名。排名往前跑代表資金正在流入，往後掉代表領導地位在流失。</p>
   <div class="tw"><table id="t-rot">
     <caption>類股排名變化<small>排名 1 = 該期間表現最好。「12M→3M」為正代表名次前進（改善）；達 ±3 名以上標記為改善／轉弱。</small></caption>
@@ -340,7 +394,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
 </section>
 
 <section id="industry">
-  <div class="sec-head"><span class="sec-no">07</span><h2>產業</h2></div>
+  <div class="sec-head"><span class="sec-no">08</span><h2>產業</h2></div>
   <p class="sec-sub">細分到產業層級（成分股至少 3 檔，共 70 個產業）。這一層才看得出領導權實際換到哪裡。</p>
   <div class="grid2">
     <div class="tw" style="margin-top:0"><table id="t-indup"><caption>近三個月最強產業<small>市值加權報酬前 12 名。</small></caption></table></div>
@@ -352,7 +406,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
 </section>
 
 <section id="stocks">
-  <div class="sec-head"><span class="sec-no">08</span><h2>個股</h2></div>
+  <div class="sec-head"><span class="sec-no">09</span><h2>個股</h2></div>
   <p class="sec-sub">近三個月漲跌幅最極端的各 15 檔，附上 12 個月報酬作對照。</p>
   <div class="grid2">
     <div class="tw" style="margin-top:0"><table id="t-lead"><caption>近三個月領漲<small>依 3 個月報酬排序。</small></caption></table></div>
@@ -360,8 +414,26 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
   </div>
 </section>
 
+<section id="kd">
+  <div class="sec-head"><span class="sec-no">10</span><h2>週月 KD 同步交叉</h2></div>
+  <p class="sec-sub" id="kd-sub">—</p>
+  <div class="note-box" id="kd-note" hidden></div>
+  <div class="tw"><table id="t-kd-down"><caption>高檔同步向下交叉（死叉）<small id="kd-down-cap">—</small></caption></table></div>
+  <div class="tw"><table id="t-kd-up"><caption>低檔同步向上交叉（金叉）<small id="kd-up-cap">—</small></caption></table></div>
+  <figure class="panel">
+    <div class="panel-head"><h3>週 KD 走勢（主要名單）</h3><p>近 30 週的週 K 與週 D；陰影為 80 以上的高檔區與 20 以下的低檔區，直線標出本月出現交叉的那一週。</p></div>
+    <div class="legend" id="lg-kd"></div>
+    <div class="kd-grid" id="kd-grid"></div>
+  </figure>
+  <div class="tw"><table id="t-kd-factor"><caption>影響因素：兩群與全體比較<small>皆為中位數或比例；兩群各含主要與觀察名單，全體為本報告全部成分股。</small></caption></table></div>
+  <div class="panel">
+    <div class="panel-head"><h3>影響因素解讀</h3><p>以下每一句都由上表與事件紀錄推導，資料改變時措辭會跟著改。</p></div>
+    <ul class="take" id="kd-take" style="padding:0 20px 8px; margin-top:6px"></ul>
+  </div>
+</section>
+
 <section id="method">
-  <div class="sec-head"><span class="sec-no">09</span><h2>方法與限制</h2></div>
+  <div class="sec-head"><span class="sec-no">11</span><h2>方法與限制</h2></div>
   <ul class="take" id="method-list"></ul>
 </section>
 
@@ -736,6 +808,406 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
   /* ------------------------------------------------------------------ *
    * scatter (sector leadership map)
    * ------------------------------------------------------------------ */
+  /* ------------------------------------------------------------------ *
+   * events + candles
+   * ------------------------------------------------------------------ */
+  var CAT_TC = { macro: "經濟", industry: "產業", stock: "個股" };
+  var WD_TC = ["日", "一", "二", "三", "四", "五", "六"];
+  function md(dstr) { return dstr.slice(5).replace("-", "/"); }
+  function weekday(dstr) { return "週" + WD_TC[new Date(dstr + "T12:00:00Z").getUTCDay()]; }
+
+  // Category is carried by shape (circle / square / diamond) so it never depends on color.
+  function badgeShape(cat, cx, cy, r) {
+    if (cat === "industry") return el("rect", { x: cx - r, y: cy - r, width: 2 * r, height: 2 * r, rx: 2 });
+    if (cat === "stock") return el("polygon", { points: [cx, cy - r - 1.5, cx + r + 1.5, cy, cx, cy + r + 1.5, cx - r - 1.5, cy].join(" ") });
+    return el("circle", { cx: cx, cy: cy, r: r });
+  }
+  function drawBadge(svg, cat, cx, cy, label) {
+    var sh = badgeShape(cat, cx, cy, 8);
+    sh.setAttribute("fill", css("--raised"));
+    sh.setAttribute("stroke", css("--ink-2"));
+    sh.setAttribute("stroke-width", 1.3);
+    svg.appendChild(sh);
+    svg.appendChild(el("text", { x: cx, y: cy + 3.6, "text-anchor": "middle", fill: css("--ink"), "font-size": 10,
+      "font-weight": 600, "font-family": "IBM Plex Mono, monospace" }, label));
+  }
+  function badgeSvg(cat, label) {
+    var s = mkSvg(22, 22);
+    s.style.width = "22px"; s.style.height = "22px";
+    drawBadge(s, cat, 11, 11, label);
+    return s.outerHTML;
+  }
+
+  function eventNumbers() {
+    var inWin = D.events.filter(function (e) { return !e.upcoming; });
+    var byId = {}, byDate = {};
+    inWin.forEach(function (e, i) {
+      byId[e.id] = i + 1;
+      (byDate[e.date] = byDate[e.date] || []).push({ no: i + 1, cat: e.category, title: e.title });
+    });
+    return { byId: byId, byDate: byDate };
+  }
+
+  function candleChart(host) {
+    var bars = D.candles.bars, evn = eventNumbers();
+    var w = Math.max(320, host.clientWidth);
+    var plotH = 230, gap = 30, stripH = 60;
+    var lo = Math.min.apply(null, bars.map(function (b) { return b.l; }));
+    var hi = Math.max.apply(null, bars.map(function (b) { return b.h; }));
+    var pad = (hi - lo) * 0.06; lo -= pad; hi += pad;
+    // Headroom only for badges that would rise above the plot: a stack over a low bar fits inside it.
+    var need = 0;
+    bars.forEach(function (b) {
+      var k = (evn.byDate[b.date] || []).length;
+      if (k) need = Math.max(need, 14 + (k - 1) * 21 + 10 - plotH * (hi - b.h) / (hi - lo));
+    });
+    var top = 16 + Math.max(0, need);
+    var h = top + plotH + gap + stripH + 26;
+    var m = { l: 46, r: 14 }, iw = w - m.l - m.r;
+    var n = bars.length, band = iw / n, bw = Math.max(5, Math.min(26, band * 0.56));
+    var X = function (i) { return m.l + band * (i + 0.5); };
+    var Y = function (v) { return top + plotH * (1 - (v - lo) / (hi - lo)); };
+    var svg = mkSvg(w, h);
+
+    for (var g = 0; g <= 4; g++) {
+      var v = lo + (hi - lo) * g / 4;
+      svg.appendChild(el("line", { x1: m.l, x2: m.l + iw, y1: Y(v), y2: Y(v), stroke: css("--grid"), "stroke-width": 1 }));
+      svg.appendChild(el("text", { x: m.l - 8, y: Y(v) + 4, "text-anchor": "end", fill: css("--ink-3"),
+        "font-size": 11, "font-family": "IBM Plex Mono, monospace" }, v.toFixed(1)));
+    }
+    if (100 >= lo && 100 <= hi) {
+      svg.appendChild(el("line", { x1: m.l, x2: m.l + iw, y1: Y(100), y2: Y(100), stroke: css("--axis"), "stroke-width": 1.5 }));
+    }
+
+    var y0 = top + plotH + gap, mid = y0 + stripH / 2;
+    var dev = Math.max(10, Math.max.apply(null, bars.map(function (b) { return Math.abs(100 * b.adv / Math.max(1, b.adv + b.dec) - 50); })));
+    svg.appendChild(el("text", { x: m.l, y: y0 - 9, fill: css("--ink-3"), "font-size": 11 }, "上漲家數比例（中線 = 50%，上下緣 = 50% ± " + dev.toFixed(0) + "%）"));
+    svg.appendChild(el("line", { x1: m.l, x2: m.l + iw, y1: mid, y2: mid, stroke: css("--axis"), "stroke-width": 1.2 }));
+
+    bars.forEach(function (b, i) {
+      var x = X(i), up = b.c >= b.o;
+      svg.appendChild(el("line", { x1: x, x2: x, y1: Y(b.h), y2: Y(b.l), stroke: css("--ink-3"), "stroke-width": 1.2 }));
+      var yt = Y(Math.max(b.o, b.c)), yb = Y(Math.min(b.o, b.c));
+      svg.appendChild(el("rect", { x: x - bw / 2, y: yt, width: bw, height: Math.max(1.5, yb - yt), rx: 1.5,
+        fill: up ? css("--surface") : css("--neg"), stroke: up ? css("--pos") : css("--neg"), "stroke-width": 1.6 }));
+      (evn.byDate[b.date] || []).forEach(function (e, k) {
+        drawBadge(svg, e.cat, x, Y(b.h) - 14 - k * 21, String(e.no));
+      });
+      var share = 100 * b.adv / Math.max(1, b.adv + b.dec);
+      var sy = mid - (share - 50) / dev * (stripH / 2);
+      svg.appendChild(el("rect", { x: x - bw / 2, y: Math.min(mid, sy), width: bw, height: Math.max(1.5, Math.abs(sy - mid)),
+        rx: 1.5, fill: share >= 50 ? css("--pos") : css("--neg") }));
+      // A date label needs ~40px; on narrow screens label every other session plus the last.
+      if (band >= 44 || i % 2 === (n - 1) % 2) {
+        svg.appendChild(el("text", { x: x, y: h - 8, "text-anchor": "middle", fill: css("--ink-3"),
+          "font-size": 11, "font-family": "IBM Plex Mono, monospace" }, md(b.date)));
+      }
+
+      var hit = el("rect", { x: x - band / 2, y: 0, width: band, height: h - 20, fill: "transparent" });
+      hit.addEventListener("mousemove", function (ev) {
+        var rows = "<div class='tt-h'>" + b.date + " " + weekday(b.date) + "</div>" +
+          "<div class='tt-r'><span>開 / 收</span><b>" + b.o.toFixed(2) + " / " + b.c.toFixed(2) + "</b></div>" +
+          "<div class='tt-r'><span>高 / 低（外框）</span><b>" + b.h.toFixed(2) + " / " + b.l.toFixed(2) + "</b></div>" +
+          "<div class='tt-r'><span>收盤漲跌</span><b>" + pct(b.chg, 2) + "</b></div>" +
+          "<div class='tt-r'><span>上漲 / 下跌家數</span><b>" + b.adv + " / " + b.dec + "</b></div>";
+        (evn.byDate[b.date] || []).forEach(function (e) {
+          rows += "<div style='margin-top:4px'>" + e.no + "．" + e.title + "</div>";
+        });
+        showTip(rows, ev);
+      });
+      hit.addEventListener("mouseleave", hideTip);
+      svg.appendChild(hit);
+    });
+    host.innerHTML = ""; host.appendChild(svg);
+  }
+
+  function renderEventsStatic() {
+    var bars = D.candles.bars, evn = eventNumbers();
+    var inWin = D.events.filter(function (e) { return !e.upcoming; });
+    var soon = D.events.filter(function (e) { return e.upcoming; });
+    var cnt = { macro: 0, industry: 0, stock: 0 };
+    inWin.forEach(function (e) { cnt[e.category] = (cnt[e.category] || 0) + 1; });
+    document.getElementById("ev-sub").textContent =
+      bars[0].date + " 至 " + bars[bars.length - 1].date + "，共 " + bars.length + " 個交易日；收錄 " + inWin.length +
+      " 則事件（經濟 " + cnt.macro + "、產業 " + cnt.industry + "、個股 " + cnt.stock + "）" +
+      (soon.length ? "，另列 " + soon.length + " 則即將發生的事件" : "") + "。";
+    document.getElementById("ev-axis-note").textContent =
+      "以 " + D.candles.base_date + " 收盤 = 100。K棒實體（開盤到收盤）為成分股價格乘以股數加總，與本報告其餘指數同一口徑；" +
+      "影線是各成分股自身最高、最低價的加總，而成分股並非在同一時間觸及高低點，所以影線比真實指數寬，只適合比較各日的相對大小。";
+
+    var icon = function (svgInner) { return "<svg width='18' height='14' viewBox='0 0 18 14' style='flex:none;width:18px;height:14px'>" + svgInner + "</svg>"; };
+    document.getElementById("lg-candle").innerHTML =
+      "<span>" + icon("<rect x='5' y='2' width='8' height='10' rx='1.5' fill='" + css("--surface") + "' stroke='" + css("--pos") + "' stroke-width='1.6'/>") + "收盤 ≥ 開盤（空心）</span>" +
+      "<span>" + icon("<rect x='5' y='2' width='8' height='10' rx='1.5' fill='" + css("--neg") + "'/>") + "收盤 &lt; 開盤（實心）</span>" +
+      "<span>" + icon("<line x1='9' y1='1' x2='9' y2='13' stroke='" + css("--ink-3") + "' stroke-width='1.2'/>") + "影線（外框上限）</span>" +
+      ["macro", "industry", "stock"].map(function (c) {
+        var sh = badgeShape(c, 9, 7, 5); sh.setAttribute("fill", css("--raised")); sh.setAttribute("stroke", css("--ink-2")); sh.setAttribute("stroke-width", 1.2);
+        return "<span>" + icon(sh.outerHTML) + CAT_TC[c] + "事件</span>";
+      }).join("");
+
+    var total = bars[bars.length - 1].c - 100;
+    var worst = bars.slice().sort(function (a, b) { return a.chg - b.chg; })[0];
+    var best = bars.slice().sort(function (a, b) { return b.chg - a.chg; })[0];
+    var breadthDays = bars.filter(function (b) { return b.adv > b.dec; }).length;
+    var splitDays = bars.filter(function (b) { return b.chg < 0 && b.adv > b.dec; });
+    document.getElementById("cap-candle").textContent =
+      "兩週累計 " + pct(total, 2) + "；跌幅最大的是 " + worst.date + "（" + pct(worst.chg, 2) + "），漲幅最大的是 " +
+      best.date + "（" + pct(best.chg, 2) + "）。" + bars.length + " 天中有 " + breadthDays + " 天上漲家數多於下跌家數" +
+      (splitDays.length
+        ? "，其中 " + splitDays.map(function (b) { return md(b.date); }).join("、") + " 指數收黑、上漲家數卻較多——跌的是權值股，不是多數股票。"
+        : "。");
+
+    var moves = (D.kd && D.kd.event_moves) || {};
+    document.getElementById("ev-list").innerHTML = D.events.map(function (e) {
+      var mv = moves[e.id] || {};
+      var mvTxt = Object.keys(mv).map(function (t) {
+        return "<span class='mv'>" + t + " " + pct(mv[t]) + "</span>";
+      }).join(" ");
+      return "<li>" +
+        "<span class='ev-badge'>" + (e.upcoming ? badgeSvg(e.category, "→") : badgeSvg(e.category, String(evn.byId[e.id]))) + "</span>" +
+        "<span class='ev-date'>" + md(e.date) + " " + weekday(e.date) + "</span>" +
+        "<div class='ev-body'><b>" + e.title + "</b>" +
+          "<span class='cat'>" + CAT_TC[e.category] + "</span>" +
+          (e.upcoming ? "<span class='cat soon'>即將</span>" : "") +
+          "<p>" + e.detail + "</p>" +
+          "<div class='ev-meta'>" +
+            (mvTxt ? "<span>當日收盤（本資料）：" + mvTxt + "</span>" : "") +
+            "<span>來源：<a href='" + e.source_url + "' target='_blank' rel='noopener'>" + e.source_name + "</a></span>" +
+          "</div>" +
+        "</div></li>";
+    }).join("");
+  }
+
+  /* ------------------------------------------------------------------ *
+   * weekly + monthly KD crosses
+   * ------------------------------------------------------------------ */
+  function med(a) {
+    var v = a.filter(function (x) { return x !== null && x !== undefined && !isNaN(x); }).sort(function (x, y) { return x - y; });
+    if (!v.length) return null;
+    var k = Math.floor(v.length / 2);
+    return v.length % 2 ? v[k] : (v[k - 1] + v[k]) / 2;
+  }
+  function evTitle(id) {
+    var e = D.events.filter(function (x) { return x.id === id; })[0];
+    return e ? e.title : id;
+  }
+  function sameDayEvents(dstr, own) {
+    return D.events.filter(function (e) { return e.date === dstr && e.category === "industry" && own.indexOf(e.id) < 0; })
+      .map(function (e) { return e.id; });
+  }
+  function eventCell(x) {
+    var own = x.event_ids ? String(x.event_ids).split("|") : [];
+    var parts = own.map(function (id) { return id + " " + evTitle(id); });
+    if (x.big_move !== null) {
+      var same = sameDayEvents(x.big_move_date, own);
+      parts.push(md(x.big_move_date) + " 單日 " + pct(x.big_move) +
+        (same.length ? "（同日 " + same.join("、") + "）" : own.length ? "" : "（無對應事件紀錄）"));
+    }
+    return parts.length ? parts.join("<br>") : "<span class='sub'>近兩週無單日 ±" + D.kd.params.big_move_pct.toFixed(0) + "% 變動</span>";
+  }
+
+  function kdRows(g) {
+    return g.map(function (x) {
+      return [
+        { html: "<span class='mono'>" + x.Ticker + "</span><span class='zone" + (x.zone === "primary" ? " main" : "") + "'>" +
+            (x.zone === "primary" ? "主要" : "觀察") + "</span><div class='sub'>" + String(x.name || "").slice(0, 22) + "</div>" },
+        { html: "<span class='sub'>" + secName(x.Sector) + "</span>" },
+        { html: md(x.w_bar) + " 週<div class='sub'>K " + x.w_k_before.toFixed(0) + " → " + x.w_k.toFixed(0) + "，D " + x.w_d.toFixed(0) + "</div>", cls: "n" },
+        { html: "K " + x.m_k_before.toFixed(0) + " → " + x.m_k.toFixed(0) + "<div class='sub'>D " + x.m_d.toFixed(0) + "</div>", cls: "n" },
+        signed(x.ret_1m), signed(x.ret_12m),
+        { html: num(x.pct_from_52wh) + "%", cls: "n" },
+        { html: "50日" + (x.above_50dma ? "↑" : "↓") + " 200日" + (x.above_200dma ? "↑" : "↓"), cls: "n" },
+        { html: num(x.fwd_pe) + "<div class='sub'>類股 " + num(x.sector_fwd_pe) + "</div>", cls: "n" },
+        { html: "<span style='white-space:normal;display:block;min-width:200px;font-size:12.5px'>" + eventCell(x) + "</span>" }
+      ];
+    });
+  }
+
+  function groupTake(g, kind) {
+    var label = kind === "down" ? "高檔死叉" : "低檔金叉";
+    if (!g.length) return ["本月沒有個股符合" + label + "的條件。"];
+    var U = D.kd.universe, out = [], half = g.length / 2;
+
+    var cnt = {};
+    g.forEach(function (x) { cnt[x.Sector] = (cnt[x.Sector] || 0) + 1; });
+    var secs = Object.keys(cnt).sort(function (a, b) { return cnt[b] - cnt[a]; });
+    var top = secs[0], share = 100 * cnt[top] / g.length, ushare = U.sector_share[top] || 0;
+    var concentrated = share >= 50 && share >= 2 * ushare;
+    out.push(label + "的 " + g.length + " 檔中有 " + cnt[top] + " 檔屬" + secName(top) + "（" + share.toFixed(0) +
+      "%，全體只占 " + ushare.toFixed(0) + "%）" +
+      (concentrated ? "，明顯集中在單一類股。" : "，其餘分散在 " + (secs.length - 1) + " 個類股，沒有明顯的類股集中。"));
+
+    var r12 = med(g.map(function (x) { return x.ret_12m; })), r1 = med(g.map(function (x) { return x.ret_1m; }));
+    var shape = (r12 > U.ret_12m && r1 < U.ret_1m) ? "漲多後的回檔"
+      : (r12 < U.ret_12m && r1 > U.ret_1m) ? "跌深後的反彈" : null;
+    out.push("報酬：近 12 個月中位數 " + pct(r12) + "（全體 " + pct(U.ret_12m) + "），近 1 個月 " + pct(r1) +
+      "（全體 " + pct(U.ret_1m) + "）" + (shape ? "——屬於" + shape + "。" : "。"));
+
+    var a50 = g.filter(function (x) { return x.above_50dma; }).length;
+    var a200 = g.filter(function (x) { return x.above_200dma; }).length;
+    var trend = "趨勢位置：" + a50 + " 檔在 50 日均線之上、" + a200 + " 檔在 200 日均線之上";
+    if (kind === "down") {
+      trend += a200 >= half && a50 < half ? "，多數跌破中期均線但仍守住長線均線，屬上升趨勢中的中期修正，長線尚未轉空。"
+        : a200 < half ? "，多數已跌破長線均線，轉弱程度較深。" : "。";
+    } else {
+      trend += a50 >= half && a200 < half ? "，多數只站回中期均線、仍在長線均線之下，屬空頭格局中的反彈，長線反轉尚未確認。"
+        : a200 >= half ? "，多數已站回長線均線，反轉的條件較完整。" : "。";
+    }
+    out.push(trend);
+
+    var withPE = g.filter(function (x) { return x.fwd_pe !== null && x.sector_fwd_pe !== null; });
+    var hiPE = withPE.filter(function (x) { return x.fwd_pe > x.sector_fwd_pe; }).length;
+    var mpe = med(g.map(function (x) { return x.fwd_pe; })), gro = med(g.map(function (x) { return x.ny_growth; }));
+    out.push("評價與成長：" + withPE.length + " 檔中有 " + hiPE + " 檔預估本益比高於所屬類股中位數（群組中位數 " + num(mpe) +
+      "，全體 " + num(U.fwd_pe) + "）" + (hiPE > withPE.length / 2 ? "，整體評價偏高" : hiPE < withPE.length / 2 ? "，整體評價偏低" : "") +
+      "；明年 EPS 成長預估中位數 " + pct(gro) + "（全體 " + pct(U.ny_growth) + "）。");
+
+    var withEv = g.filter(function (x) { return x.event_ids; });
+    var bigNoEv = g.filter(function (x) { return !x.event_ids && x.big_move !== null; });
+    var quiet = g.length - withEv.length - bigNoEv.length;
+    var ev = [];
+    if (withEv.length) ev.push(withEv.map(function (x) {
+      return x.Ticker + "（" + String(x.event_ids).split("|").map(evTitle).join("、") +
+        (x.big_move !== null ? "，" + md(x.big_move_date) + " " + pct(x.big_move) : "") + "）";
+    }).join("、") + " 有直接對應的事件紀錄");
+    if (bigNoEv.length) ev.push(bigNoEv.map(function (x) {
+      var same = sameDayEvents(x.big_move_date, []);
+      return x.Ticker + " " + md(x.big_move_date) + " 單日 " + pct(x.big_move) + (same.length ? "（與 " + same.join("、") + " 同日）" : "");
+    }).join("、") + " 有大幅單日變動");
+    if (quiet) ev.push("其餘 " + quiet + " 檔近兩週沒有單日 ±" + D.kd.params.big_move_pct.toFixed(0) +
+      "% 的變動、也沒有事件紀錄，交叉較可能反映整體資金輪動，而非個別消息");
+    out.push("觸發因素：" + ev.join("；") + "。");
+
+    var rot = (D.rotation || []).filter(function (r) { return r.Sector === top; })[0];
+    if (rot && concentrated) out.push("類股背景：同期" + secName(top) + "類股近一個月 " + pct(rot.cw_1M) + "，在 " + D.rotation.length +
+      " 個類股中排第 " + rot.rank_1M + " 名。");
+    return out;
+  }
+
+  function renderKDStatic() {
+    var sec = document.getElementById("kd");
+    if (!D.kd) { sec.hidden = true; return; }
+    var K = D.kd, p = K.params;
+    var down = K.crosses.filter(function (x) { return x.kind === "down"; });
+    var up = K.crosses.filter(function (x) { return x.kind === "up"; });
+    var byZone = function (a, z) { return a.filter(function (x) { return x.zone === z; }).length; };
+
+    document.getElementById("kd-sub").textContent =
+      "以 KD（" + p.n + ",3,3）計算週線與月線，週線資料到 " + K.last_weekly_bar + "。「同步」的定義：月 KD 在 " + K.month +
+      " 這根月K出現交叉，且週 KD 在同月的週K（" + K.month_weeks.map(md).join("、") + "）中也出現同方向交叉。" +
+      "高檔指交叉前一根的 K 值在兩個週期都 ≥ " + p.zones.primary[0] + "（觀察名單 ≥ " + p.zones.watch[0] + "），低檔則 ≤ " +
+      p.zones.primary[1] + "（觀察名單 ≤ " + p.zones.watch[1] + "）。單看最新一根，全體有週KD死叉 " + K.scan.weekly_down +
+      " 檔、金叉 " + K.scan.weekly_up + " 檔，月KD死叉 " + K.scan.monthly_down + " 檔、金叉 " + K.scan.monthly_up + " 檔。";
+
+    var note = document.getElementById("kd-note");
+    if (!K.month_complete) {
+      note.hidden = false;
+      note.innerHTML = "<b>月K尚未收定。</b>" + K.month + " 的月K要到該月最後一個交易日收盤才確定，目前的月 KD 是用月中資料計算的；" +
+        "在那之前，月線的交叉都可能因後續走勢而消失或成形。";
+    } else { note.hidden = true; }
+
+    var head = ["代號", "類股", "週 KD 交叉", "月 KD", "近 1 月", "近 12 月", "距 52 週高", "均線位置", "預估本益比", "近兩週事件"];
+    fillTable("t-kd-down", head, kdRows(down));
+    fillTable("t-kd-up", head, kdRows(up));
+    document.getElementById("kd-down-cap").textContent = down.length
+      ? "主要名單 " + byZone(down, "primary") + " 檔、觀察名單 " + byZone(down, "watch") + " 檔。「K 84 → 74」表示交叉前一根的 K 值與目前的 K 值。"
+      : "本月沒有個股符合條件。";
+    document.getElementById("kd-up-cap").textContent = up.length
+      ? "主要名單 " + byZone(up, "primary") + " 檔、觀察名單 " + byZone(up, "watch") + " 檔。"
+      : "本月沒有個股符合條件。";
+
+    var U = K.universe;
+    var share = function (a, f) { return a.length ? 100 * a.filter(f).length / a.length : null; };
+    var pe = function (a) { return a.filter(function (x) { return x.fwd_pe !== null && x.sector_fwd_pe !== null; }); };
+    var row = function (lab, fn, uni, fmt) {
+      return [{ html: lab }, { html: fmt(fn(down)), cls: "n" }, { html: fmt(fn(up)), cls: "n" }, { html: uni === null ? "—" : fmt(uni), cls: "n" }];
+    };
+    var P = function (v) { return v === null ? "—" : pct(v); };
+    var S = function (v) { return v === null ? "—" : v.toFixed(0) + "%"; };
+    var N = function (v) { return v === null ? "—" : v.toFixed(1); };
+    fillTable("t-kd-factor", ["因素", "高檔死叉", "低檔金叉", "全體"], [
+      row("檔數", function (a) { return a.length; }, U.n, function (v) { return String(v); }),
+      row("近 1 月報酬", function (a) { return med(a.map(function (x) { return x.ret_1m; })); }, U.ret_1m, P),
+      row("近 3 月報酬", function (a) { return med(a.map(function (x) { return x.ret_3m; })); }, U.ret_3m, P),
+      row("近 12 月報酬", function (a) { return med(a.map(function (x) { return x.ret_12m; })); }, U.ret_12m, P),
+      row("距 52 週高", function (a) { return med(a.map(function (x) { return x.pct_from_52wh; })); }, U.pct_from_52wh, P),
+      row("站上 50 日均線", function (a) { return share(a, function (x) { return x.above_50dma; }); }, D.latest.pct_above_50dma, S),
+      row("站上 200 日均線", function (a) { return share(a, function (x) { return x.above_200dma; }); }, D.latest.pct_above_200dma, S),
+      row("預估本益比", function (a) { return med(a.map(function (x) { return x.fwd_pe; })); }, U.fwd_pe, N),
+      row("本益比高於所屬類股", function (a) { return share(pe(a), function (x) { return x.fwd_pe > x.sector_fwd_pe; }); }, null, S),
+      row("明年 EPS 成長預估", function (a) { return med(a.map(function (x) { return x.ny_growth; })); }, U.ny_growth, P),
+      row("近兩週有單日 ±" + p.big_move_pct.toFixed(0) + "% 變動", function (a) { return share(a, function (x) { return x.big_move !== null; }); }, null, S),
+      row("有對應事件紀錄", function (a) { return share(a, function (x) { return !!x.event_ids; }); }, null, S)
+    ]);
+
+    var items = groupTake(down, "down").map(function (t) { return ["↓", t]; })
+      .concat(groupTake(up, "up").map(function (t) { return ["↑", t]; }));
+    if (!K.month_complete) items.push(["!", "以上兩群都建立在尚未收定的 " + K.month + " 月K上，月底前名單可能增減；月底收盤後重跑即可確認。"]);
+    document.getElementById("kd-take").innerHTML = items.map(function (x) {
+      return "<li data-i='" + x[0] + "'><span>" + x[1] + "</span></li>";
+    }).join("");
+  }
+
+  function miniKD(host, dates, k, d, crossDate) {
+    var w = Math.max(200, host.clientWidth), h = 118;
+    var m = { t: 6, r: 8, b: 18, l: 24 }, iw = w - m.l - m.r, ih = h - m.t - m.b;
+    var n = dates.length;
+    var X = function (i) { return m.l + iw * i / Math.max(1, n - 1); };
+    var Y = function (v) { return m.t + ih * (1 - v / 100); };
+    var svg = mkSvg(w, h);
+    svg.appendChild(el("rect", { x: m.l, y: Y(100), width: iw, height: Y(80) - Y(100), fill: css("--grid") }));
+    svg.appendChild(el("rect", { x: m.l, y: Y(20), width: iw, height: Y(0) - Y(20), fill: css("--grid") }));
+    [20, 80].forEach(function (v) {
+      svg.appendChild(el("text", { x: m.l - 5, y: Y(v) + 4, "text-anchor": "end", fill: css("--ink-3"),
+        "font-size": 10, "font-family": "IBM Plex Mono, monospace" }, String(v)));
+    });
+    var ci = dates.indexOf(crossDate);
+    if (ci >= 0) svg.appendChild(el("line", { x1: X(ci), x2: X(ci), y1: m.t, y2: m.t + ih, stroke: css("--rule-strong"), "stroke-width": 1 }));
+    [[k, css("--s1")], [d, css("--s2")]].forEach(function (pair) {
+      var dstr = "", started = false;
+      pair[0].forEach(function (v, i) {
+        if (v === null) { started = false; return; }
+        dstr += (started ? "L" : "M") + X(i).toFixed(1) + " " + Y(v).toFixed(1) + " ";
+        started = true;
+      });
+      svg.appendChild(el("path", { d: dstr, fill: "none", stroke: pair[1], "stroke-width": 1.7, "stroke-linejoin": "round" }));
+      var li = pair[0].length - 1;
+      if (pair[0][li] !== null) svg.appendChild(el("circle", { cx: X(li), cy: Y(pair[0][li]), r: 3, fill: pair[1], stroke: css("--raised"), "stroke-width": 1.5 }));
+    });
+    [0, n - 1].forEach(function (i) {
+      svg.appendChild(el("text", { x: X(i), y: h - 4, "text-anchor": i ? "end" : "start", fill: css("--ink-3"),
+        "font-size": 10, "font-family": "IBM Plex Mono, monospace" }, fmtDate(dates[i])));
+    });
+    var hit = el("rect", { x: m.l, y: m.t, width: iw, height: ih, fill: "transparent" });
+    hit.addEventListener("mousemove", function (ev) {
+      var bb = svg.getBoundingClientRect();
+      var i = Math.max(0, Math.min(n - 1, Math.round((ev.clientX - bb.left - m.l) / (iw / Math.max(1, n - 1)))));
+      showTip("<div class='tt-h'>" + dates[i] + " 週</div><div class='tt-r'><span>K</span><b>" + (k[i] === null ? "—" : k[i].toFixed(1)) +
+        "</b></div><div class='tt-r'><span>D</span><b>" + (d[i] === null ? "—" : d[i].toFixed(1)) + "</b></div>", ev);
+    });
+    hit.addEventListener("mouseleave", hideTip);
+    svg.appendChild(hit);
+    host.innerHTML = ""; host.appendChild(svg);
+  }
+
+  function renderKDCharts() {
+    if (!D.kd) return;
+    var K = D.kd, grid = document.getElementById("kd-grid");
+    var prim = K.crosses.filter(function (x) { return x.zone === "primary"; });
+    document.getElementById("lg-kd").innerHTML =
+      "<span><i class='swatch' style='background:" + css("--s1") + "'></i>週 K</span>" +
+      "<span><i class='swatch' style='background:" + css("--s2") + "'></i>週 D</span>" +
+      "<span><i class='swatch' style='height:10px;background:" + css("--grid") + "'></i>高檔 ≥ 80 ／ 低檔 ≤ 20</span>";
+    grid.innerHTML = prim.map(function (x, i) {
+      return "<div class='kd-cell'><h4>" + x.Ticker + "<span>" + (x.kind === "down" ? "高檔死叉" : "低檔金叉") + " · " +
+        secName(x.Sector) + "</span></h4><div id='kd-mini-" + i + "'></div></div>";
+    }).join("");
+    prim.forEach(function (x, i) {
+      var s = K.weekly_series.data[x.Ticker];
+      if (s) miniKD(document.getElementById("kd-mini-" + i), K.weekly_series.dates, s.k, s.d, x.w_bar);
+    });
+  }
+
   function scatter(host, opt) {
     var w = Math.max(300, host.clientWidth), h = opt.height || 340;
     var m = { t: 16, r: 18, b: 44, l: 48 };
@@ -857,6 +1329,8 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
    * render everything
    * ------------------------------------------------------------------ */
   function renderStatic() {
+    renderEventsStatic();
+    renderKDStatic();
     document.getElementById("st-asof").textContent = D.asof;
     document.getElementById("st-gen").textContent = D.generated || D.asof;
     document.getElementById("st-dek-n").textContent = D.n_tickers;
@@ -1103,6 +1577,8 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
 
   /* charts (re-rendered on resize / theme change) --------------------- */
   function renderCharts() {
+    candleChart(document.getElementById("c-candle"));
+    renderKDCharts();
     var s1 = css("--s1"), s2 = css("--s2"), s3 = css("--s3");
 
     lineChart(document.getElementById("c-ma"), {

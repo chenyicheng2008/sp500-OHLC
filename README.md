@@ -80,7 +80,7 @@ and writes a self-contained Traditional-Chinese report to
 and JS inlined, so it opens straight from disk with no server and no network.
 
 ```bash
-python analysis/breadth_sector.py && python analysis/build_report_data.py && python analysis/build_report.py
+python analysis/breadth_sector.py && python analysis/kd_signals.py && python analysis/build_report_data.py && python analysis/build_report.py
 ```
 
 The filename carries the data date, and the page prints both the data date (`資料日`,
@@ -89,3 +89,17 @@ run writes a new dated file rather than overwriting the last one.
 
 The analysis scripts need `pandas` and `numpy`; `requirements.txt` covers only the fetch
 step.
+
+### Two-week K-line, events and KD crosses
+
+- `breadth_sector.py` also writes `index_ohlc_daily.csv`, a daily OHLC for the reconstructed
+  index. Bodies are exact; wicks are the sum of each constituent's own high/low and are
+  therefore wider than the real index range.
+- `data/events/market_events.csv` is a hand-curated list of economic, industry and stock
+  events, one row per event, each with its source URL. It is the only input that is not
+  computed from the fetched data.
+- `kd_signals.py` computes weekly and monthly KD(9,3,3) for every constituent and flags
+  names whose weekly and monthly KD cross the same way in the same month inside the
+  high (≥80) or low (≤20) zone, with a ≥70 / ≤30 watch list. Each flagged name is lined
+  up against sector, returns, position vs moving averages, valuation, growth and any
+  catalogued event or large one-day move in the last two weeks.
