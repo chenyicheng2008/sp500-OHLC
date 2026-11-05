@@ -129,6 +129,7 @@ def main() -> None:
     ev_path = REPO / "data" / "events" / "market_events.csv"
     events = pd.read_csv(ev_path, encoding=ENC).replace({np.nan: None}) if ev_path.exists() else pd.DataFrame()
     first = payload["candles"]["bars"][0]["date"]
+    payload["events_all"] = events.to_dict("records") if len(events) else []
     if len(events):
         events = events[events["date"] >= first].sort_values(["date", "id"])
         events["upcoming"] = events["date"] > payload["asof"]

@@ -298,7 +298,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
 
 <section id="trend">
   <div class="sec-head"><span class="sec-no">03</span><h2>趨勢與背離</h2></div>
-  <p class="sec-sub">廣度和指數在同一段時間裡走了不同方向。四張圖分別看：站上均線的比例、市值加權與等權指數的落差、騰落線的高點、以及創新高減創新低。</p>
+  <p class="sec-sub" id="sub-trend">—</p>
 
   <figure class="panel">
     <div class="panel-head">
@@ -318,7 +318,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
       <figcaption id="cap-idx"></figcaption>
     </figure>
     <figure class="panel">
-      <div class="panel-head"><h3>騰落線（A/D Line）</h3><p>每日上漲家數減下跌家數的累計值。它的高點比指數高點早到。</p></div>
+      <div class="panel-head"><h3>騰落線（A/D Line）</h3><p id="sub-ad">—</p></div>
       <div class="panel-body"><div id="c-ad"></div></div>
       <figcaption id="cap-ad"></figcaption>
     </figure>
@@ -333,13 +333,13 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
 
 <section id="partic">
   <div class="sec-head"><span class="sec-no">04</span><h2>參與度</h2></div>
-  <p class="sec-sub">指數漲了多少是一回事，多少股票跟著漲是另一回事。平均報酬遠高於中位數，代表少數極端贏家把平均拉了上去。</p>
+  <p class="sec-sub" id="sub-partic">—</p>
   <div class="tw"><table id="t-part">
     <caption>各期間的個股參與度<small>「贏過指數」以同期市值加權指數報酬為基準。P10／P90 為個股報酬的十分位與九十分位。</small></caption>
   </table></div>
 
   <figure class="panel">
-    <div class="panel-head"><h3>距 52 週高點的位置分布</h3><p>指數只差高點不到 2%，但成分股分散得很開。</p></div>
+    <div class="panel-head"><h3>距 52 週高點的位置分布</h3><p id="sub-dd">—</p></div>
     <div class="panel-body"><div id="c-dd"></div></div>
     <figcaption id="cap-dd"></figcaption>
   </figure>
@@ -358,7 +358,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
 
 <section id="sector">
   <div class="sec-head"><span class="sec-no">06</span><h2>類股</h2></div>
-  <p class="sec-sub">11 個類股的報酬、廣度與評價。特別注意「市值加權／等權／中位數」三欄的落差——那是判斷一個類股是全面走強還是被兩三檔權值股撐著的關鍵。</p>
+  <p class="sec-sub"><span id="n-sec">—</span> 個類股的報酬、廣度與評價。特別注意「市值加權／等權／中位數」三欄的落差——那是判斷一個類股是全面走強還是被兩三檔權值股撐著的關鍵。</p>
 
   <figure class="panel">
     <div class="panel-head"><h3>近三個月類股報酬（市值加權）</h3><p>橫軸為報酬率，垂直線為指數本身的同期報酬。</p></div>
@@ -395,7 +395,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
 
 <section id="industry">
   <div class="sec-head"><span class="sec-no">08</span><h2>產業</h2></div>
-  <p class="sec-sub">細分到產業層級（成分股至少 3 檔，共 70 個產業）。這一層才看得出領導權實際換到哪裡。</p>
+  <p class="sec-sub">細分到產業層級（成分股至少 3 檔，共 <span id="n-ind">—</span> 個產業）。這一層才看得出領導權實際換到哪裡。</p>
   <div class="grid2">
     <div class="tw" style="margin-top:0"><table id="t-indup"><caption>近三個月最強產業<small>市值加權報酬前 12 名。</small></caption></table></div>
     <div class="tw" style="margin-top:0"><table id="t-inddn"><caption>近三個月最弱產業<small>市值加權報酬後 12 名。</small></caption></table></div>
@@ -407,7 +407,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
 
 <section id="stocks">
   <div class="sec-head"><span class="sec-no">09</span><h2>個股</h2></div>
-  <p class="sec-sub">近三個月漲跌幅最極端的各 15 檔，附上 12 個月報酬作對照。</p>
+  <p class="sec-sub">近三個月漲跌幅最極端的各 <span id="n-lead">—</span> 檔，附上 12 個月報酬作對照。</p>
   <div class="grid2">
     <div class="tw" style="margin-top:0"><table id="t-lead"><caption>近三個月領漲<small>依 3 個月報酬排序。</small></caption></table></div>
     <div class="tw" style="margin-top:0"><table id="t-lag"><caption>近三個月落後<small>依 3 個月報酬排序。</small></caption></table></div>
@@ -421,7 +421,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
   <div class="tw"><table id="t-kd-down"><caption>高檔同步向下交叉（死叉）<small id="kd-down-cap">—</small></caption></table></div>
   <div class="tw"><table id="t-kd-up"><caption>低檔同步向上交叉（金叉）<small id="kd-up-cap">—</small></caption></table></div>
   <figure class="panel">
-    <div class="panel-head"><h3>週 KD 走勢（主要名單）</h3><p>近 30 週的週 K 與週 D；陰影為 80 以上的高檔區與 20 以下的低檔區，直線標出本月出現交叉的那一週。</p></div>
+    <div class="panel-head"><h3>週 KD 走勢（主要名單）</h3><p>近 30 週的週 K 與週 D；陰影為 80 以上的高檔區與 20 以下的低檔區，直線標出該月出現交叉的那一週。</p></div>
     <div class="legend" id="lg-kd"></div>
     <div class="kd-grid" id="kd-grid"></div>
   </figure>
@@ -430,6 +430,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     <div class="panel-head"><h3>影響因素解讀</h3><p>以下每一句都由上表與事件紀錄推導，資料改變時措辭會跟著改。</p></div>
     <ul class="take" id="kd-take" style="padding:0 20px 8px; margin-top:6px"></ul>
   </div>
+  <div class="tw" id="kd-prov-wrap" hidden><table id="t-kd-prov"><caption><span id="kd-prov-title">本月進行中的初步訊號</span><small id="kd-prov-cap">—</small></caption></table></div>
 </section>
 
 <section id="method">
@@ -921,6 +922,38 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     host.innerHTML = ""; host.appendChild(svg);
   }
 
+  // Section subtitles that state something about the market: each clause is chosen from the readings.
+  function renderSubtitles() {
+    var div = D.signals.filter(function (x) { return x.signal === "Breadth vs index divergence"; })[0];
+    document.getElementById("sub-trend").textContent =
+      (div && div.status === "warning"
+        ? "這段期間廣度和指數走了不同方向。"
+        : "廣度和指數目前沒有明顯背離。") +
+      "四張圖分別看：站上均線的比例、市值加權與等權指數的落差、騰落線的高點、以及創新高減創新低。";
+
+    var ad = D.adline_peak.date, cp = D.cap_peak.date;
+    document.getElementById("sub-ad").textContent = "每日上漲家數減下跌家數的累計值。" +
+      (ad < cp ? "它的高點（" + ad + "）比指數高點（" + cp + "）早到。"
+        : ad > cp ? "它的高點（" + ad + "）比指數高點（" + cp + "）晚到。"
+        : "它和指數在同一天（" + ad + "）創高。");
+
+    var p12 = D.participation.filter(function (r) { return r.horizon === "12M"; })[0];
+    var gap = p12.mean_ret - p12.median_ret;
+    document.getElementById("sub-partic").textContent = "指數漲了多少是一回事，多少股票跟著漲是另一回事。" +
+      (gap > 5 ? "一年期平均報酬比中位數高 " + gap.toFixed(1) + " 個百分點，代表少數極端贏家把平均拉了上去。"
+        : gap > 1 ? "一年期平均報酬略高於中位數（差 " + gap.toFixed(1) + " 個百分點），少數贏家有拉高平均，但幅度不大。"
+        : "一年期平均報酬與中位數接近，漲幅分布相對平均。");
+
+    var off = Math.abs(D.cap_off_high), deep = D.drawdown[0].pct + D.drawdown[1].pct;
+    document.getElementById("sub-dd").textContent =
+      (off < 0.05 ? "指數正在高點" : "指數距高點 " + off.toFixed(1) + "%") + "，成分股中有 " + deep.toFixed(0) +
+      "% 距自身高點超過 20%" + (deep >= 25 ? "，個股分散得很開。" : "。");
+
+    document.getElementById("n-sec").textContent = D.sector.filter(function (x) { return x.Sector !== "unknown"; }).length;
+    document.getElementById("n-ind").textContent = D.industry.length;
+    document.getElementById("n-lead").textContent = D.leaders.length;
+  }
+
   function renderEventsStatic() {
     var bars = D.candles.bars, evn = eventNumbers();
     var inWin = D.events.filter(function (e) { return !e.upcoming; });
@@ -987,22 +1020,30 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     var k = Math.floor(v.length / 2);
     return v.length % 2 ? v[k] : (v[k - 1] + v[k]) / 2;
   }
-  function evTitle(id) {
-    var e = D.events.filter(function (x) { return x.id === id; })[0];
-    return e ? e.title : id;
+  function evById(id) { return (D.events_all || D.events).filter(function (x) { return x.id === id; })[0]; }
+  function evTitle(id) { var e = evById(id); return e ? e.title : id; }
+  // An event in its own right: title and date, never fused with a move from another day.
+  function evLabel(id) { var e = evById(id); return e ? id + "「" + e.title + "」" + md(e.date) : id; }
+  function sameDayEvents(dstr, own, sector) {
+    var secs = (D.kd && D.kd.event_sectors) || {};
+    return (D.events_all || D.events).filter(function (e) {
+      return e.date === dstr && e.category !== "macro" && own.indexOf(e.id) < 0 &&
+        (secs[e.id] || []).indexOf(sector) >= 0;
+    }).map(function (e) { return e.id; });
   }
-  function sameDayEvents(dstr, own) {
-    return D.events.filter(function (e) { return e.date === dstr && e.category === "industry" && own.indexOf(e.id) < 0; })
-      .map(function (e) { return e.id; });
+  // The big move is shown separately unless it happened on the day of one of the name's own events.
+  function moveClause(x, own) {
+    if (x.big_move === null) return null;
+    var onOwn = own.some(function (id) { var e = evById(id); return e && e.date === x.big_move_date; });
+    if (onOwn) return null;
+    var same = sameDayEvents(x.big_move_date, own, x.Sector);
+    return md(x.big_move_date) + " 單日 " + pct(x.big_move) + (same.length ? "（與同類股的 " + same.join("、") + " 同日）" : "");
   }
   function eventCell(x) {
     var own = x.event_ids ? String(x.event_ids).split("|") : [];
-    var parts = own.map(function (id) { return id + " " + evTitle(id); });
-    if (x.big_move !== null) {
-      var same = sameDayEvents(x.big_move_date, own);
-      parts.push(md(x.big_move_date) + " 單日 " + pct(x.big_move) +
-        (same.length ? "（同日 " + same.join("、") + "）" : own.length ? "" : "（無對應事件紀錄）"));
-    }
+    var parts = own.map(evLabel);
+    var mv = moveClause(x, own);
+    if (mv) parts.push(mv + (own.length || mv.indexOf("同日") >= 0 ? "" : "（無對應事件紀錄）"));
     return parts.length ? parts.join("<br>") : "<span class='sub'>近兩週無單日 ±" + D.kd.params.big_move_pct.toFixed(0) + "% 變動</span>";
   }
 
@@ -1033,7 +1074,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     var secs = Object.keys(cnt).sort(function (a, b) { return cnt[b] - cnt[a]; });
     var top = secs[0], share = 100 * cnt[top] / g.length, ushare = U.sector_share[top] || 0;
     var concentrated = share >= 50 && share >= 2 * ushare;
-    out.push(label + "的 " + g.length + " 檔中有 " + cnt[top] + " 檔屬" + secName(top) + "（" + share.toFixed(0) +
+    out.push(label + "的 " + g.length + " 檔中" + (cnt[top] === g.length ? "全部" : "有 " + cnt[top] + " 檔") + "屬" + secName(top) + "（" + share.toFixed(0) +
       "%，全體只占 " + ushare.toFixed(0) + "%）" +
       (concentrated ? "，明顯集中在單一類股。" : "，其餘分散在 " + (secs.length - 1) + " 個類股，沒有明顯的類股集中。"));
 
@@ -1047,11 +1088,13 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     var a200 = g.filter(function (x) { return x.above_200dma; }).length;
     var trend = "趨勢位置：" + a50 + " 檔在 50 日均線之上、" + a200 + " 檔在 200 日均線之上";
     if (kind === "down") {
-      trend += a200 >= half && a50 < half ? "，多數跌破中期均線但仍守住長線均線，屬上升趨勢中的中期修正，長線尚未轉空。"
-        : a200 < half ? "，多數已跌破長線均線，轉弱程度較深。" : "。";
+      trend += a200 > half && a50 < half ? "，多數跌破中期均線但仍守住長線均線，屬上升趨勢中的中期修正，長線尚未轉空。"
+        : a200 < half ? "，多數已跌破長線均線，轉弱程度較深。"
+        : "，長線均線上下各半，修正深淺不一。";
     } else {
-      trend += a50 >= half && a200 < half ? "，多數只站回中期均線、仍在長線均線之下，屬空頭格局中的反彈，長線反轉尚未確認。"
-        : a200 >= half ? "，多數已站回長線均線，反轉的條件較完整。" : "。";
+      trend += a50 > half && a200 < half ? "，多數只站回中期均線、仍在長線均線之下，屬空頭格局中的反彈，長線反轉尚未確認。"
+        : a200 > half ? "，多數已站回長線均線，反轉的條件較完整。"
+        : a200 === half ? "，只有半數站回長線均線，反轉仍待確認。" : "。";
     }
     out.push(trend);
 
@@ -1067,13 +1110,11 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     var quiet = g.length - withEv.length - bigNoEv.length;
     var ev = [];
     if (withEv.length) ev.push(withEv.map(function (x) {
-      return x.Ticker + "（" + String(x.event_ids).split("|").map(evTitle).join("、") +
-        (x.big_move !== null ? "，" + md(x.big_move_date) + " " + pct(x.big_move) : "") + "）";
-    }).join("、") + " 有直接對應的事件紀錄");
-    if (bigNoEv.length) ev.push(bigNoEv.map(function (x) {
-      var same = sameDayEvents(x.big_move_date, []);
-      return x.Ticker + " " + md(x.big_move_date) + " 單日 " + pct(x.big_move) + (same.length ? "（與 " + same.join("、") + " 同日）" : "");
-    }).join("、") + " 有大幅單日變動");
+      var own = String(x.event_ids).split("|");
+      var mv = moveClause(x, own);
+      return x.Ticker + "：" + own.map(evLabel).join("、") + (mv ? "，另有 " + mv : "");
+    }).join("；") + " 有直接對應的事件紀錄");
+    if (bigNoEv.length) ev.push(bigNoEv.map(function (x) { return x.Ticker + " " + moveClause(x, []); }).join("、") + " 有大幅單日變動");
     if (quiet) ev.push("其餘 " + quiet + " 檔近兩週沒有單日 ±" + D.kd.params.big_move_pct.toFixed(0) +
       "% 的變動、也沒有事件紀錄，交叉較可能反映整體資金輪動，而非個別消息");
     out.push("觸發因素：" + ev.join("；") + "。");
@@ -1088,25 +1129,32 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     var sec = document.getElementById("kd");
     if (!D.kd) { sec.hidden = true; return; }
     var K = D.kd, p = K.params;
-    var down = K.crosses.filter(function (x) { return x.kind === "down"; });
-    var up = K.crosses.filter(function (x) { return x.kind === "up"; });
+    var pm = K.months.filter(function (m) { return m.month === K.primary_month; })[0];
+    var prov = K.months.filter(function (m) { return !m.complete; })[0];
+    var inPm = K.crosses.filter(function (x) { return x.month === K.primary_month; });
+    var down = inPm.filter(function (x) { return x.kind === "down"; });
+    var up = inPm.filter(function (x) { return x.kind === "up"; });
     var byZone = function (a, z) { return a.filter(function (x) { return x.zone === z; }).length; };
 
     document.getElementById("kd-sub").textContent =
-      "以 KD（" + p.n + ",3,3）計算週線與月線，週線資料到 " + K.last_weekly_bar + "。「同步」的定義：月 KD 在 " + K.month +
-      " 這根月K出現交叉，且週 KD 在同月的週K（" + K.month_weeks.map(md).join("、") + "）中也出現同方向交叉。" +
+      "以 KD（" + p.n + ",3,3）計算週線與月線，資料到 " + K.last_session + "。「同步」的定義：月 KD 在 " + pm.month +
+      " 這根" + (pm.complete ? "已收定的" : "") + "月K出現交叉，且週 KD 在同月的週K（" + pm.weeks.map(md).join("、") + "）中也出現同方向交叉。" +
       "高檔指交叉前一根的 K 值在兩個週期都 ≥ " + p.zones.primary[0] + "（觀察名單 ≥ " + p.zones.watch[0] + "），低檔則 ≤ " +
       p.zones.primary[1] + "（觀察名單 ≤ " + p.zones.watch[1] + "）。單看最新一根，全體有週KD死叉 " + K.scan.weekly_down +
       " 檔、金叉 " + K.scan.weekly_up + " 檔，月KD死叉 " + K.scan.monthly_down + " 檔、金叉 " + K.scan.monthly_up + " 檔。";
 
     var note = document.getElementById("kd-note");
-    if (!K.month_complete) {
+    if (!pm.complete) {
       note.hidden = false;
-      note.innerHTML = "<b>月K尚未收定。</b>" + K.month + " 的月K要到該月最後一個交易日收盤才確定，目前的月 KD 是用月中資料計算的；" +
+      note.innerHTML = "<b>月K尚未收定。</b>" + pm.month + " 的月K要到該月最後一個交易日收盤才確定，目前的月 KD 是用月中資料計算的；" +
         "在那之前，月線的交叉都可能因後續走勢而消失或成形。";
+    } else if (prov) {
+      note.hidden = false;
+      note.innerHTML = "<b>以下主表以已收定的 " + pm.month + " 月K為準。</b>" + prov.month + " 的月K目前只有 " + prov.sessions +
+        " 個交易日" + (K.week_complete ? "" : "，本週的週K也尚未收定") + "，它的初步訊號另列在本節最後，月底收定後才算數。";
     } else { note.hidden = true; }
 
-    var head = ["代號", "類股", "週 KD 交叉", "月 KD", "近 1 月", "近 12 月", "距 52 週高", "均線位置", "預估本益比", "近兩週事件"];
+    var head = ["代號", "類股", "週 KD 交叉", "月 KD", "近 1 月", "近 12 月", "距 52 週高", "均線位置", "預估本益比", "相關事件與大幅變動"];
     fillTable("t-kd-down", head, kdRows(down));
     fillTable("t-kd-up", head, kdRows(up));
     document.getElementById("kd-down-cap").textContent = down.length
@@ -1142,10 +1190,31 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
 
     var items = groupTake(down, "down").map(function (t) { return ["↓", t]; })
       .concat(groupTake(up, "up").map(function (t) { return ["↑", t]; }));
-    if (!K.month_complete) items.push(["!", "以上兩群都建立在尚未收定的 " + K.month + " 月K上，月底前名單可能增減；月底收盤後重跑即可確認。"]);
+    if (!pm.complete) items.push(["!", "以上兩群都建立在尚未收定的 " + pm.month + " 月K上，月底前名單可能增減；月底收盤後重跑即可確認。"]);
     document.getElementById("kd-take").innerHTML = items.map(function (x) {
       return "<li data-i='" + x[0] + "'><span>" + x[1] + "</span></li>";
     }).join("");
+
+    var wrap = document.getElementById("kd-prov-wrap");
+    if (!prov) { wrap.hidden = true; return; }
+    wrap.hidden = false;
+    var pv = K.crosses.filter(function (x) { return x.month === prov.month; });
+    document.getElementById("kd-prov-title").textContent = prov.month + " 進行中的初步訊號";
+    document.getElementById("kd-prov-cap").textContent = (pv.length
+      ? "共 " + pv.length + " 檔。"
+      : "目前沒有個股符合條件。") + "月K只有 " + prov.sessions + " 個交易日" +
+      (K.week_complete ? "" : "、本週週K也未收定") + "，這份名單到月底前都可能大幅改變，僅供追蹤。";
+    fillTable("t-kd-prov", ["代號", "方向", "類股", "週 KD 交叉", "月 KD", "近 1 月"], pv.map(function (x) {
+      return [
+        { html: "<span class='mono'>" + x.Ticker + "</span><span class='zone" + (x.zone === "primary" ? " main" : "") + "'>" +
+            (x.zone === "primary" ? "主要" : "觀察") + "</span>" },
+        { html: x.kind === "down" ? "高檔死叉" : "低檔金叉" },
+        { html: "<span class='sub'>" + secName(x.Sector) + "</span>" },
+        { html: md(x.w_bar) + " 週<div class='sub'>K " + x.w_k_before.toFixed(0) + " → " + x.w_k.toFixed(0) + "，D " + x.w_d.toFixed(0) + "</div>", cls: "n" },
+        { html: "K " + x.m_k_before.toFixed(0) + " → " + x.m_k.toFixed(0) + "<div class='sub'>D " + x.m_d.toFixed(0) + "</div>", cls: "n" },
+        signed(x.ret_1m)
+      ];
+    }));
   }
 
   function miniKD(host, dates, k, d, crossDate) {
@@ -1193,7 +1262,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
   function renderKDCharts() {
     if (!D.kd) return;
     var K = D.kd, grid = document.getElementById("kd-grid");
-    var prim = K.crosses.filter(function (x) { return x.zone === "primary"; });
+    var prim = K.crosses.filter(function (x) { return x.zone === "primary" && x.month === K.primary_month; });
     document.getElementById("lg-kd").innerHTML =
       "<span><i class='swatch' style='background:" + css("--s1") + "'></i>週 K</span>" +
       "<span><i class='swatch' style='background:" + css("--s2") + "'></i>週 D</span>" +
@@ -1331,6 +1400,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
   function renderStatic() {
     renderEventsStatic();
     renderKDStatic();
+    renderSubtitles();
     document.getElementById("st-asof").textContent = D.asof;
     document.getElementById("st-gen").textContent = D.generated || D.asof;
     document.getElementById("st-dek-n").textContent = D.n_tickers;
@@ -1370,9 +1440,14 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     var p12 = D.participation.filter(function (r) { return r.horizon === "12M"; })[0];
     var c = D.concentration;
     document.getElementById("v-body").innerHTML =
-      "過去 12 個月標普 500 市值加權上漲 <b>" + pct(p12.index_ret) + "</b>，但成分股報酬中位數只有 <b>" +
-      pct(p12.median_ret) + "</b>，僅 <b>" + p12.pct_beat_index.toFixed(0) + "%</b> 的股票跑贏指數，前十大市值股就吃掉了 <b>" +
-      c.top10_share_of_12m_gain.toFixed(0) + "%</b> 的指數市值增幅。眼下 <b>" + D.latest.pct_above_200dma.toFixed(0) +
+      "過去 12 個月標普 500 市值加權" + (p12.index_ret >= 0 ? "上漲" : "下跌") + " <b>" + pct(p12.index_ret) + "</b>，" +
+      (p12.median_ret < p12.index_ret
+        ? "但成分股報酬中位數只有 <b>" + pct(p12.median_ret) + "</b>"
+        : "成分股報酬中位數 <b>" + pct(p12.median_ret) + "</b>，還高於指數") + "，" +
+      (p12.pct_beat_index < 45 ? "僅" : p12.pct_beat_index > 55 ? "有" : "約") + " <b>" + p12.pct_beat_index.toFixed(0) +
+      "%</b> 的股票跑贏指數，前十大市值股" +
+      (c.top10_share_of_12m_gain >= 35 ? "就吃掉了 <b>" : "只貢獻了 <b>") + c.top10_share_of_12m_gain.toFixed(0) +
+      "%</b> 的指數市值增幅。眼下 <b>" + D.latest.pct_above_200dma.toFixed(0) +
       "%</b> 的成分股" + (p200 >= 50 && !improving ? "仍站在" : improving ? "回到" : "站在") + " 200 日均線之上（" +
       (p200 >= 60 ? "長線結構完好"
         : p200 >= 45 ? (improving ? "長線結構正在修復" : "長線結構已在鬆動")

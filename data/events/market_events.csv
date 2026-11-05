@@ -1,4 +1,4 @@
-id,date,category,title,detail,tickers,source_name,source_url
+﻿id,date,category,title,detail,tickers,source_name,source_url
 E01,2026-10-12,industry,光通訊股集體重挫,Ciena、Lumentum 單日約跌 10%、Coherent 約跌 8%；三家公司前一週皆無公告，報導歸因於漲多後獲利了結與資金轉向防禦類股。,CIEN|LITE|COHR,TIKR；247 Wall St.,https://www.tikr.com/blog/coherent-stock-falls-nearly-8-as-ciena-and-lumentum-drop-about-10-heres-where-the-stock-could-go-by-2031
 E02,2026-10-13,stock,大型銀行財報分歧,Goldman Sachs 第三季 EPS 17.01 美元遠優於預期（股票交易收入年增 72%）；JPMorgan EPS 5.57 美元低於預期，約三年來首次不如預期；Wells Fargo 營收低於預期。,GS|JPM|WFC,24/7 Wall St.,https://247wallst.com/investing/2026/10/13/goldman-sachs-rises-on-equities-led-earnings-beat-jpmorgan-chase-treads-water-wells-fargo-declines-3/
 E03,2026-10-14,macro,9 月 CPI 高於預期,CPI 年增 3.7%（預期 3.6%）、核心 CPI 月增 0.3%（預期 0.2%），汽油單月漲 9.1%；市場一度定價 10 月升息機率逾五成。,,investingLive,https://investinglive.com/news/us-september-cpi-vs-3-6-expected-0/
@@ -10,4 +10,9 @@ E08,2026-10-22,industry,半導體設備股重挫,Lam Research 財報與財測皆
 E09,2026-10-22,stock,Moderna 重挫,癌症疫苗三期早期結果外洩，加上多家券商調整目標價，其中 Citi 給予賣出評等。,MRNA,Trefis,https://www.trefis.com/articles/620111/how-much-downside-is-left-in-moderna-stock/2026-10-23
 E10,2026-10-22,stock,Pool Corp 財報後大漲,第三季財報於盤前公布，股價當日大漲；Goldman Sachs 下調目標價但維持買進。,POOL,StocksToTrade,https://stockstotrade.com/news/pool-corporation-pool-news-2026_10_22/
 E11,2026-10-23,macro,AI 交易疑慮未散、等待巨頭財報,路透：標普 500 收 7623.86 點、跌 0.52%；市場仍在消化對 AI 交易的質疑，下週約三分之一成分股公布財報，含三家 AI 雲端巨頭的資本支出計畫。,,Reuters（Virginia Business 轉載）,https://virginiabusiness.com/sp-500-closes-lower-ai-trade-earnings-outlook/
-E12,2026-10-28,macro,FOMC 利率決議（即將）,聯準會 9 月已升息至 3.75%–4.00%，9 月會議紀錄顯示多數委員認為年底前可能再升息；市場預期 10 月按兵不動。,,Scotsman Guide,https://www.scotsmanguide.com/news/fed-policymakers-saw-multiple-2026-rate-hikes-as-likely-september-fomc-minutes-show/
+E12,2026-10-28,macro,FOMC 維持利率不變,聯準會將聯邦基金利率目標區間維持在 3.75%–4.00%，決議票數 10 比 2，兩位反對者皆主張升息；市場仍在定價 12 月升息的可能。,,Federal Reserve；Admiral Markets,https://federalreserve.gov/newsevents/pressreleases/monetary20261028a.htm
+E13,2026-10-29,stock,Alphabet 財報後重挫,"10-28 盤後公布第三季財報：營收 1,276 億美元略低於預期，EPS 2.12 美元遠低於約 3 美元的預期，資本支出使自由現金流轉負；2026 年資本支出指引維持 1,950–2,050 億美元，並預期 2027 年續增。",GOOGL|GOOG,XTB,https://www.xtb.com/en/market-analysis/news-and-research/alphabet-disappoints-wall-street-despite-record-results-shares-plunge-over-8-and-test-300
+E14,2026-10-29,industry,軟體股財報後重挫,Fortinet 第三季獲利優於預期，但服務營收成長放緩、全年服務營收預估下修；ServiceNow 財測疲弱。軟體類股普遍走弱。,FTNT|NOW,24/7 Wall St.；Trefis,https://247wallst.com/investing/2026/10/29/software-stocks-are-getting-crushed-again-after-hours/
+E15,2026-10-30,stock,Intel 財測疲弱、創 1974 年來最大跌幅,10-29 盤後公布第三季財報，第四季財測遠低於市場預期，報導歸因於 PC 市場轉弱與記憶體供應問題；分析師隨後下修目標價與獲利預估。,INTC,Koala Gains,https://koalagains.com/daily-top-movers/top-losers/details/489ce2f1-82f6-4c7a-816b-b69190813034
+E16,2026-11-05,stock,Lumentum 公布財報,Lumentum 第一季（2027 會計年度）財報訂於 11-05 盤後公布；光通訊股近兩週多次單日大跌。,LITE,TIKR,https://www.tikr.com/zh/blog/lumentum-stock-falls-nearly-10-as-optics-stocks-slide-in-a-sector-wide-selloff-heres-where-the-stock-could-go-by-2032
+E17,2026-11-06,macro,10 月非農就業報告,美國勞工統計局 11-06 公布 10 月就業報告，是聯準會 12 月會議前的關鍵數據。,,Thrive in Markets 經濟日曆,https://thriveinmarkets.com/calendar/dates/nfp-2026/

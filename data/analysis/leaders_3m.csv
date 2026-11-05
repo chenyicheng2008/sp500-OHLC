@@ -1,16 +1,16 @@
 ﻿Ticker,ret_3m,ret_12m,Short Name,Sector,Industry,Market Cap
-MRNA,259.69800873903716,645.2514087918328,"Moderna, Inc.",healthcare,biotechnology,79388065792
-VEEV,66.12156607618047,11.416157075533162,Veeva Systems Inc.,healthcare,health-information-services,51516157952
-ACN,63.16401802094123,2.974362567507427,Accenture plc,technology,information-technology-services,151290445824
-IT,56.174976972111864,-8.265944349640542,"Gartner, Inc.",technology,information-technology-services,14589307904
-PTC,54.779973220038954,-4.546124111231709,PTC Inc.,technology,software-application,21101809664
-CRL,53.97681249139015,84.68983696106282,Charles River Laboratories Inte,healthcare,diagnostics-research,17208883200
-CTSH,50.80470302627382,5.517451919345939,Cognizant Technology Solutions ,technology,information-technology-services,31233800192
-NOW,50.587353533835014,-15.053704608508067,"ServiceNow, Inc.",technology,software-application,163536289792
-APA,50.15186498545579,133.22136761821238,APA Corporation,energy,oil-gas-e-p,18099159040
-PLTR,49.58564724853392,12.114646898033232,Palantir Technologies Inc.,technology,software-infrastructure,477824122880
-RVTY,46.97942247318778,66.34744833431947,"Revvity, Inc.",healthcare,diagnostics-research,17897342976
-MPC,46.78147719399448,146.55612316265953,Marathon Petroleum Corporation,energy,oil-gas-refining-marketing,132167376896
-ZBRA,46.05616899949656,27.69718995863495,Zebra Technologies Corporation,technology,communication-equipment,18174390272
-EPAM,44.68514670199018,-12.92260565153478,"EPAM Systems, Inc.",technology,information-technology-services,7096304640
-CRM,43.437383057425905,-2.3229757719033572,"Salesforce, Inc.",technology,software-application,203783028736
+MRNA,306.07945623324093,741.0898517113679,"Moderna, Inc.",healthcare,biotechnology,103154573312
+ACN,50.29702927481612,4.714026914951397,Accenture plc,technology,information-technology-services,161717927936
+MPC,43.916072201216274,122.91204176071689,Marathon Petroleum Corporation,energy,oil-gas-refining-marketing,106919796736
+RVTY,42.195054214906634,75.10722101085618,"Revvity, Inc.",healthcare,diagnostics-research,17790218240
+VEEV,42.01208339470508,4.124305887565782,Veeva Systems Inc.,healthcare,health-information-services,50293747712
+PTC,39.180956574992074,-2.256470171771685,PTC Inc.,technology,software-application,21202837504
+APA,38.52235523265506,116.9370955963271,APA Corporation,energy,oil-gas-e-p,15587139584
+PSX,34.97078778134439,105.66529124566615,Phillips 66,energy,oil-gas-refining-marketing,101274484736
+CRL,34.96087506509507,95.40733092970908,Charles River Laboratories Inte,healthcare,diagnostics-research,15576717312
+TYL,31.854657165982168,-15.121995980030356,"Tyler Technologies, Inc.",technology,software-application,16826230784
+HAS,30.380851325043402,59.5804040925483,"Hasbro, Inc.",consumer-cyclical,leisure,17004493824
+VLO,28.19536860275338,133.4683597674711,Valero Energy Corporation,energy,oil-gas-refining-marketing,101887631360
+GILD,27.818182178148177,43.25801701464969,"Gilead Sciences, Inc.",healthcare,drug-manufacturers-general,216414273536
+SWKS,27.481720031620014,13.443896773448149,"Skyworks Solutions, Inc.",technology,semiconductors,19499927552
+REGN,26.79181804535762,50.09989542205355,"Regeneron Pharmaceuticals, Inc.",healthcare,biotechnology,96275816448

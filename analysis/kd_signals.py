@@ -96,10 +96,27 @@ def main() -> None:
     W, M = bars(fields, "W-FRI"), bars(fields, "ME")
     Kw, Dw = kd(W)
     Km, Dm = kd(M)
-    month = Km.index[-1].to_period("M")
-    month_weeks = [t for t in Kw.index if t.to_period("M") == month]
-    # The monthly bar is final only once the last session of the month is in the data.
-    month_complete = (close.index[-1] + pd.offsets.BDay(1)).to_period("M") != month
+    # A bar is final only once its last session is in the data. While the current month
+    # is unfinished, the previous (finished) month is the one whose list can be trusted,
+    # so both are scanned: the finished month as the confirmed list, the current one as
+    # provisional. The same applies to the current weekly bar.
+    last_session = close.index[-1]
+    next_session = last_session + pd.offsets.BDay(1)
+    cur = Km.index[-1].to_period("M")
+    cur_complete = next_session.to_period("M") != cur
+    week_complete = next_session > Kw.index[-1]
+    scan = ([(cur - 1, True)] if not cur_complete else []) + [(cur, cur_complete)]
+    months = []
+    for period, complete in scan:
+        mbars = [t for t in Km.index if t.to_period("M") == period]
+        if not mbars:
+            continue
+        months.append({
+            "month": str(period), "complete": bool(complete), "bar": mbars[0],
+            "weeks": [t for t in Kw.index if t.to_period("M") == period],
+            "sessions": int(sum(1 for t in close.index if t.to_period("M") == period)),
+        })
+    primary_month = [m["month"] for m in months if m["complete"]][-1] if any(m["complete"] for m in months) else months[-1]["month"]
 
     meta = fund.set_index("Ticker")
     last = close.iloc[-1]
@@ -117,46 +134,49 @@ def main() -> None:
 
     events = pd.read_csv(args.events, encoding=ENC) if Path(args.events).exists() else pd.DataFrame()
 
-    def events_for(tk: str) -> list:
+    def events_for(tk: str, since: str) -> list:
+        """Catalogued events naming `tk`, dated in the cross month or later."""
         if events.empty:
             return []
-        hits = events[events["tickers"].fillna("").str.split("|").apply(lambda xs: tk in xs)]
-        return hits["id"].tolist()
+        named = events["tickers"].fillna("").str.split("|").apply(lambda xs: tk in xs)
+        return events[named & (events["date"] >= since)]["id"].tolist()
 
     rows = []
-    for kind in ("down", "up"):
-        wk = crosses_in(Kw, Dw, month_weeks, kind)
-        mo = crosses_in(Km, Dm, [Km.index[-1]], kind)
-        both = wk.index.intersection(mo.index)
-        for tk in both:
-            w, m = wk.loc[tk], mo.loc[tk]
-            hi_ok = {z: (w.k_before >= hi and m.k_before >= hi) for z, (hi, lo) in ZONES.items()}
-            lo_ok = {z: (w.k_before <= lo and m.k_before <= lo) for z, (hi, lo) in ZONES.items()}
-            ok = hi_ok if kind == "down" else lo_ok
-            zone = "primary" if ok["primary"] else ("watch" if ok["watch"] else None)
-            if zone is None:
-                continue
-            sec = meta.at[tk, "Sector"] if tk in meta.index else "unknown"
-            fpe = meta.at[tk, "Forward P/E Ratio"] if tk in meta.index else np.nan
-            bd = big_day.get(tk)
-            mv = big_move.get(tk)
-            rows.append({
-                "Ticker": tk, "kind": kind, "zone": zone,
-                "name": meta.at[tk, "Short Name"] if tk in meta.index else "",
-                "Sector": sec, "Industry": meta.at[tk, "Industry"] if tk in meta.index else "",
-                "w_bar": w.bar, "w_k_before": w.k_before, "w_k": w.k, "w_d": w.d,
-                "m_bar": m.bar, "m_k_before": m.k_before, "m_k": m.k, "m_d": m.d,
-                "ret_1m": ret(21).get(tk), "ret_3m": ret(63).get(tk), "ret_12m": ret(252).get(tk),
-                "pct_from_52wh": 100 * (last[tk] / hi52[tk] - 1),
-                "above_50dma": bool(last[tk] > ma50[tk]) if pd.notna(ma50[tk]) else None,
-                "above_200dma": bool(last[tk] > ma200[tk]) if pd.notna(ma200[tk]) else None,
-                "fwd_pe": fpe, "sector_fwd_pe": sector_fpe.get(sec),
-                "ny_growth": (meta.at[tk, "NextY成長"] * 100) if tk in meta.index and pd.notna(meta.at[tk, "NextY成長"]) else np.nan,
-                "big_move_date": bd.date().isoformat() if pd.notna(bd) and abs(mv) >= BIG_MOVE else None,
-                "big_move": 100 * mv if pd.notna(mv) and abs(mv) >= BIG_MOVE else None,
-                "event_ids": "|".join(events_for(tk)),
-            })
-    crosses = pd.DataFrame(rows)
+    for mon in months:
+        for kind in ("down", "up"):
+            wk = crosses_in(Kw, Dw, mon["weeks"], kind)
+            mo = crosses_in(Km, Dm, [mon["bar"]], kind)
+            both = wk.index.intersection(mo.index) if len(wk) and len(mo) else []
+            for tk in both:
+                w, m = wk.loc[tk], mo.loc[tk]
+                hi_ok = {z: (w.k_before >= hi and m.k_before >= hi) for z, (hi, lo) in ZONES.items()}
+                lo_ok = {z: (w.k_before <= lo and m.k_before <= lo) for z, (hi, lo) in ZONES.items()}
+                ok = hi_ok if kind == "down" else lo_ok
+                zone = "primary" if ok["primary"] else ("watch" if ok["watch"] else None)
+                if zone is None:
+                    continue
+                sec = meta.at[tk, "Sector"] if tk in meta.index else "unknown"
+                fpe = meta.at[tk, "Forward P/E Ratio"] if tk in meta.index else np.nan
+                bd = big_day.get(tk)
+                mv = big_move.get(tk)
+                rows.append({
+                    "Ticker": tk, "kind": kind, "zone": zone,
+                    "month": mon["month"], "month_complete": mon["complete"],
+                    "name": meta.at[tk, "Short Name"] if tk in meta.index else "",
+                    "Sector": sec, "Industry": meta.at[tk, "Industry"] if tk in meta.index else "",
+                    "w_bar": w.bar, "w_k_before": w.k_before, "w_k": w.k, "w_d": w.d,
+                    "m_bar": m.bar, "m_k_before": m.k_before, "m_k": m.k, "m_d": m.d,
+                    "ret_1m": ret(21).get(tk), "ret_3m": ret(63).get(tk), "ret_12m": ret(252).get(tk),
+                    "pct_from_52wh": 100 * (last[tk] / hi52[tk] - 1),
+                    "above_50dma": bool(last[tk] > ma50[tk]) if pd.notna(ma50[tk]) else None,
+                    "above_200dma": bool(last[tk] > ma200[tk]) if pd.notna(ma200[tk]) else None,
+                    "fwd_pe": fpe, "sector_fwd_pe": sector_fpe.get(sec),
+                    "ny_growth": (meta.at[tk, "NextY成長"] * 100) if tk in meta.index and pd.notna(meta.at[tk, "NextY成長"]) else np.nan,
+                    "big_move_date": bd.date().isoformat() if pd.notna(bd) and abs(mv) >= BIG_MOVE else None,
+                    "big_move": 100 * mv if pd.notna(mv) and abs(mv) >= BIG_MOVE else None,
+                    "event_ids": "|".join(events_for(tk, mon["bar"].to_period("M").start_time.date().isoformat())),
+                })
+    crosses = pd.DataFrame(rows, columns=None if rows else ["Ticker", "kind", "zone", "month", "month_complete"])
     crosses.to_csv(out_dir / "kd_crosses.csv", index=False, encoding=ENC)
 
     # Universe baseline, so each group's factors can be read against the market as a whole.
@@ -198,10 +218,19 @@ def main() -> None:
     tks = crosses["Ticker"].tolist() if len(crosses) else []
     bundle = {
         "params": {"n": KD_N, "zones": ZONES, "event_window": EVENT_WINDOW, "big_move_pct": BIG_MOVE * 100},
-        "month": str(month), "month_complete": bool(month_complete),
-        "month_weeks": [t.date().isoformat() for t in month_weeks],
+        "months": [{"month": m["month"], "complete": m["complete"], "sessions": m["sessions"],
+                    "weeks": [t.date().isoformat() for t in m["weeks"]]} for m in months],
+        "primary_month": primary_month,
+        "last_session": last_session.date().isoformat(),
         "last_weekly_bar": Kw.index[-1].date().isoformat(),
+        "week_complete": bool(week_complete),
         "event_moves": event_moves,
+        # Sectors of each event's named tickers: a same-day move is only shown as
+        # co-occurring with an event from its own sector.
+        "event_sectors": {
+            ev["id"]: sorted({meta.at[t, "Sector"] for t in str(ev["tickers"]).split("|") if t in meta.index})
+            for _, ev in (events.iterrows() if not events.empty else []) if pd.notna(ev.get("tickers"))
+        },
         "universe": base,
         "weekly_series": series(tks, Kw, Dw, 30),
         "monthly_series": series(tks, Km, Dm, 18),
@@ -215,13 +244,15 @@ def main() -> None:
     with open(out_dir / "kd_bundle.json", "w", encoding="utf-8") as fh:
         json.dump(bundle, fh, ensure_ascii=False, indent=1, default=str)
 
-    for kind, label in (("down", "high-zone cross down"), ("up", "low-zone cross up")):
-        sub = crosses[crosses["kind"] == kind] if len(crosses) else crosses
-        for zone in ZONES:
-            names = sub[sub["zone"] == zone]["Ticker"].tolist() if len(sub) else []
-            print(f"{label} [{zone} {ZONES[zone]}]: {len(names)} {names}")
-    print(f"monthly bar {month} {'complete' if month_complete else 'still in progress'}; "
-          f"weekly bars checked: {bundle['month_weeks']}")
+    for m in bundle["months"]:
+        print(f"{m['month']} ({'confirmed' if m['complete'] else 'provisional, ' + str(m['sessions']) + ' sessions'}), "
+              f"weekly bars: {m['weeks']}")
+        for kind, label in (("down", "  high-zone cross down"), ("up", "  low-zone cross up")):
+            for zone in ZONES:
+                sel = crosses[(crosses["month"] == m["month"]) & (crosses["kind"] == kind) & (crosses["zone"] == zone)] if len(crosses) else crosses
+                print(f"{label} [{zone} {ZONES[zone]}]: {len(sel)} {sel['Ticker'].tolist() if len(sel) else []}")
+    if not bundle["week_complete"]:
+        print(f"current weekly bar ({bundle['last_weekly_bar']}) is partial: data ends {bundle['last_session']}")
 
 
 if __name__ == "__main__":

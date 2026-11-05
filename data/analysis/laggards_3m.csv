@@ -1,16 +1,16 @@
 ﻿Ticker,ret_3m,ret_12m,Short Name,Sector,Industry,Market Cap
-MGM,-39.39524853494613,-14.137089339321985,MGM Resorts International,consumer-cyclical,resorts-casinos,7301994496
-APP,-36.94425094553618,-53.92337441569931,Applovin Corporation,communication-services,advertising-agencies,87592869888
-FICO,-36.33225581146395,-48.1994213305148,Fair Isaac Corporation,technology,software-application,15292638208
-HWM,-35.40325230718236,-2.5795887741424273,Howmet Aerospace Inc.,industrials,aerospace-defense,77511041024
-FIX,-32.879815057088145,47.11112857443629,"Comfort Systems USA, Inc.",industrials,engineering-construction,43788427264
-VRT,-32.41736926841855,13.367281617674355,"Vertiv Holdings, LLC",industrials,electrical-equipment-parts,76912934912
-NRG,-32.1335756182787,-41.74622807705954,"NRG Energy, Inc.",utilities,utilities-independent-power-producers,19677802496
-LII,-31.04316258072185,-22.840156497805808,"Lennox International, Inc.",industrials,building-products-equipment,12636766208
-WDC,-30.956714241229644,185.8065868193946,Western Digital Corporation,technology,computer-hardware,133307744256
-KLAC,-28.316988241374276,31.376536793241016,KLA Corporation,technology,semiconductor-equipment-materials,194720022528
-PCG,-27.942832916684303,-22.827368687509086,Pacific Gas & Electric Co.,utilities,utilities-regulated-electric,38580416512
-TTD,-27.293061464312572,-75.87678577243196,"The Trade Desk, Inc.",communication-services,advertising-agencies,6037593600
-AMAT,-26.939316853592565,71.98337960544299,"Applied Materials, Inc.",technology,semiconductor-equipment-materials,307590430720
-WYNN,-26.872563711240403,-38.51158021186936,"Wynn Resorts, Limited",consumer-cyclical,resorts-casinos,7640662016
-EIX,-25.87304285845864,4.298643773903699,Edison International,utilities,utilities-regulated-electric,22234552320
+APP,-41.23743377692658,-61.47835690716782,Applovin Corporation,communication-services,advertising-agencies,90941284352
+INTC,-40.08509726912061,51.41284495035314,Intel Corporation,technology,semiconductors,309705048064
+COHR,-36.783253695242436,57.23703769057153,Coherent Corp.,technology,scientific-technical-instruments,38419300352
+FICO,-33.63749049706899,-56.35029242648146,Fair Isaac Corporation,technology,software-application,15140591616
+WDC,-33.07364943538141,131.67434896855036,Western Digital Corporation,technology,computer-hardware,121217097728
+TTD,-32.17299431618128,-74.42322997435625,"The Trade Desk, Inc.",communication-services,advertising-agencies,6255078912
+AXON,-31.652690938528817,-43.10940299691852,"Axon Enterprise, Inc.",industrials,aerospace-defense,34459287552
+TER,-30.801137124055234,48.4769775639144,"Teradyne, Inc.",technology,semiconductor-equipment-materials,39185752064
+MGM,-30.30779234436253,-3.1532886669544014,MGM Resorts International,consumer-cyclical,resorts-casinos,8303805952
+AKAM,-29.230390811330942,15.219707772849667,"Akamai Technologies, Inc.",technology,software-infrastructure,12349568000
+AMAT,-28.435080455069162,64.75008476271475,"Applied Materials, Inc.",technology,semiconductor-equipment-materials,293154881536
+CAT,-28.201324168787945,9.005618314795605,"Caterpillar, Inc.",industrials,farm-heavy-construction-machinery,271805743104
+BA,-27.84462475665602,-13.784701086917316,Boeing Company (The),industrials,aerospace-defense,140263636992
+STX,-27.55221454788034,138.37509815646692,Seagate Technology Holdings PLC,technology,computer-hardware,127879307264
+CIEN,-26.60029928621127,58.003364293067406,Ciena Corporation,technology,communication-equipment,38605950976

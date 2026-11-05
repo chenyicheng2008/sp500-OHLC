@@ -66,7 +66,12 @@ on 3.11), so it reports "already satisfied" while the import still fails.
   caption reads from — add new prose through it, never with a fixed adjective. Level bands
   need it too: 「長線結構正在鬆動」 for any %>200DMA in 45-60 read wrong on 2026-10-23 when
   the reading was 58% and climbing from 41%; the same band now says 「正在修復」 when
-  improving.
+  improving. **Section subtitles count too**: as of 2026-11-03 the static lines 「平均報酬
+  遠高於中位數」, 「指數只差高點不到 2%」 (a figure typed in since 09-11), 「它的高點比指數高點
+  早到」 and 「廣度和指數…走了不同方向」 were all filled from data (`renderSubtitles()`), as
+  were the counts 「11 個類股」「70 個產業」「各 15 檔」. The verdict body's 「但…只有」「僅」
+  「就吃掉了」 flipped wrong that day — the 12-month median stock (+14.7%) beat the index
+  (+10.8%) and the top ten supplied only 17% of the gain — and now follow the readings.
 - Prose, labels and tables are Traditional Chinese. Metric names keep their standard
   English term in parentheses on first use (例如「騰落線（A/D Line）」).
 - Charts are hand-built inline SVG re-rendered on resize and on theme change; there
@@ -89,7 +94,12 @@ be computed, so they live in a hand-maintained CSV — and it is the one place w
 - A headline that contradicts our data is about a different date (one result claimed LRCX
   +20% on its October 2026 report; our data shows -11.8% that day) — drop it.
 - Add the new two weeks of events on each refresh; rows dated after the data date render
-  as 「即將」.
+  as 「即將」 automatically — never type 「（即將）」 into a title, it goes stale. When a
+  previewed event happens (e.g. E12, the 10-28 FOMC), rewrite its row with the outcome.
+- Date an earnings event to the **session the market reacted**, not the after-hours release
+  (Alphabet reported 10-28 after the close → row dated 10-29), so the measured move lines up.
+- No source, no row: the 11-02 optical drop (LITE -18.6%) had no coverage, so it appears
+  only as a data move.
 - Sources reachable from this container: WebSearch works. Yahoo (`yfinance` direct) is
   blocked by the proxy (403), Alpha Vantage needs a premium plan for recent US prices, and
   some recap sites fail WebFetch DNS — so the candles are built from our own data.
@@ -106,8 +116,19 @@ seeded at 50. Weekly and monthly bars are resampled from the daily slice with th
   lines up), which is why the same-month reading is used.
 - Zone is checked on the bar **before** the cross, in both timeframes: ≥80 / ≤20 is the
   main list, ≥70 / ≤30 the watch list.
-- The current monthly bar is unfinished until the month's last session; the report says so
-  whenever `month_complete` is false. Rerun after month-end to confirm a list.
+- **Confirmed vs provisional months.** While the current month is unfinished, the script
+  scans the previous (finished) month as the confirmed list and the current month as a
+  provisional one; every row carries `month` and `month_complete`, and `primary_month` in
+  the bundle is what the main tables, factors and read-out use. The current weekly bar can
+  be partial too (`week_complete`): `W-FRI` labels it with the coming Friday, e.g. a week
+  labelled 2026-11-06 when the data ended 2026-11-03. October 2026 confirmed after
+  month-end: ANET/DELL/KEYS and AZO/ZTS/FIS/OTIS/POOL held from the mid-month list; STZ and
+  NDSN dropped out; LULU, NVDA, FFIV, AON, KKR joined.
+- Event links: a crossed name links only to events naming it **dated in its cross month or
+  later**, and a large one-day move is shown as 「與同類股的 Exx 同日」 only when the event's
+  own tickers share the name's sector (`event_sectors` in the bundle). Without the sector
+  filter, KEYS's 10-22 drop was listed beside Moderna and Pool. A move on a different day
+  from the name's own event is shown separately, never fused into that event.
 - Group read-outs are generated: "concentrated in one sector" needs ≥50% of the group
   *and* ≥2× that sector's universe share (3 of 10 industrials at 2× is not concentration).
 
@@ -137,6 +158,11 @@ them as the true index range. Validated against reported S&P 500 closes: 10-16 -
   PSKY also stopped receiving bars after 2026-10-16 while every other name kept updating,
   so it may never reach 60 — check whether the ticker changed before assuming it will;
   `FISV` comes back with a null sector/industry (patched via `SECTOR_OVERRIDES`);
+  `KVUE` dropped to a single bar (2026-10-30) by 2026-11-05 — Kimberly-Clark's acquisition
+  was expected to close in H2 2026, but no closing report was found, so do not state it;
+  `SATS` now resolves to "Strive, Inc. – Series A" preferred, a different security entirely;
+  a session can be missing outright, not just blank (2026-11-04 was absent at the 02:19 UTC
+  fetch because the fetch-side fix dropped its unsettled rows) — the next refresh adds it;
   `AZO` returned a zero market cap on 2026-09-22 with its price history intact (back to
   normal on 2026-09-30 — these glitches come and go, so check the printed lines, not this list).
   The two failures are handled differently on purpose: **no usable price history** (<60
