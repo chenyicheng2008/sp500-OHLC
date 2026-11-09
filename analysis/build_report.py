@@ -15,6 +15,9 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
 PLACEHOLDER = "__REPORT_DATA__"
+VIEW = "__REPORT_VIEW__"
+# One template, two files: the full report and a page with only the bull-bear spread sections.
+OUTPUTS = [("full", "sp500_internals_{asof}.html"), ("spread", "ai_spread_{asof}.html")]
 
 
 def main() -> None:
@@ -37,10 +40,14 @@ def main() -> None:
     asof = payload["asof"]
     out_dir = Path(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
-    out = out_dir / f"sp500_internals_{asof}.html"
-    out.write_text(tpl.replace(PLACEHOLDER, raw), encoding="utf-8")
-
-    print(f"wrote {out} ({out.stat().st_size:,} bytes)")
+    if VIEW not in tpl:
+        raise SystemExit(f"{args.template} has no {VIEW} placeholder")
+    for view, name in OUTPUTS:
+        if view == "spread" and "trend" not in payload:
+            continue                                  # no regime data, no spread page
+        out = out_dir / name.format(asof=asof)
+        out.write_text(tpl.replace(VIEW, view).replace(PLACEHOLDER, raw), encoding="utf-8")
+        print(f"wrote {out} ({out.stat().st_size:,} bytes)")
     print(f"  data as of {asof} · generated {payload.get('generated', 'n/a')}")
 
 

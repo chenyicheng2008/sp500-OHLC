@@ -105,6 +105,17 @@ nav a:hover{color:var(--ink)}
 nav a.on{color:var(--ink); border-bottom-color:var(--accent)}
 nav a .n{font-family:"IBM Plex Mono",monospace; font-size:11.5px; color:var(--accent); margin-right:5px}
 
+/* ---------- adjustable time range ---------- */
+.rangebar{padding:8px 20px 0}
+.rb-row{display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-bottom:6px}
+.rb-row button{font:inherit; font-size:12px; padding:3px 10px; border-radius:3px; cursor:pointer;
+  border:1px solid var(--rule-strong); background:var(--surface); color:var(--ink-2)}
+.rb-row button:hover{color:var(--ink); border-color:var(--ink-3)}
+.rb-row button.on{background:var(--ink); color:var(--surface); border-color:var(--ink); font-weight:600}
+.rb-row button:focus-visible,.rangebar svg:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.rb-info{margin-left:auto; font-family:"IBM Plex Mono",monospace; font-size:11.5px; color:var(--ink-3)}
+.rb-hint{font-size:11.5px; color:var(--ink-3); margin-top:4px}
+
 /* ---------- chapter index ---------- */
 .toc{margin-top:40px; border:1px solid var(--rule); border-radius:3px; background:var(--surface); padding:16px 20px 8px}
 .toc h2{font-size:14px; font-weight:600; color:var(--ink-2); letter-spacing:.06em}
@@ -255,14 +266,15 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
 
 <header class="mast">
   <div class="mast-in">
-    <p class="kicker">S&amp;P 500 · Market Internals</p>
+    <p class="kicker" id="h-kicker">S&amp;P 500 · Market Internals</p>
     <h1 id="h-title">—</h1>
-    <p class="dek">用 <b id="st-dek-n">—</b> 檔成分股的日線資料，重算市場廣度（breadth）與類股／產業結構——不看指數點位，只看有多少股票真的在漲。</p>
+    <p class="dek" id="h-dek-spread" hidden></p>
+    <p class="dek" id="h-dek">用 <b id="st-dek-n">—</b> 檔成分股的日線資料，重算市場廣度（breadth）與類股／產業結構——不看指數點位，只看有多少股票真的在漲。</p>
     <div class="stamp">
       <span>資料日 <b id="st-asof">—</b></span>
       <span>報告產出 <b id="st-gen">—</b></span>
-      <span>成分股 <b id="st-n">496</b> 檔</span>
-      <span>日線 <b id="st-bars">—</b> 根</span>
+      <span><span id="st-n-label">成分股</span> <b id="st-n">496</b> 檔</span>
+      <span id="st-bars-wrap">日線 <b id="st-bars">—</b> 根</span>
       <span>來源 <b>yfinance / sp500_ohlc.csv</b></span>
     </div>
     <div class="verdict">
@@ -404,6 +416,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
   <div class="stats" id="tech-stats" style="margin-top:22px"></div>
   <figure class="panel">
     <div class="panel-head"><h3 id="tech-h-stack">—</h3><p id="tech-def">—</p></div>
+    <div id="rb-ai-daily"></div>
     <div class="legend" id="lg-tech-stack"></div>
     <div class="panel-body"><div id="c-tech-stack"></div></div>
     <figcaption id="cap-tech-stack"></figcaption>
@@ -417,6 +430,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     </figure>
     <figure class="panel">
       <div class="panel-head"><h3 id="tech-h-long">—</h3><p id="tech-long-def">—</p></div>
+      <div id="rb-ai-weekly"></div>
       <div class="legend" id="lg-tech-long"></div>
       <div class="panel-body"><div id="c-tech-long"></div></div>
       <figcaption id="cap-tech-long"></figcaption>
@@ -437,6 +451,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
   <div class="stats" id="bt-stats" style="margin-top:22px"></div>
   <figure class="panel">
     <div class="panel-head"><h3 id="bt-h-time">—</h3><p id="bt-time-def">—</p></div>
+    <div id="rb-bt"></div>
     <div class="legend" id="lg-bt-time"></div>
     <div class="panel-body"><div id="c-bt-time"></div></div>
     <figcaption id="cap-bt-time"></figcaption>
@@ -529,13 +544,13 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
 </section>
 
 <footer>
-  <p><b>怎麼重算</b>：<code>python analysis/breadth_sector.py</code> 產出 <code>data/analysis/*.csv</code>，再用 <code>python analysis/build_report_data.py</code> 產出 <code>report_data.json</code>，最後由 <code>python analysis/build_report.py</code> 烤成本頁。原始 OHLC 由 <code>fetch_sp500_memory_software.py</code> 每日經 GitHub Actions 更新。</p>
+  <p id="foot-how"><b>怎麼重算</b>：<code>python analysis/breadth_sector.py</code> 產出 <code>data/analysis/*.csv</code>，再用 <code>python analysis/build_report_data.py</code> 產出 <code>report_data.json</code>，最後由 <code>python analysis/build_report.py</code> 烤成本頁。原始 OHLC 由 <code>fetch_sp500_memory_software.py</code> 每日經 GitHub Actions 更新。</p>
   <p>本頁為技術面與結構面的量化整理，僅呈現資料本身，不構成投資建議。</p>
 </footer>
 </div>
 <div id="tip" role="status" aria-live="polite"></div>
 
-<script>window.__SPX__=__REPORT_DATA__;</script>
+<script>window.__SPX__=__REPORT_DATA__;window.__VIEW__="__REPORT_VIEW__";</script>
 <script>
 (function () {
   "use strict";
@@ -668,6 +683,12 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     return s;
   }
   function fmtDate(d) { var p = d.split("-"); return p[0].slice(2) + "/" + p[1]; }
+  // Tick label for a date on an axis spanning `dates`: YY/MM normally, MM/DD when the span is
+  // under ~7 months (a zoomed-in window would otherwise repeat the same month).
+  function fmtTick(dates, i) {
+    var span = (new Date(dates[dates.length - 1]) - new Date(dates[0])) / 864e5;
+    return span < 210 ? dates[i].slice(5).replace("-", "/") : fmtDate(dates[i]);
+  }
 
   /* tooltip ---------------------------------------------------------- */
   var tip = document.getElementById("tip");
@@ -720,7 +741,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     if (n - 1 - xt[xt.length - 1] >= step * 0.55) xt.push(n - 1); else xt[xt.length - 1] = n - 1;
     xt.forEach(function (i) {
       svg.appendChild(el("text", { x: X(i), y: h - 8, "text-anchor": "middle", fill: mutedC,
-        "font-size": 11, "font-family": "IBM Plex Mono, monospace" }, fmtDate(opt.dates[i])));
+        "font-size": 11, "font-family": "IBM Plex Mono, monospace" }, fmtTick(opt.dates, i)));
     });
     // series
     var endLabels = [];
@@ -1377,6 +1398,113 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
   }
 
   /* ------------------------------------------------------------------ *
+   * adjustable time range: presets + a draggable window on an overview strip.
+   * Drag the window to move it, drag its edges to change its length, click the
+   * strip to centre the window there; arrow keys move, +/- change the length.
+   * The window is kept per chart group for the life of the page.
+   * ------------------------------------------------------------------ */
+  var RANGE = {};
+  function rangeOf(key, n, defLen) {
+    var r = RANGE[key];
+    if (!r || r.n !== n) {
+      var len = defLen ? Math.min(n, defLen) : n;
+      r = RANGE[key] = { a: n - len, b: n - 1, n: n };
+    }
+    return r;
+  }
+  function sliceIdx(arr, r) { return arr.slice(r.a, r.b + 1); }
+
+  function rangeBar(host, key, dates, values, presets, unit, redraw) {
+    var n = dates.length, r = rangeOf(key, n, presets.def);
+    var w = Math.max(280, host.clientWidth), h = 40, m = { l: 4, r: 4 }, iw = w - m.l - m.r;
+    var X = function (i) { return m.l + iw * i / Math.max(1, n - 1); };
+    var I = function (x) { return Math.max(0, Math.min(n - 1, Math.round((x - m.l) / iw * (n - 1)))); };
+    host.innerHTML = "";
+    host.className = "rangebar";
+    var row = document.createElement("div"); row.className = "rb-row";
+    presets.list.forEach(function (p) {
+      var b = document.createElement("button"); b.type = "button"; b.textContent = p.label;
+      var on = (p.len >= n ? r.a === 0 && r.b === n - 1 : r.b === n - 1 && r.b - r.a + 1 === Math.min(n, p.len));
+      if (on) b.className = "on";
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+      b.addEventListener("click", function () { set(n - Math.min(n, p.len), n - 1, true); });
+      row.appendChild(b);
+    });
+    var info = document.createElement("span"); info.className = "rb-info"; row.appendChild(info);
+    host.appendChild(row);
+    var svg = mkSvg(w, h); svg.setAttribute("tabindex", "0"); svg.setAttribute("role", "slider");
+    svg.setAttribute("aria-label", "調整時間範圍：方向鍵移動，加減鍵改變長短");
+    svg.style.touchAction = "none"; svg.style.cursor = "pointer";
+    var lo = Math.min.apply(null, values.filter(function (v) { return v !== null; })),
+      hi = Math.max.apply(null, values.filter(function (v) { return v !== null; }));
+    var Y = function (v) { return 6 + (h - 12) * (1 - (v - lo) / ((hi - lo) || 1)); };
+    var d = ""; values.forEach(function (v, i) { if (v !== null) d += (d ? "L" : "M") + X(i).toFixed(1) + " " + Y(v).toFixed(1); });
+    svg.appendChild(el("rect", { x: m.l, y: 0, width: iw, height: h, fill: css("--sunken"), rx: 3 }));
+    svg.appendChild(el("path", { d: d, fill: "none", stroke: css("--ink-3"), "stroke-width": 1.2 }));
+    var shadeL = el("rect", { y: 0, height: h, fill: css("--plane"), opacity: 0.7 }), shadeR = el("rect", { y: 0, height: h, fill: css("--plane"), opacity: 0.7 });
+    var win = el("rect", { y: 1, height: h - 2, fill: "transparent", stroke: css("--accent"), "stroke-width": 1.5, rx: 3, style: "cursor:grab" });
+    var hL = el("rect", { y: 8, width: 7, height: h - 16, rx: 2, fill: css("--accent"), style: "cursor:ew-resize" });
+    var hR = el("rect", { y: 8, width: 7, height: h - 16, rx: 2, fill: css("--accent"), style: "cursor:ew-resize" });
+    [shadeL, shadeR, win, hL, hR].forEach(function (e) { svg.appendChild(e); });
+    host.appendChild(svg);
+    var hint = document.createElement("div"); hint.className = "rb-hint";
+    hint.textContent = "拖曳框移動、拖曳兩側調整長短；只改變圖的顯示範圍，文字與表格仍是全期數字。";
+    host.appendChild(hint);
+    function paint() {
+      var xa = X(r.a), xb = X(r.b);
+      shadeL.setAttribute("x", m.l); shadeL.setAttribute("width", Math.max(0, xa - m.l));
+      shadeR.setAttribute("x", xb); shadeR.setAttribute("width", Math.max(0, m.l + iw - xb));
+      win.setAttribute("x", xa); win.setAttribute("width", Math.max(2, xb - xa));
+      hL.setAttribute("x", xa - 3.5); hR.setAttribute("x", xb - 3.5);
+      info.textContent = dates[r.a] + " – " + dates[r.b] + "（" + (r.b - r.a + 1) + " " + unit + "）";
+      svg.setAttribute("aria-valuetext", info.textContent);
+      [].forEach.call(row.querySelectorAll("button"), function (b, j) {
+        var p = presets.list[j];
+        var on = (p.len >= n ? r.a === 0 && r.b === n - 1 : r.b === n - 1 && r.b - r.a + 1 === Math.min(n, p.len));
+        b.className = on ? "on" : ""; b.setAttribute("aria-pressed", on ? "true" : "false");
+      });
+    }
+    var pending = false;
+    function set(a, b, now) {
+      var minLen = Math.min(n, presets.min || 8);
+      a = Math.max(0, Math.min(a, n - minLen)); b = Math.max(a + minLen - 1, Math.min(n - 1, b));
+      r.a = a; r.b = b; paint();
+      if (now) { redraw(); return; }
+      if (!pending) { pending = true; requestAnimationFrame(function () { pending = false; redraw(); }); }
+    }
+    var drag = null;
+    function px(ev) { return ev.clientX - svg.getBoundingClientRect().left; }
+    svg.addEventListener("pointerdown", function (ev) {
+      var x = px(ev), xa = X(r.a), xb = X(r.b);
+      if (Math.abs(x - xa) <= 9) drag = { mode: "a" };
+      else if (Math.abs(x - xb) <= 9) drag = { mode: "b" };
+      else if (x > xa && x < xb) drag = { mode: "move", x0: x, a0: r.a, b0: r.b };
+      else { var len = r.b - r.a, c = I(x); set(c - Math.round(len / 2), c - Math.round(len / 2) + len); drag = { mode: "move", x0: x, a0: r.a, b0: r.b }; }
+      svg.setPointerCapture(ev.pointerId); ev.preventDefault();
+    });
+    svg.addEventListener("pointermove", function (ev) {
+      if (!drag) return;
+      var x = px(ev);
+      if (drag.mode === "a") set(Math.min(I(x), r.b), r.b);
+      else if (drag.mode === "b") set(r.a, Math.max(I(x), r.a));
+      else {
+        var di = Math.round((x - drag.x0) / iw * (n - 1)), len = drag.b0 - drag.a0;
+        var a = Math.max(0, Math.min(n - 1 - len, drag.a0 + di)); set(a, a + len);
+      }
+    });
+    var end = function () { drag = null; };
+    svg.addEventListener("pointerup", end); svg.addEventListener("pointercancel", end);
+    svg.addEventListener("keydown", function (ev) {
+      var len = r.b - r.a, step = Math.max(1, Math.round(len / 10));
+      if (ev.key === "ArrowLeft") { set(r.a - step, r.b - step, true); ev.preventDefault(); }
+      else if (ev.key === "ArrowRight") { var a = Math.min(n - 1 - len, r.a + step); set(a, a + len, true); ev.preventDefault(); }
+      else if (ev.key === "+" || ev.key === "=") { set(r.a + step, r.b, true); ev.preventDefault(); }
+      else if (ev.key === "-" || ev.key === "_") { set(r.a - step, r.b, true); ev.preventDefault(); }
+    });
+    paint();
+  }
+
+  /* ------------------------------------------------------------------ *
    * bull / bear regime of the AI concept list (or one sector)
    * ------------------------------------------------------------------ */
   var ST_TC = { bull: "多頭", neither: "整理", bear: "空頭" };
@@ -1421,10 +1549,10 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     for (var i = 0; i < n; i += step) {
       if (n - 1 - i < step * 0.55 && i !== 0) continue;
       svg.appendChild(el("text", { x: X(i), y: h - 8, "text-anchor": "middle", fill: css("--ink-3"),
-        "font-size": 11, "font-family": "IBM Plex Mono, monospace" }, fmtDate(dates[i])));
+        "font-size": 11, "font-family": "IBM Plex Mono, monospace" }, fmtTick(dates, i)));
     }
     svg.appendChild(el("text", { x: X(n - 1), y: h - 8, "text-anchor": "end", fill: css("--ink-3"),
-      "font-size": 11, "font-family": "IBM Plex Mono, monospace" }, fmtDate(dates[n - 1])));
+      "font-size": 11, "font-family": "IBM Plex Mono, monospace" }, fmtTick(dates, n - 1)));
     // end labels, spaced so thin bands cannot overlap
     var labs = layers.map(function (L) {
       return { y: Y(L._mid) + 4, text: L.name + " " + L.values[n - 1].toFixed(0) + "%", color: L.ink };
@@ -1652,45 +1780,59 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
   function renderTrendCharts() {
     var T = D.trend;
     if (!T) return;
-    var U = T.universe.kind === "aisoft" ? T.universe.label : secName(T.universe.label) + "類股";
+    var U = T.universe.kind !== "sector" ? T.universe.label : secName(T.universe.label) + "類股";
     var neutral = css("--rule-strong");
-    stackChart(document.getElementById("c-tech-stack"), T.daily.dates, [
-      { name: "空頭", color: css("--neg"), ink: css("--neg"), values: T.daily.sec_bear },
-      { name: "整理", color: neutral, ink: css("--ink-2"), values: T.daily.sec_neither },
-      { name: "多頭", color: css("--pos"), ink: css("--pos"), values: T.daily.sec_bull }
-    ]);
+    var nf = function (v) { return (v >= 0 ? "+" : "") + v.toFixed(0); };
+    var tf = function (v) { return (v >= 0 ? "+" : "") + v.toFixed(1); };
+
+    // daily: the stack and the net chart share one window
+    function drawDaily() {
+      var r = rangeOf("ai-daily", T.daily.dates.length), ds = sliceIdx(T.daily.dates, r);
+      stackChart(document.getElementById("c-tech-stack"), ds, [
+        { name: "空頭", color: css("--neg"), ink: css("--neg"), values: sliceIdx(T.daily.sec_bear, r) },
+        { name: "整理", color: neutral, ink: css("--ink-2"), values: sliceIdx(T.daily.sec_neither, r) },
+        { name: "多頭", color: css("--pos"), ink: css("--pos"), values: sliceIdx(T.daily.sec_bull, r) }
+      ]);
+      lineChart(document.getElementById("c-tech-net"), {
+        dates: ds, height: 250, right: 46, zeroLine: 0, min: -100, max: 100, yTicks: 4, yFmt: nf, tipFmt: tf,
+        series: [
+          { name: U, color: css("--s1"), values: sliceIdx(T.daily.sec_net, r) },
+          { name: "全體", color: css("--ink-3"), values: sliceIdx(T.daily.mkt_net, r) }
+        ]
+      });
+    }
+    rangeBar(document.getElementById("rb-ai-daily"), "ai-daily", T.daily.dates, T.daily.sec_net,
+      { list: [{ label: "3 個月", len: 63 }, { label: "6 個月", len: 126 }, { label: "全部", len: Infinity }], min: 20 }, "個交易日", drawDaily);
+    drawDaily();
     document.getElementById("lg-tech-stack").innerHTML =
       "<span><i class='swatch' style='height:10px;background:" + css("--pos") + "'></i>多頭排列</span>" +
       "<span><i class='swatch' style='height:10px;background:" + neutral + "'></i>整理</span>" +
       "<span><i class='swatch' style='height:10px;background:" + css("--neg") + "'></i>空頭排列</span>";
-
-    var nf = function (v) { return (v >= 0 ? "+" : "") + v.toFixed(0); };
-    lineChart(document.getElementById("c-tech-net"), {
-      dates: T.daily.dates, height: 250, right: 46, zeroLine: 0, min: -100, max: 100, yTicks: 4,
-      yFmt: nf, tipFmt: function (v) { return (v >= 0 ? "+" : "") + v.toFixed(1); },
-      series: [
-        { name: U, color: css("--s1"), values: T.daily.sec_net, label: nf(T.latest.sec_net) },
-        { name: "全體", color: css("--ink-3"), values: T.daily.mkt_net, label: nf(T.latest.mkt_net) }
-      ]
-    });
     document.getElementById("lg-tech-net").innerHTML =
       "<span><i class='swatch' style='background:" + css("--s1") + "'></i>" + U + "多空排列差</span>" +
       "<span><i class='swatch' style='background:" + css("--ink-3") + "'></i>全體成分股多空排列差</span>";
 
     var ex = T.weekly_extremes;
-    lineChart(document.getElementById("c-tech-long"), {
-      dates: T.weekly.dates, height: 250, right: 46, zeroLine: 0, min: -100, max: 100, yTicks: 4,
-      yFmt: nf, tipFmt: function (v) { return (v >= 0 ? "+" : "") + v.toFixed(1); },
-      marks: [
-        { date: ex.max.date, value: ex.max.net, text: ex.max.date.slice(0, 7) + " " + nf(ex.max.net) },
-        // at the -100 floor a label below the point would sit on the date axis
-        { date: ex.min.date, value: ex.min.net, text: ex.min.date.slice(0, 7) + " " + nf(ex.min.net), below: ex.min.net > -85 }
-      ],
-      series: [
-        { name: U, color: css("--s1"), values: T.weekly.sec_net, label: nf(T.weekly_latest.sec_net) },
-        { name: "全體", color: css("--ink-3"), values: T.weekly.mkt_net, label: nf(T.weekly_latest.mkt_net) }
-      ]
-    });
+    function drawWeekly() {
+      var r = rangeOf("ai-weekly", T.weekly.dates.length), ds = sliceIdx(T.weekly.dates, r);
+      var inR = function (d) { return d >= ds[0] && d <= ds[ds.length - 1]; };
+      lineChart(document.getElementById("c-tech-long"), {
+        dates: ds, height: 250, right: 46, zeroLine: 0, min: -100, max: 100, yTicks: 4, yFmt: nf, tipFmt: tf,
+        // the all-period extremes, drawn only when they fall inside the window
+        marks: [
+          { date: ex.max.date, value: ex.max.net, text: ex.max.date.slice(0, 7) + " " + nf(ex.max.net) },
+          // at the -100 floor a label below the point would sit on the date axis
+          { date: ex.min.date, value: ex.min.net, text: ex.min.date.slice(0, 7) + " " + nf(ex.min.net), below: ex.min.net > -85 }
+        ].filter(function (mk) { return inR(mk.date); }),
+        series: [
+          { name: U, color: css("--s1"), values: sliceIdx(T.weekly.sec_net, r) },
+          { name: "全體", color: css("--ink-3"), values: sliceIdx(T.weekly.mkt_net, r) }
+        ]
+      });
+    }
+    rangeBar(document.getElementById("rb-ai-weekly"), "ai-weekly", T.weekly.dates, T.weekly.sec_net,
+      { list: [{ label: "1 年", len: 52 }, { label: "3 年", len: 156 }, { label: "5 年", len: 260 }, { label: "全部", len: Infinity }], min: 13 }, "週", drawWeekly);
+    drawWeekly();
     document.getElementById("lg-tech-long").innerHTML =
       "<span><i class='swatch' style='background:" + css("--s1") + "'></i>" + U + "（週線）</span>" +
       "<span><i class='swatch' style='background:" + css("--ink-3") + "'></i>全體（週線）</span>";
@@ -1752,7 +1894,9 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
       svg.appendChild(el("text", { x: m.l - 6, y: y + strip.row - 3, "text-anchor": "end", fill: ink3, "font-size": 10.5 },
         btShort(B.indices[k].label)));
       B.by_index[k].episodes.forEach(function (ep) {
-        var a = idx[ep.peak], b = ep.ongoing ? n - 1 : idx[ep.trough];
+        var d0 = W.dates[0], d1 = W.dates[n - 1], end = ep.ongoing ? d1 : ep.trough;
+        if (end < d0 || ep.peak > d1) return;                       // outside the window
+        var a = ep.peak < d0 ? 0 : idx[ep.peak], b = end > d1 ? n - 1 : idx[end];
         if (a === undefined || b === undefined) return;
         svg.appendChild(el("rect", { x: X(a), y: y, width: Math.max(3, X(b) - X(a)), height: strip.row, rx: 2,
           fill: css(BT_COL[k]), opacity: 0.85 }));
@@ -1785,13 +1929,22 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
       svg.appendChild(el("text", { x: m.l + iw + 15, y: lb.y + 4, fill: css("--ink-2"), "font-size": 11, "font-weight": 600 }, lb.t));
     });
     // years along the bottom
-    var lastYear = null;
-    W.dates.forEach(function (d, i) {
-      var y = d.slice(0, 4);
-      if (y === lastYear) return; lastYear = y;
-      if (i === 0 || (small && +y % 2)) return;
-      svg.appendChild(el("text", { x: X(i), y: h - 8, "text-anchor": "middle", fill: ink3, "font-size": 10.5, "font-family": mono }, y));
-    });
+    if (n > 120) {
+      var lastYear = null, every = Math.max(1, Math.ceil(n / 52 / (small ? 5 : 11)));
+      W.dates.forEach(function (d, i) {
+        var y = d.slice(0, 4);
+        if (y === lastYear) return; lastYear = y;
+        if (i === 0 || +y % every) return;
+        svg.appendChild(el("text", { x: X(i), y: h - 8, "text-anchor": "middle", fill: ink3, "font-size": 10.5, "font-family": mono }, y));
+      });
+    } else {                                                          // short window: YY/MM ticks
+      var st = Math.max(1, Math.round(n / (small ? 4 : 7)));
+      for (var q = 0; q < n; q += st) {
+        if (n - 1 - q < st * 0.55 && q !== 0) continue;
+        svg.appendChild(el("text", { x: X(q), y: h - 8, "text-anchor": q === 0 ? "start" : "middle", fill: ink3, "font-size": 10.5, "font-family": mono }, fmtTick(W.dates, q)));
+      }
+      svg.appendChild(el("text", { x: X(n - 1), y: h - 8, "text-anchor": "end", fill: ink3, "font-size": 10.5, "font-family": mono }, fmtTick(W.dates, n - 1)));
+    }
     // hover
     var cross = el("line", { x1: 0, x2: 0, y1: top.y, y2: bot.y + bot.h, stroke: css("--ink"), "stroke-width": 1, opacity: 0 });
     svg.appendChild(cross);
@@ -2270,7 +2423,14 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
   function renderBacktestCharts() {
     var B = D.backtest;
     if (!B) return;
-    btTimeline(document.getElementById("c-bt-time"), B);
+    var drawBt = function () {
+      var r = rangeOf("bt", B.weekly.dates.length), W = {};
+      Object.keys(B.weekly).forEach(function (k) { W[k] = sliceIdx(B.weekly[k], r); });
+      btTimeline(document.getElementById("c-bt-time"), Object.assign({}, B, { weekly: W }));
+    };
+    rangeBar(document.getElementById("rb-bt"), "bt", B.weekly.dates, B.weekly.net,
+      { list: [{ label: "1 年", len: 52 }, { label: "3 年", len: 156 }, { label: "5 年", len: 260 }, { label: "全部", len: Infinity }], min: 13 }, "週", drawBt);
+    drawBt();
     btBuckets(document.getElementById("c-bt-bucket"), B);
     btCycleDots(document.getElementById("c-bt-cyc"), B);
     BT_KEYS.forEach(function (k) { btWaitCurve(document.getElementById("c-bt-slide-" + k), B, k, String(B.slide.thresholds[0])); });
@@ -2430,6 +2590,37 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
       requestAnimationFrame(function () { ticking = false; spy(); });
     }, { passive: true });
     spy();
+  }
+
+  /* A second file built from this same template shows only the bull-bear spread sections
+   * (build_report.py writes ai_spread_<asof>.html with view "spread"). Same data, same code,
+   * so the two files can never disagree. */
+  var VIEW = window.__VIEW__ === "spread" ? "spread" : "full";
+  var SPREAD_SECTIONS = ["ai", "bt", "method"];
+  function applyView() {
+    if (VIEW !== "spread" || !D.trend) return;
+    var T = D.trend, U = T.universe.kind !== "sector" ? T.universe.label : secName(T.universe.label) + "類股";
+    [].forEach.call(document.querySelectorAll(".wrap > section"), function (x) {
+      if (SPREAD_SECTIONS.indexOf(x.id) < 0) x.hidden = true;
+    });
+    // style.display, not the hidden attribute: .verdict / .stats set their own display
+    ["v-title", "statrow", "st-bars-wrap", "h-dek"].forEach(function (id) {
+      var e = document.getElementById(id); if (e) (id === "v-title" ? e.parentNode : e).style.display = "none";
+    });
+    var L = T.latest, sgn = function (v) { return (v >= 0 ? "+" : "") + v.toFixed(1); };
+    document.title = U + "多空排列差 · " + D.asof;
+    document.getElementById("h-kicker").textContent = "AI Hardware · Bull–Bear Spread";
+    document.getElementById("h-title").textContent = U + "多空排列差 " + sgn(L.sec_net) + "，" +
+      pctTxt(T.pctile_daily, "近一年").replace(/^為/, "") + "（全體 " + sgn(L.mkt_net) + "）";
+    var dek = document.getElementById("h-dek-spread"); dek.hidden = false;
+    dek.textContent = U + "（" + T.n_members + " 檔）每一檔每天判斷多頭排列、空頭排列或整理，" +
+      "多空排列差＝多頭排列占比 − 空頭排列占比。本頁只收這個指標的時間序列、和科技／半導體指數的比較、預警檢驗與週期；" +
+      "每張時間序列圖上方都可以調整顯示的時間範圍。完整的廣度報告是另一個檔案（sp500_internals_" + D.asof + ".html）。";
+    document.getElementById("st-n-label").textContent = "名單";
+    document.getElementById("st-n").textContent = T.n_members;
+    document.getElementById("foot-how").innerHTML = "<b>怎麼重算</b>：<code>python analysis/trend_regime.py</code> 產出多空排列差，" +
+      "<code>python analysis/regime_backtest.py</code> 產出預警檢驗與週期，再經 <code>build_report_data.py</code>、<code>build_report.py</code> 烤成本頁" +
+      "（與完整報告同一份資料與範本）。";
   }
 
   function renderStatic() {
@@ -2865,19 +3056,19 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
           " 跑贏指數，資金有部分往防禦端靠。");
   }
 
-  renderStatic();
+  renderStatic(); applyView();
   renderCharts();
   buildToc();
 
   var rt;
-  window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(function () { renderStatic(); renderCharts(); }, 180); });
+  window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(function () { renderStatic(); applyView(); renderCharts(); }, 180); });
   if (window.matchMedia) {
     var mq = window.matchMedia("(prefers-color-scheme: dark)");
     (mq.addEventListener ? mq.addEventListener.bind(mq, "change") : mq.addListener.bind(mq))(function () {
-      renderStatic(); renderCharts();
+      renderStatic(); applyView(); renderCharts();
     });
   }
-  new MutationObserver(function () { renderStatic(); renderCharts(); })
+  new MutationObserver(function () { renderStatic(); applyView(); renderCharts(); })
     .observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
 })();
 

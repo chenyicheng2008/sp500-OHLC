@@ -122,3 +122,8 @@ correlations with past and forward 13-week returns, the probability of a ≥10% 
 next 13 weeks by net bucket, the timing of every ≥15% drawdown relative to the net's
 zero-cross, and four signal tests. Windows overlap, so it is descriptive, not a
 significance test.
+
+`build_report.py` writes two files from the same template and data: the full report
+(`sp500_internals_<asof>.html`) and a page with only the bull-bear spread sections
+(`ai_spread_<asof>.html`). Every spread time-series chart has an adjustable time window
+(presets plus a draggable, resizable range strip).

@@ -21,7 +21,7 @@ analysis/trend_regime.py         bull/bear share over time (default: AI hardware
 analysis/regime_backtest.py      does that net warn of falls in rebuilt tech / semi indices? -> regime_backtest*.csv/json
 data/events/market_events.csv    hand-curated, sourced market events (the only non-computed input)
 analysis/build_report_data.py    condenses those CSVs -> data/analysis/report_data.json
-analysis/build_report.py         bakes the JSON into the template -> analysis/reports/*.html
+analysis/build_report.py         bakes the JSON into the template -> analysis/reports/*.html (two files, see below)
 analysis/report_template.html    report page; `__REPORT_DATA__` is the data placeholder
 analysis/reports/                dated standalone reports (one file per data date)
 ```
@@ -36,7 +36,7 @@ python analysis/kd_signals.py            # data/analysis/kd_crosses.csv + kd_bun
 python analysis/trend_regime.py          # data/analysis/trend_regime_{daily,weekly,groups}.csv + trend_regime_bundle.json
 python analysis/regime_backtest.py       # data/analysis/regime_backtest_weekly.csv + regime_backtest.json
 python analysis/build_report_data.py     # data/analysis/report_data.json
-python analysis/build_report.py          # analysis/reports/sp500_internals_<asof>.html
+python analysis/build_report.py          # analysis/reports/sp500_internals_<asof>.html + ai_spread_<asof>.html
 ```
 
 Needs `pandas` and `numpy` (not in `requirements.txt`, which covers only the fetch step).
@@ -236,6 +236,30 @@ net (2015-08 → 2026-11, 587 weeks): **no — it confirms, it doesn't warn.**
   「相差不大」 only when the return gap < 3 points, 「各占一半」 only when hits = half).
   The first draft put 「明顯較高」 after the *lower* group's figures — read the sentence
   order, not just the condition.
+
+## Two files from one template
+
+`build_report.py` writes `sp500_internals_<asof>.html` (view `full`) and, when the payload has
+`trend`, `ai_spread_<asof>.html` (view `spread`, asked 2026-11-09: 「多空排列差圖形單獨生成一個
+HTML」). The view is the `__REPORT_VIEW__` placeholder; `applyView()` hides every section but
+`ai`, `bt` and `method`, swaps the masthead (title from the spread reading, `#h-dek-spread`,
+名單 count) and the footer. Same data and code, so the two pages cannot disagree — never fork
+the template for the spread page. `applyView()` must run after every `renderStatic()`
+(initial, resize, theme): renderStatic rewrites the masthead. Hide masthead blocks with
+`style.display`, not `hidden` — `.verdict`/`.stats` set their own display and win over the
+attribute; and never overwrite an element that renderStatic fills (`#h-dek` holds
+`#st-dek-n` — replacing its text crashed the resize handler).
+
+## Adjustable time range
+
+Every spread time series (07 daily stack + net, 07 weekly long run, 08 timeline) has a
+`rangeBar()` above it: presets plus an overview strip whose window drags to move, drags
+at its edges to resize, recentres on click; ←/→ move, +/− resize. The two 07 daily charts
+share one window. Windows live in `RANGE` (in memory, per group). Ranges change only what
+the charts draw — captions, tables and read-outs stay full-period, and the bar says so.
+All-period marks (weekly extremes, episodes, pivots, zero-crosses) are drawn only when
+inside the window; episodes are clipped to it. Axis ticks use `fmtTick()`: YY/MM, or MM/DD
+when the window is under ~7 months (otherwise a 3-month window repeated "26/08 26/08").
 
 ## Chapter index
 
