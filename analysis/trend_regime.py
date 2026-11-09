@@ -1,4 +1,10 @@
-"""Bull / bear share of a sector over time, from moving-average alignment.
+"""Bull / bear share of a stock universe over time, from moving-average alignment.
+
+The universe is the repo's AI concept list (``data/tableau/AIsoftware_en.csv``) by
+default, grouped by its own sub-themes (``ethnic_group``); ``--universe sector:<name>``
+uses one Yahoo sector instead, grouped by industry. Only names with price history in
+``sp500_ohlc.csv`` can be classified -- the fetch step saves fundamentals, not prices,
+for list names outside the S&P 500 -- so the bundle records which ones are missing.
 
 Each constituent is classified every session:
 
@@ -15,7 +21,7 @@ carries survivorship bias: names that left the index are missing from the past.
 Run after ``breadth_sector.py``.
 
 Usage:
-    python analysis/trend_regime.py [--sector technology]
+    python analysis/trend_regime.py [--universe aisoft | --universe sector:technology]
 """
 
 from __future__ import annotations
@@ -35,6 +41,30 @@ DAILY_MA = (50, 200)
 WEEKLY_MA = (10, 40)
 LOOKBACK = {"1M": 21, "3M": 63}   # sessions, for "then vs now" comparisons
 STATES = ("bull", "neither", "bear")
+AI_LIST = REPO / "data" / "tableau" / "AIsoftware_en.csv"
+
+
+def universe(spec: str, meta: pd.DataFrame, priced: pd.Index) -> dict:
+    """Members (with prices), their group, and the list names we cannot price."""
+    if spec == "aisoft":
+        lst = pd.read_csv(AI_LIST, encoding=ENC)
+        lst = lst[lst["ethnic_group"].fillna("") != "INDEX"]           # the list carries index rows too
+        group = dict(zip(lst["stock"], lst["ethnic_group"].fillna("unknown")))
+        missing = {}
+        for t, g in group.items():
+            if t not in priced:
+                missing.setdefault(g, []).append(t)
+        return {"kind": "aisoft", "label": "AI 概念股", "group_kind": "族群",
+                "members": [t for t in group if t in priced],
+                "group_of": {t: g for t, g in group.items() if t in priced},
+                "list_size": len(group), "missing": {g: sorted(v) for g, v in missing.items()}}
+    if spec.startswith("sector:"):
+        sector = spec.split(":", 1)[1]
+        members = [t for t in meta.index[meta["Sector"] == sector] if t in priced]
+        return {"kind": "sector", "sector": sector, "label": sector, "group_kind": "產業",
+                "members": members, "group_of": {t: meta.at[t, "Industry"] for t in members},
+                "list_size": int((meta["Sector"] == sector).sum()), "missing": {}}
+    raise SystemExit(f"unknown universe {spec!r}; use 'aisoft' or 'sector:<name>'")
 
 
 def classify(close: pd.DataFrame, fast: int, slow: int) -> pd.DataFrame:
@@ -64,7 +94,7 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--data-dir", default=os.environ.get("FETCH_BASE", str(REPO / "data" / "weekly_reutin")))
     ap.add_argument("--out-dir", default=str(REPO / "data" / "analysis"))
-    ap.add_argument("--sector", default="technology")
+    ap.add_argument("--universe", default="aisoft", help="aisoft (default) or sector:<yahoo sector>")
     args = ap.parse_args()
     out_dir = Path(args.out_dir)
 
@@ -78,9 +108,10 @@ def main() -> None:
     weekly = weekly[~weekly.index.duplicated(keep="last")].dropna(how="all")
 
     meta = fund.set_index("Ticker")
-    members = [t for t in meta.index[meta["Sector"] == args.sector] if t in daily.columns]
+    uni = universe(args.universe, meta, daily.columns)
+    members, group_of = uni["members"], uni["group_of"]
     if not members:
-        raise SystemExit(f"no constituents with price history in sector {args.sector!r}")
+        raise SystemExit(f"no names with price history in universe {args.universe!r}")
 
     # --- daily: sector vs whole market --------------------------------------
     d_state = classify(daily, *DAILY_MA)
@@ -95,16 +126,18 @@ def main() -> None:
     w_members = [t for t in members if t in w_state.columns]
     w_sec, w_mkt = shares(w_state[w_members]), shares(w_state)
     weekly_out = w_sec.add_prefix("sec_").join(w_mkt.add_prefix("mkt_"), how="inner")
-    weekly_out = weekly_out[weekly_out["sec_n"] >= 10]          # too few names early on to mean anything
+    # Early years where most of today's names had not listed yet say little; require 60%.
+    min_n = max(5, int(0.6 * len(members)))
+    weekly_out = weekly_out[weekly_out["sec_n"] >= min_n]
     weekly_out.index.name = "Date"
     weekly_out.round(2).to_csv(out_dir / "trend_regime_weekly.csv", encoding=ENC)
 
-    # --- industries inside the sector, now vs 1M / 3M ago ---------------------
+    # --- groups inside the universe, now vs 1M / 3M ago -----------------------
     last = d_state.index[-1]
     rows = []
-    for ind, grp in meta.loc[members].groupby("Industry"):
-        tks = grp.index.tolist()
-        row = {"Industry": ind, "n": len(tks)}
+    for grp_name in sorted(set(group_of.values())):
+        tks = [t for t in members if group_of[t] == grp_name]
+        row = {"group": grp_name, "n": len(tks)}
         for lab, back in [("now", 0)] + list(LOOKBACK.items()):
             st = d_state[tks].iloc[-1 - back]
             m = st.notna().sum()
@@ -112,8 +145,8 @@ def main() -> None:
             row[f"bear_{lab}"] = 100 * (st == -1).sum() / m if m else np.nan
             row[f"net_{lab}"] = row[f"bull_{lab}"] - row[f"bear_{lab}"]
         rows.append(row)
-    industry = pd.DataFrame(rows).sort_values(["net_now", "n"], ascending=[False, False])
-    industry.round(1).to_csv(out_dir / "trend_regime_industry.csv", index=False, encoding=ENC)
+    groups = pd.DataFrame(rows).sort_values(["net_now", "n"], ascending=[False, False])
+    groups.round(1).to_csv(out_dir / "trend_regime_groups.csv", index=False, encoding=ENC)
 
     # --- transitions over the last month: where the ratio's change came from ---
     back = LOOKBACK["1M"]
@@ -135,7 +168,7 @@ def main() -> None:
     sec_hist = daily_out["sec_net"]
     wk_hist = weekly_out["sec_net"]
     bundle = {
-        "sector": args.sector,
+        "universe": {k: uni[k] for k in ("kind", "label", "group_kind", "list_size", "missing")} | {"n_priced": len(members)},
         "asof": last.date().isoformat(),
         "ma_daily": DAILY_MA, "ma_weekly": WEEKLY_MA,
         "n_members": len(members),
@@ -145,7 +178,7 @@ def main() -> None:
         "transitions": matrix,
         "moved": {k: sorted(v) for k, v in moved.items()},
         "names_now": names,
-        "industry_of": {t: meta.at[t, "Industry"] for t in members},
+        "group_of": group_of,
         "lookback": {k: {"date": d_state.index[-1 - v].date().isoformat(),
                          **{c: round(float(daily_out[c].iloc[-1 - v]), 1)
                             for c in ("sec_bull", "sec_bear", "sec_net", "mkt_bull", "mkt_bear", "mkt_net")}}
@@ -162,7 +195,9 @@ def main() -> None:
         json.dump(bundle, fh, ensure_ascii=False, indent=1, default=str)
 
     t = daily_out.iloc[-1]
-    print(f"{args.sector}: {len(members)} names, as of {bundle['asof']}")
+    print(f"{uni['label']}: {len(members)} of {uni['list_size']} names priced, as of {bundle['asof']}")
+    if uni["missing"]:
+        print(f"  no prices for: {uni['missing']}")
     print(f"  daily  bull {t.sec_bull:.1f}%  neither {t.sec_neither:.1f}%  bear {t.sec_bear:.1f}%  "
           f"net {t.sec_net:+.1f} (market net {t.mkt_net:+.1f}); 1y percentile {bundle['pctile_daily']}")
     print(f"  weekly net {wk_hist.iloc[-1]:+.1f}, {bundle['weekly_start']} on; 10y percentile {bundle['pctile_weekly']}")

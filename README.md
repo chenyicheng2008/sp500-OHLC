@@ -104,11 +104,13 @@ step.
   up against sector, returns, position vs moving averages, valuation, growth and any
   catalogued event or large one-day move in the last two weeks.
 
-### Sector bull / bear regime
+### AI-concept bull / bear regime
 
-`trend_regime.py` classifies each constituent every session as bull (close > MA50 > MA200),
-bear (close < MA50 < MA200) or neither, and tracks the share of each over time for one
-sector (technology by default, `--sector` to change) against the whole market. It also
-writes a ten-year weekly version (10/40-week averages; today's constituents, so it carries
-survivorship bias), per-industry shares now vs one and three months ago, and the
-one-month transition matrix between states.
+`trend_regime.py` classifies each name every session as bull (close > MA50 > MA200),
+bear (close < MA50 < MA200) or neither, and tracks the share of each over time for the AI
+concept list in `data/tableau/AIsoftware_en.csv` (or one Yahoo sector with
+`--universe sector:<name>`) against the whole market. Only list names with price history
+can be classified — currently the 15 that are S&P 500 members; the rest are listed by
+sub-theme in the bundle and on the page. It also writes a weekly version back to 2015
+(10/40-week averages; today's list, so it carries survivorship bias), per-sub-theme shares
+now vs one and three months ago, and the one-month transition matrix between states.

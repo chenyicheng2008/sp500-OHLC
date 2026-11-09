@@ -17,7 +17,7 @@ data/weekly_reutin/              fetched CSVs (sp500_ohlc.csv, sp500_stocks.csv,
 data/tableau/                    ticker lists
 analysis/breadth_sector.py       breadth + sector/industry analysis -> data/analysis/*.csv
 analysis/kd_signals.py           weekly/monthly KD(9,3,3) crosses + their factors -> kd_crosses.csv, kd_bundle.json
-analysis/trend_regime.py         sector bull/bear share over time (default: technology) -> trend_regime_*.csv/json
+analysis/trend_regime.py         bull/bear share over time (default: AI concept list) -> trend_regime_*.csv/json
 data/events/market_events.csv    hand-curated, sourced market events (the only non-computed input)
 analysis/build_report_data.py    condenses those CSVs -> data/analysis/report_data.json
 analysis/build_report.py         bakes the JSON into the template -> analysis/reports/*.html
@@ -32,7 +32,7 @@ Always in this order — each step consumes the previous one's output:
 ```bash
 python analysis/breadth_sector.py        # data/analysis/*.csv + analysis_bundle.json + index_ohlc_daily.csv
 python analysis/kd_signals.py            # data/analysis/kd_crosses.csv + kd_bundle.json (reads market_events.csv)
-python analysis/trend_regime.py          # data/analysis/trend_regime_{daily,weekly,industry}.csv + trend_regime_bundle.json
+python analysis/trend_regime.py          # data/analysis/trend_regime_{daily,weekly,groups}.csv + trend_regime_bundle.json
 python analysis/build_report_data.py     # data/analysis/report_data.json
 python analysis/build_report.py          # analysis/reports/sp500_internals_<asof>.html
 ```
@@ -141,24 +141,48 @@ seeded at 50. Weekly and monthly bars are resampled from the daily slice with th
 - Group read-outs are generated: "concentrated in one sector" needs ≥50% of the group
   *and* ≥2× that sector's universe share (3 of 10 industrials at 2× is not concentration).
 
-## Sector bull / bear regime (`trend_regime.py`)
+## AI-concept bull / bear regime (`trend_regime.py`)
 
-Every constituent is classified each session: **bull** = close > MA50 > MA200, **bear** =
-close < MA50 < MA200, **neither** otherwise. The sector's three shares, and net = bull −
-bear, form the time series; the whole market is computed the same way as the baseline.
+Every name is classified each session: **bull** = close > MA50 > MA200, **bear** =
+close < MA50 < MA200, **neither** otherwise. The universe's three shares, and net = bull −
+bear, form the time series; the whole S&P 500 is computed the same way as the baseline.
 
+- **Universe** (since 2026-11-09): `data/tableau/AIsoftware_en.csv`, minus its INDEX rows
+  (^GSPC/^IXIC/^SOX), grouped by its own `ethnic_group` sub-themes (zh names in `GRP_TC`
+  in the template). `--universe sector:technology` restores the earlier Yahoo-sector view
+  (grouped by industry); the page wording follows `bundle.universe`, never a fixed label.
+- **Only 15 of 44 list names are priced.** The fetch step saves OHLC for S&P 500 members
+  only; the other 29 (SNOW, NET, ZS, SHOP, RDDT, …) have fundamentals but no candles. The
+  bundle lists them by group and the page shows them in a note — do not drop that note,
+  and do not describe the 15 as "the AI list". Full coverage needs the fetch step (which
+  runs on `main`) to also save OHLC for the AI list; that is the user's call. With 15
+  names one state change moves a share 6.7 points, and the page says so.
 - Daily series starts only once MA200 exists (~2025-08 with the current file). The long
   run uses 10/40-week averages on the spliced weekly bars from 2015 — with **today's**
-  constituents, so it carries survivorship bias (early years read too bullish); the page
-  says so, and the percentile it reports is a lower bound on the true one.
-- "Tech" is Yahoo's `technology` sector (83 names): Alphabet and Meta are communication
-  services, Amazon consumer cyclical. The page states this; don't silently add them.
+  list, so it carries survivorship bias (early years read too bullish; for a hand-picked
+  theme list it is worse than for an index); the page says so, and the percentile it
+  reports is a lower bound on the true one. Weeks with fewer than 60% of members warmed
+  up are dropped (`min_n`; the old fixed `>= 10` was sized for 83 tech names).
 - The transition matrix (state 21 sessions ago → now) explains *why* the ratio moved;
   the read-out's "單日衝擊" line names the session with the largest one-day fall in net
-  and the events catalogued that day (on 2026-11-06 that was 10-14: CPI + Barclays).
-- As of 2026-11-06: tech net +4.8 vs market +18.9, down from +33.7 vs -5.1 a month
-  earlier — 31 of 40 tech bulls slid to neither (chips, AI hardware), 14 new bulls were
-  mostly IT services/payments.
+  and the events catalogued that day (on 2026-11-06 that was 10-29: E13 Alphabet, E14
+  software earnings).
+- Read-out verbs come from signs: on 2026-11-06 all three ≥3-name groups fell, and the
+  first draft still said 「上升最多的是 CSP（+67 → +33）」. 「只剩 N 檔維持」 only when
+  fewer than half held; a single new bull is named, not 「1 檔以…為主」.
+- As of 2026-11-06: AI net -6.7 vs market +18.9, down from +40.0 vs -5.1 a month earlier —
+  7 of 9 bulls slid to neither (security CRWD/FTNT/PANW, CRM/NOW, DDOG/PLTR), GOOG went
+  bull → bear, AMZN was the one new bull.
+
+## Chapter index
+
+The 章節索引 block and the sticky bar are both generated by `buildToc()` from
+`.wrap > section[data-toc]`: number = position among visible sections (written into each
+`.sec-no` too), title = the section's own h2, `data-toc` = short bar label, `data-q` = one
+line on what the section answers. Add a section by giving it those two attributes — never
+type a number into the nav or a `.sec-no` (they drifted before). `data-q` describes the
+question, not a reading, so it carries no figures or states. The bar highlights the
+section being read (scroll spy) and scrolls itself horizontally on phones.
 
 ## Index K-line
 
