@@ -1,0 +1,567 @@
+{
+ "asof": "2026-11-06",
+ "start": "2015-08-14",
+ "weeks": 587,
+ "horizon": 13,
+ "big_drop": -10,
+ "episode_dd": -15,
+ "universe_label": "AI 硬體股",
+ "n_members": 22,
+ "indices": {
+  "tech": {
+   "label": "科技類股",
+   "n": 83,
+   "overlap_n": 21,
+   "overlap_cap": 40.0
+  },
+  "semi": {
+   "label": "半導體（含設備）",
+   "n": 18,
+   "overlap_n": 8,
+   "overlap_cap": 88.0
+  }
+ },
+ "independent_windows": 45,
+ "by_index": {
+  "tech": {
+   "base_p_big": 16.4,
+   "base_med_fwd_ret": 7.0,
+   "corr_past": 0.62,
+   "corr_fwd_mdd": 0.07,
+   "corr_fwd_ret": -0.05,
+   "buckets": [
+    {
+     "lo": -101,
+     "hi": -50,
+     "weeks": 40,
+     "p_big": 30.0,
+     "med_fwd_ret": 6.7,
+     "med_fwd_mdd": -6.3
+    },
+    {
+     "lo": -50,
+     "hi": -20,
+     "weeks": 35,
+     "p_big": 45.7,
+     "med_fwd_ret": 6.0,
+     "med_fwd_mdd": -5.9
+    },
+    {
+     "lo": -20,
+     "hi": 20,
+     "weeks": 127,
+     "p_big": 30.7,
+     "med_fwd_ret": 6.7,
+     "med_fwd_mdd": -1.8
+    },
+    {
+     "lo": 20,
+     "hi": 50,
+     "weeks": 133,
+     "p_big": 3.8,
+     "med_fwd_ret": 9.0,
+     "med_fwd_mdd": -1.5
+    },
+    {
+     "lo": 50,
+     "hi": 80,
+     "weeks": 172,
+     "p_big": 11.6,
+     "med_fwd_ret": 6.4,
+     "med_fwd_mdd": -2.3
+    },
+    {
+     "lo": 80,
+     "hi": 101,
+     "weeks": 67,
+     "p_big": 3.0,
+     "med_fwd_ret": 6.8,
+     "med_fwd_mdd": -1.7
+    }
+   ],
+   "signals": [
+    {
+     "id": "cross0",
+     "label": "淨值由正轉負（跌破 0）",
+     "n": 14,
+     "n_done": 13,
+     "hits": 4,
+     "med_fwd_ret": 10.4,
+     "dates": [
+      "2015-12-11",
+      "2016-04-29",
+      "2018-04-06",
+      "2018-07-20",
+      "2019-05-31",
+      "2020-02-28",
+      "2021-10-01",
+      "2022-01-21",
+      "2022-08-26",
+      "2022-12-16",
+      "2023-10-20",
+      "2024-09-06",
+      "2024-12-20",
+      "2026-10-16"
+     ],
+     "pending": [
+      "2026-10-16"
+     ]
+    },
+    {
+     "id": "drop50",
+     "label": "4 週內淨值下降 50 點以上",
+     "n": 18,
+     "n_done": 17,
+     "hits": 2,
+     "med_fwd_ret": 11.5,
+     "dates": [
+      "2016-01-15",
+      "2016-04-29",
+      "2016-11-04",
+      "2017-08-11",
+      "2018-04-06",
+      "2018-10-12",
+      "2019-05-17",
+      "2020-03-06",
+      "2021-05-14",
+      "2021-10-01",
+      "2022-01-21",
+      "2022-06-24",
+      "2022-12-23",
+      "2024-04-19",
+      "2024-07-26",
+      "2025-11-21",
+      "2026-07-17",
+      "2026-10-23"
+     ],
+     "pending": [
+      "2026-10-23"
+     ]
+    },
+    {
+     "id": "diverge",
+     "label": "指數距高點 3% 以內，淨值卻 ≤ 0",
+     "n": 5,
+     "n_done": 5,
+     "hits": 2,
+     "med_fwd_ret": -0.4,
+     "dates": [
+      "2015-08-14",
+      "2015-11-20",
+      "2018-07-20",
+      "2021-10-15",
+      "2024-12-20"
+     ],
+     "pending": []
+    },
+    {
+     "id": "deep40",
+     "label": "淨值跌破 -40",
+     "n": 9,
+     "n_done": 8,
+     "hits": 4,
+     "med_fwd_ret": 7.3,
+     "dates": [
+      "2015-09-18",
+      "2016-01-08",
+      "2018-10-12",
+      "2020-03-27",
+      "2022-04-08",
+      "2022-08-26",
+      "2022-12-23",
+      "2025-03-14",
+      "2026-11-06"
+     ],
+     "pending": [
+      "2026-11-06"
+     ]
+    }
+   ],
+   "episodes": [
+    {
+     "peak": "2015-12-04",
+     "trough": "2016-02-12",
+     "depth": -16.2,
+     "ongoing": false,
+     "net_at_peak": 0.0,
+     "net_min": -47.1,
+     "cross": "2016-01-08",
+     "lead_weeks": 5,
+     "at_cross": -11.6,
+     "cross_to_peak": null,
+     "cross_to_trough": -5.2
+    },
+    {
+     "peak": "2018-09-28",
+     "trough": "2018-12-21",
+     "depth": -21.5,
+     "ongoing": false,
+     "net_at_peak": -5.0,
+     "net_min": -70.0,
+     "cross": "2018-07-20",
+     "lead_weeks": -10,
+     "at_cross": null,
+     "cross_to_peak": 8.0,
+     "cross_to_trough": -15.3
+    },
+    {
+     "peak": "2020-02-14",
+     "trough": "2020-03-20",
+     "depth": -30.0,
+     "ongoing": false,
+     "net_at_peak": 61.9,
+     "net_min": -38.1,
+     "cross": "2020-02-28",
+     "lead_weeks": 2,
+     "at_cross": -13.2,
+     "cross_to_peak": null,
+     "cross_to_trough": -19.4
+    },
+    {
+     "peak": "2021-12-10",
+     "trough": "2022-10-14",
+     "depth": -34.2,
+     "ongoing": false,
+     "net_at_peak": 76.2,
+     "net_min": -95.2,
+     "cross": "2021-10-01",
+     "lead_weeks": -10,
+     "at_cross": null,
+     "cross_to_peak": 17.2,
+     "cross_to_trough": -22.9
+    },
+    {
+     "peak": "2024-12-06",
+     "trough": "2025-04-04",
+     "depth": -24.2,
+     "ongoing": false,
+     "net_at_peak": 33.3,
+     "net_min": -85.7,
+     "cross": "2024-12-20",
+     "lead_weeks": 2,
+     "at_cross": -1.2,
+     "cross_to_peak": null,
+     "cross_to_trough": -23.2
+    },
+    {
+     "peak": "2025-10-31",
+     "trough": "2026-03-27",
+     "depth": -15.5,
+     "ongoing": false,
+     "net_at_peak": 100.0,
+     "net_min": 27.3,
+     "cross": null,
+     "lead_weeks": null,
+     "at_cross": null,
+     "cross_to_peak": null,
+     "cross_to_trough": null
+    }
+   ],
+   "dd_now": -14.3,
+   "peak": "2026-10-02"
+  },
+  "semi": {
+   "base_p_big": 24.9,
+   "base_med_fwd_ret": 8.9,
+   "corr_past": 0.7,
+   "corr_fwd_mdd": 0.09,
+   "corr_fwd_ret": -0.03,
+   "buckets": [
+    {
+     "lo": -101,
+     "hi": -50,
+     "weeks": 40,
+     "p_big": 40.0,
+     "med_fwd_ret": 11.9,
+     "med_fwd_mdd": -6.9
+    },
+    {
+     "lo": -50,
+     "hi": -20,
+     "weeks": 35,
+     "p_big": 45.7,
+     "med_fwd_ret": 8.9,
+     "med_fwd_mdd": -7.5
+    },
+    {
+     "lo": -20,
+     "hi": 20,
+     "weeks": 127,
+     "p_big": 35.4,
+     "med_fwd_ret": 6.4,
+     "med_fwd_mdd": -4.5
+    },
+    {
+     "lo": 20,
+     "hi": 50,
+     "weeks": 133,
+     "p_big": 14.3,
+     "med_fwd_ret": 11.7,
+     "med_fwd_mdd": -2.4
+    },
+    {
+     "lo": 50,
+     "hi": 80,
+     "weeks": 172,
+     "p_big": 21.5,
+     "med_fwd_ret": 7.3,
+     "med_fwd_mdd": -3.5
+    },
+    {
+     "lo": 80,
+     "hi": 101,
+     "weeks": 67,
+     "p_big": 14.9,
+     "med_fwd_ret": 8.4,
+     "med_fwd_mdd": -1.9
+    }
+   ],
+   "signals": [
+    {
+     "id": "cross0",
+     "label": "淨值由正轉負（跌破 0）",
+     "n": 14,
+     "n_done": 13,
+     "hits": 6,
+     "med_fwd_ret": 11.2,
+     "dates": [
+      "2015-12-11",
+      "2016-04-29",
+      "2018-04-06",
+      "2018-07-20",
+      "2019-05-31",
+      "2020-02-28",
+      "2021-10-01",
+      "2022-01-21",
+      "2022-08-26",
+      "2022-12-16",
+      "2023-10-20",
+      "2024-09-06",
+      "2024-12-20",
+      "2026-10-16"
+     ],
+     "pending": [
+      "2026-10-16"
+     ]
+    },
+    {
+     "id": "drop50",
+     "label": "4 週內淨值下降 50 點以上",
+     "n": 18,
+     "n_done": 17,
+     "hits": 5,
+     "med_fwd_ret": 15.3,
+     "dates": [
+      "2016-01-15",
+      "2016-04-29",
+      "2016-11-04",
+      "2017-08-11",
+      "2018-04-06",
+      "2018-10-12",
+      "2019-05-17",
+      "2020-03-06",
+      "2021-05-14",
+      "2021-10-01",
+      "2022-01-21",
+      "2022-06-24",
+      "2022-12-23",
+      "2024-04-19",
+      "2024-07-26",
+      "2025-11-21",
+      "2026-07-17",
+      "2026-10-23"
+     ],
+     "pending": [
+      "2026-10-23"
+     ]
+    },
+    {
+     "id": "diverge",
+     "label": "指數距高點 3% 以內，淨值卻 ≤ 0",
+     "n": 4,
+     "n_done": 4,
+     "hits": 2,
+     "med_fwd_ret": -2.9,
+     "dates": [
+      "2015-08-14",
+      "2015-11-27",
+      "2021-10-15",
+      "2024-12-27"
+     ],
+     "pending": []
+    },
+    {
+     "id": "deep40",
+     "label": "淨值跌破 -40",
+     "n": 9,
+     "n_done": 8,
+     "hits": 4,
+     "med_fwd_ret": 9.3,
+     "dates": [
+      "2015-09-18",
+      "2016-01-08",
+      "2018-10-12",
+      "2020-03-27",
+      "2022-04-08",
+      "2022-08-26",
+      "2022-12-23",
+      "2025-03-14",
+      "2026-11-06"
+     ],
+     "pending": [
+      "2026-11-06"
+     ]
+    }
+   ],
+   "episodes": [
+    {
+     "peak": "2015-12-04",
+     "trough": "2016-02-12",
+     "depth": -18.4,
+     "ongoing": false,
+     "net_at_peak": 0.0,
+     "net_min": -47.1,
+     "cross": "2016-01-08",
+     "lead_weeks": 5,
+     "at_cross": -12.5,
+     "cross_to_peak": null,
+     "cross_to_trough": -6.8
+    },
+    {
+     "peak": "2018-06-15",
+     "trough": "2018-12-21",
+     "depth": -25.9,
+     "ongoing": false,
+     "net_at_peak": 40.0,
+     "net_min": -70.0,
+     "cross": "2018-04-06",
+     "lead_weeks": -10,
+     "at_cross": null,
+     "cross_to_peak": 15.6,
+     "cross_to_trough": -14.3
+    },
+    {
+     "peak": "2019-04-19",
+     "trough": "2019-05-31",
+     "depth": -19.3,
+     "ongoing": false,
+     "net_at_peak": 75.0,
+     "net_min": -9.5,
+     "cross": "2019-05-24",
+     "lead_weeks": 5,
+     "at_cross": -17.9,
+     "cross_to_peak": null,
+     "cross_to_trough": -1.7
+    },
+    {
+     "peak": "2020-02-14",
+     "trough": "2020-03-20",
+     "depth": -33.4,
+     "ongoing": false,
+     "net_at_peak": 61.9,
+     "net_min": -38.1,
+     "cross": "2020-02-28",
+     "lead_weeks": 2,
+     "at_cross": -13.7,
+     "cross_to_peak": null,
+     "cross_to_trough": -22.8
+    },
+    {
+     "peak": "2021-11-19",
+     "trough": "2022-10-14",
+     "depth": -48.3,
+     "ongoing": false,
+     "net_at_peak": 57.1,
+     "net_min": -95.2,
+     "cross": "2021-10-01",
+     "lead_weeks": -7,
+     "at_cross": null,
+     "cross_to_peak": 27.6,
+     "cross_to_trough": -34.1
+    },
+    {
+     "peak": "2024-03-22",
+     "trough": "2024-04-19",
+     "depth": -15.4,
+     "ongoing": false,
+     "net_at_peak": 81.0,
+     "net_min": 19.1,
+     "cross": null,
+     "lead_weeks": null,
+     "at_cross": null,
+     "cross_to_peak": null,
+     "cross_to_trough": null
+    },
+    {
+     "peak": "2024-06-14",
+     "trough": "2024-09-06",
+     "depth": -21.4,
+     "ongoing": false,
+     "net_at_peak": 81.0,
+     "net_min": -9.5,
+     "cross": "2024-08-02",
+     "lead_weeks": 7,
+     "at_cross": -18.6,
+     "cross_to_peak": null,
+     "cross_to_trough": -3.4
+    },
+    {
+     "peak": "2025-01-24",
+     "trough": "2025-04-04",
+     "depth": -33.2,
+     "ongoing": false,
+     "net_at_peak": 28.6,
+     "net_min": -85.7,
+     "cross": "2024-12-20",
+     "lead_weeks": -5,
+     "at_cross": null,
+     "cross_to_peak": 7.2,
+     "cross_to_trough": -28.4
+    },
+    {
+     "peak": "2026-10-02",
+     "trough": "2026-11-06",
+     "depth": -24.9,
+     "ongoing": true,
+     "net_at_peak": 68.2,
+     "net_min": -45.5,
+     "cross": "2026-10-16",
+     "lead_weeks": 2,
+     "at_cross": -12.2,
+     "cross_to_peak": null,
+     "cross_to_trough": -14.5
+    }
+   ],
+   "dd_now": -24.9,
+   "peak": "2026-10-02"
+  }
+ },
+ "zero_crosses": [
+  "2015-12-11",
+  "2016-01-08",
+  "2016-04-29",
+  "2018-04-06",
+  "2018-04-20",
+  "2018-06-29",
+  "2018-07-20",
+  "2018-09-28",
+  "2019-05-31",
+  "2019-06-14",
+  "2020-02-28",
+  "2020-05-15",
+  "2021-10-01",
+  "2022-01-21",
+  "2022-03-04",
+  "2022-04-01",
+  "2022-08-26",
+  "2022-12-16",
+  "2023-10-20",
+  "2024-09-06",
+  "2024-12-20",
+  "2025-01-31",
+  "2025-02-21",
+  "2026-10-16"
+ ],
+ "net_now": -45.5,
+ "d4_now": -104.5
+}

@@ -1,0 +1,213 @@
+"""Does the AI-hardware bull/bear net warn of large falls in tech and semiconductors?
+
+Reads the weekly net written by ``trend_regime.py`` and sets it against two weekly
+indices rebuilt from our own closes:
+
+    tech    Yahoo sector ``technology``                         (S&P 500 members)
+    semi    Yahoo industries ``semiconductors`` + ``semiconductor-equipment-materials``
+
+Both are cap-weighted with shares = latest market cap / latest close, held constant,
+and chain-linked week to week so a name entering the data does not jump the level.
+Today's constituents only -- survivorship bias, same as the regime's long run.
+
+Outputs ``regime_backtest_weekly.csv`` (the time series for the chart) and
+``regime_backtest.json`` (correlations, net-bucket table, signal tests, drawdown
+episodes, current reading). Every window here overlaps its neighbours, so the
+counts are descriptive, not significance tests; the bundle carries the number of
+non-overlapping windows so the page can say how small the sample really is.
+
+Run after ``trend_regime.py``.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+
+from breadth_sector import ENC, load, pivot, drop_empty_sessions
+
+REPO = Path(__file__).resolve().parent.parent
+H = 13                      # forward / backward horizon, weeks
+BIG_DROP = -0.10            # "large fall": max drawdown within the next H weeks
+EPISODE_DD = -0.15          # peak-to-trough drawdown that counts as an episode
+BUCKETS = [-101, -50, -20, 20, 50, 80, 101]
+INDICES = {
+    "tech": ("科技類股", lambda m: m["Sector"] == "technology"),
+    "semi": ("半導體（含設備）", lambda m: m["Industry"].isin(["semiconductors", "semiconductor-equipment-materials"])),
+}
+
+
+def weekly_closes(ohlc: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+    daily, _ = drop_empty_sessions(pivot(ohlc, "1d", "Close"))
+    wh, _ = drop_empty_sessions(pivot(ohlc, "1wk", "Close"))
+    w = pd.concat([wh[wh.index < daily.index[0]].resample("W-FRI").last(), daily.resample("W-FRI").last()])
+    return daily, w[~w.index.duplicated(keep="last")].dropna(how="all")
+
+
+def chain_index(w: pd.DataFrame, shares: pd.Series, cols: list) -> pd.Series:
+    """Cap-weighted, chain-linked: each week's return weights names by last week's cap."""
+    px = w[cols]
+    r = px.pct_change(fill_method=None)
+    cap = px.mul(shares.reindex(cols), axis=1).shift(1)
+    ok = r.notna() & cap.notna()
+    ret = (r.where(ok) * cap.where(ok)).sum(axis=1) / cap.where(ok).sum(axis=1)
+    return 100 * (1 + ret.fillna(0)).cumprod()
+
+
+def fwd_max_dd(s: pd.Series, h: int = H) -> pd.Series:
+    v, out = s.values, np.full(len(s), np.nan)
+    for i in range(len(v) - h):
+        out[i] = v[i + 1:i + h + 1].min() / v[i] - 1
+    return pd.Series(out, index=s.index)
+
+
+def rank_corr(a: pd.Series, b: pd.Series) -> float:
+    ok = a.notna() & b.notna()
+    return round(float(a[ok].rank().corr(b[ok].rank())), 2)
+
+
+def declustered(cond: pd.Series, gap: int = H) -> list:
+    """First week of each run of triggers; a new trigger needs `gap` quiet weeks."""
+    out, last = [], None
+    for t in cond.index[cond.fillna(False)]:
+        if last is None or (t - last).days > 7 * gap:
+            out.append(t)
+            last = t
+    return out
+
+
+def episodes(level: pd.Series, net: pd.Series) -> list:
+    """Peak-to-trough falls past EPISODE_DD, and when net first crossed below zero around them."""
+    peak_v, peak_t, eps, cur = level.iloc[0], level.index[0], [], None
+    for t, v in level.items():
+        if v >= peak_v:
+            if cur:                                    # back at a new high: the episode is over
+                eps.append(cur); cur = None
+            peak_v, peak_t = v, t
+        elif cur is None and v / peak_v - 1 <= EPISODE_DD:
+            cur = {"peak": peak_t, "open": False}
+        if cur is not None:
+            seg = level.loc[cur["peak"]:t]
+            cur.update(trough=seg.idxmin(), depth=seg.min() / seg.iloc[0] - 1)
+    if cur:                                            # still below the old high at the data date
+        cur["open"] = True
+        eps.append(cur)
+    rows = []
+    for e in eps:
+        pk, tr = e["peak"], e["trough"]
+        win = net.loc[pk - pd.Timedelta(weeks=H): tr]
+        cross = win[(win <= 0) & (win.shift(1) > 0)].index
+        c = cross.min() if len(cross) else None
+        rows.append({
+            "peak": pk.date().isoformat(), "trough": tr.date().isoformat(), "depth": round(100 * e["depth"], 1),
+            "ongoing": e["open"],
+            "net_at_peak": round(float(net.get(pk, np.nan)), 1),
+            "net_min": round(float(net.loc[pk:tr].min()), 1),
+            "cross": c.date().isoformat() if c is not None else None,
+            "lead_weeks": int((c - pk).days // 7) if c is not None else None,
+            # index level at the cross relative to the peak, and what was still to come
+            "at_cross": round(100 * (level[c] / level[pk] - 1), 1) if c is not None and c >= pk else None,
+            "cross_to_peak": round(100 * (level[pk] / level[c] - 1), 1) if c is not None and c < pk else None,
+            "cross_to_trough": round(100 * (level[tr] / level[c] - 1), 1) if c is not None else None,
+        })
+    return rows
+
+
+def main() -> None:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--data-dir", default=os.environ.get("FETCH_BASE", str(REPO / "data" / "weekly_reutin")))
+    ap.add_argument("--out-dir", default=str(REPO / "data" / "analysis"))
+    args = ap.parse_args()
+    out_dir = Path(args.out_dir)
+
+    ohlc, fund, _ = load(Path(args.data_dir))
+    daily, w = weekly_closes(ohlc)
+    meta = fund.set_index("Ticker")
+    last = daily.ffill().iloc[-1].reindex(meta.index)
+    shares = (meta["Market Cap"] / last).replace([np.inf, -np.inf, 0], np.nan).dropna()
+
+    reg = json.load(open(out_dir / "trend_regime_bundle.json", encoding="utf-8"))
+    net = pd.read_csv(out_dir / "trend_regime_weekly.csv", index_col=0, parse_dates=True)["sec_net"]
+    members = set(reg["group_of"])
+
+    df = pd.DataFrame({"net": net})
+    info = {}
+    for key, (label, sel) in INDICES.items():
+        cols = [t for t in meta.index[sel(meta)] if t in w.columns and t in shares.index]
+        lvl = chain_index(w, shares, cols)
+        df[key] = lvl
+        overlap = [t for t in cols if t in members]
+        info[key] = {"label": label, "n": len(cols), "overlap_n": len(overlap),
+                     "overlap_cap": round(100 * float(meta.loc[overlap, "Market Cap"].sum() / meta.loc[cols, "Market Cap"].sum()), 0)}
+    df = df.dropna(subset=["net", "tech", "semi"])
+    for key in INDICES:
+        df[key] = 100 * df[key] / df[key].iloc[0]                  # rebase to the first net week
+        df[key + "_dd"] = 100 * (df[key] / df[key].cummax() - 1)
+
+    out = df[["net", "tech", "semi", "tech_dd", "semi_dd"]].round(2)
+    out.index.name = "Date"
+    out.to_csv(out_dir / "regime_backtest_weekly.csv", encoding=ENC)
+
+    d4 = df["net"] - df["net"].shift(4)
+    res = {"asof": df.index[-1].date().isoformat(), "start": df.index[0].date().isoformat(),
+           "weeks": len(df), "horizon": H, "big_drop": round(100 * BIG_DROP), "episode_dd": round(100 * EPISODE_DD),
+           "universe_label": reg["universe"]["label"], "n_members": reg["n_members"],
+           "indices": info, "independent_windows": len(df) // H, "by_index": {}}
+    for key in INDICES:
+        lvl = df[key]
+        mdd, fr, past = fwd_max_dd(lvl), lvl.shift(-H) / lvl - 1, lvl / lvl.shift(H) - 1
+        base = mdd.notna()
+        near_high = lvl / lvl.cummax() - 1 > -0.03
+        buckets = []
+        cut = pd.cut(df["net"], BUCKETS)
+        for iv, grp in df[base].groupby(cut[base], observed=True):
+            m = mdd[grp.index]
+            buckets.append({"lo": int(iv.left), "hi": int(iv.right), "weeks": len(grp),
+                            "p_big": round(100 * float((m <= BIG_DROP).mean()), 1),
+                            "med_fwd_ret": round(100 * float(fr[grp.index].median()), 1),
+                            "med_fwd_mdd": round(100 * float(m.median()), 1)})
+        signals = []
+        for sid, label, cond in [
+            ("cross0", "淨值由正轉負（跌破 0）", (df["net"] < 0) & (df["net"].shift(1) >= 0)),
+            ("drop50", "4 週內淨值下降 50 點以上", d4 <= -50),
+            ("diverge", "指數距高點 3% 以內，淨值卻 ≤ 0", near_high & (df["net"] <= 0)),
+            ("deep40", "淨值跌破 -40", (df["net"] <= -40) & (df["net"].shift(1) > -40)),
+        ]:
+            idx = declustered(cond)
+            done = [t for t in idx if base[t]]
+            signals.append({"id": sid, "label": label, "n": len(idx), "n_done": len(done),
+                            "hits": int(sum(mdd[t] <= BIG_DROP for t in done)),
+                            "med_fwd_ret": round(100 * float(fr[done].median()), 1) if done else None,
+                            "dates": [t.date().isoformat() for t in idx],
+                            "pending": [t.date().isoformat() for t in idx if not base[t]]})
+        res["by_index"][key] = {
+            "base_p_big": round(100 * float((mdd[base] <= BIG_DROP).mean()), 1),
+            "base_med_fwd_ret": round(100 * float(fr[base].median()), 1),
+            "corr_past": rank_corr(df["net"], past), "corr_fwd_mdd": rank_corr(df["net"], mdd),
+            "corr_fwd_ret": rank_corr(df["net"], fr),
+            "buckets": buckets, "signals": signals, "episodes": episodes(lvl, df["net"]),
+            "dd_now": round(float(df[key + "_dd"].iloc[-1]), 1),
+            "peak": lvl.idxmax().date().isoformat(),
+        }
+    crosses = df.index[(df["net"] < 0) & (df["net"].shift(1) >= 0)]
+    res["zero_crosses"] = [t.date().isoformat() for t in crosses]
+    res["net_now"] = round(float(df["net"].iloc[-1]), 1)
+    res["d4_now"] = round(float(d4.iloc[-1]), 1)
+    with open(out_dir / "regime_backtest.json", "w", encoding="utf-8") as fh:
+        json.dump(res, fh, ensure_ascii=False, indent=1)
+
+    print(f"backtest {res['start']} → {res['asof']}, {res['weeks']} weeks ({res['independent_windows']} non-overlapping {H}w windows)")
+    for key, r in res["by_index"].items():
+        print(f"  {key}: corr past {r['corr_past']} fwd-mdd {r['corr_fwd_mdd']} fwd-ret {r['corr_fwd_ret']}; "
+              f"base P(≤{res['big_drop']}%) {r['base_p_big']}%; {len(r['episodes'])} episodes; dd now {r['dd_now']}%")
+        for s in r["signals"]:
+            print(f"    {s['id']}: {s['hits']}/{s['n_done']} hits, median fwd {s['med_fwd_ret']}%, pending {s['pending']}")
+
+
+if __name__ == "__main__":
+    main()

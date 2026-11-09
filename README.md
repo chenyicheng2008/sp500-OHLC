@@ -80,7 +80,7 @@ and writes a self-contained Traditional-Chinese report to
 and JS inlined, so it opens straight from disk with no server and no network.
 
 ```bash
-python analysis/breadth_sector.py && python analysis/kd_signals.py && python analysis/trend_regime.py && python analysis/build_report_data.py && python analysis/build_report.py
+python analysis/breadth_sector.py && python analysis/kd_signals.py && python analysis/trend_regime.py && python analysis/regime_backtest.py && python analysis/build_report_data.py && python analysis/build_report.py
 ```
 
 The filename carries the data date, and the page prints both the data date (`資料日`,
@@ -115,3 +115,10 @@ S&P 500 members are priced), and `--universe sector:<name>` one Yahoo sector. It
 writes a weekly version back to 2015 (10/40-week averages; today's list, so it carries
 survivorship bias), per-sub-theme shares now vs one and three months ago, and the
 one-month transition matrix between states.
+
+`regime_backtest.py` then sets that weekly net against tech and semiconductor indices
+rebuilt from the same closes (cap-weighted, chain-linked, today's constituents): rank
+correlations with past and forward 13-week returns, the probability of a ≥10% fall in the
+next 13 weeks by net bucket, the timing of every ≥15% drawdown relative to the net's
+zero-cross, and four signal tests. Windows overlap, so it is descriptive, not a
+significance test.

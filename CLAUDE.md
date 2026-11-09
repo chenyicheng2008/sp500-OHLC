@@ -18,6 +18,7 @@ data/tableau/                    ticker lists (AIhardware_en.csv is hand-made, s
 analysis/breadth_sector.py       breadth + sector/industry analysis -> data/analysis/*.csv
 analysis/kd_signals.py           weekly/monthly KD(9,3,3) crosses + their factors -> kd_crosses.csv, kd_bundle.json
 analysis/trend_regime.py         bull/bear share over time (default: AI hardware list) -> trend_regime_*.csv/json
+analysis/regime_backtest.py      does that net warn of falls in rebuilt tech / semi indices? -> regime_backtest*.csv/json
 data/events/market_events.csv    hand-curated, sourced market events (the only non-computed input)
 analysis/build_report_data.py    condenses those CSVs -> data/analysis/report_data.json
 analysis/build_report.py         bakes the JSON into the template -> analysis/reports/*.html
@@ -33,6 +34,7 @@ Always in this order — each step consumes the previous one's output:
 python analysis/breadth_sector.py        # data/analysis/*.csv + analysis_bundle.json + index_ohlc_daily.csv
 python analysis/kd_signals.py            # data/analysis/kd_crosses.csv + kd_bundle.json (reads market_events.csv)
 python analysis/trend_regime.py          # data/analysis/trend_regime_{daily,weekly,groups}.csv + trend_regime_bundle.json
+python analysis/regime_backtest.py       # data/analysis/regime_backtest_weekly.csv + regime_backtest.json
 python analysis/build_report_data.py     # data/analysis/report_data.json
 python analysis/build_report.py          # analysis/reports/sp500_internals_<asof>.html
 ```
@@ -177,10 +179,35 @@ bear, form the time series; the whole S&P 500 is computed the same way as the ba
   fewer than half held; a single new bull is named, not 「1 檔以…為主」.
 - Extremes are said in words: a percentile of 0 reads 「為近一年最低」, not 「第 0 百分位」
   (`pctTxt()`), and zero counts read 「沒有一檔維持」/「同期沒有新進多頭」.
+- The weekly series feeds section 「預警檢驗」 (see below) — change `trend_regime_weekly.csv`
+  and that section changes with it.
 - As of 2026-11-06, AI hardware: bull 0%, neither 68%, bear 32%, net -31.8 (lowest of the
   daily year) vs market +18.9; a month earlier +59.1 vs -5.1. All 14 bulls left (13 to
   neither, KLAC to bear); the largest one-day fall was 10-14 (E03 CPI, E04 Barclays AI
   hardware downgrade). The software list on the same date: net -6.7.
+
+## Regime as a warning? (`regime_backtest.py`, section 「預警檢驗」)
+
+Asked 2026-11-09: "can this indicator predict a large tech fall?" Answer, from the weekly
+net (2015-08 → 2026-11, 587 weeks): **no — it confirms, it doesn't warn.**
+
+- Indices are rebuilt from our closes (no ^IXIC/^SOX in the data): tech = Yahoo
+  `technology` (83), semi = `semiconductors` + `semiconductor-equipment-materials` (18);
+  cap-weighted, constant shares, **chain-linked weekly** so names entering the data don't
+  jump the level. Semi overlaps the AI-hardware list by 8 names / 88% of cap, tech by
+  21 / 40% — partly self-comparison; the page says so.
+- Rank correlation of net with the *past* 13w return 0.62 (tech) / 0.70 (semi); with the
+  *forward* 13w max drawdown +0.07 / +0.09, forward return -0.05 / -0.03.
+- Net ≤ +20 → P(≥10% fall within 13w) 33% / 38% vs 7% / 18% above +20, but median forward
+  return is about the same: low net = higher volatility, not lower returns.
+- Of 15 episodes (≥15% falls, both indices) the net crossed below 0 after the peak 8×,
+  before it 5× (index then rose another 7-28% first), never 2× (tech 2025-10, semi 2024-03).
+- Signals are declustered (13w); signals inside the last 13w are "尚無結果", never counted.
+  Only 45 non-overlapping 13w windows exist — say so whenever quoting these rates.
+- Every read-out clause picks its connective from the numbers (「明顯高於/略高於/對照」,
+  「相差不大」 only when the return gap < 3 points, 「各占一半」 only when hits = half).
+  The first draft put 「明顯較高」 after the *lower* group's figures — read the sentence
+  order, not just the condition.
 
 ## Chapter index
 

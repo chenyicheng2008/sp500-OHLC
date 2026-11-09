@@ -162,6 +162,16 @@ def main() -> None:
         tr["groups"] = read("trend_regime_groups.csv").to_dict("records")
         payload["trend"] = tr
 
+    # --- does the regime net warn of large falls? (regime_backtest.py) -------------
+    bt_json = d / "regime_backtest.json"
+    if bt_json.exists():
+        bt = json.load(open(bt_json, encoding="utf-8"))
+        bw = pd.read_csv(d / "regime_backtest_weekly.csv", index_col=0, parse_dates=True)
+        bt["weekly"] = {"dates": [x.strftime("%Y-%m-%d") for x in bw.index],
+                        **{c: [None if pd.isna(v) else round(float(v), 1) for v in bw[c]]
+                           for c in ("net", "tech", "semi", "tech_dd", "semi_dd")}}
+        payload["backtest"] = bt
+
     txt = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
     out.write_text(txt, encoding="utf-8")
     print(f"wrote {out} ({len(txt):,} bytes, {len(wk)} chart points)")
