@@ -30,6 +30,7 @@ import numpy as np
 import pandas as pd
 
 from breadth_sector import ENC, load, pivot, drop_empty_sessions
+from trend_regime import classify, DAILY_MA
 
 REPO = Path(__file__).resolve().parent.parent
 H = 13                      # forward / backward horizon, weeks
@@ -272,6 +273,28 @@ def cycle_study(df: pd.DataFrame) -> dict:
                     "peak_lag": best[0] if best else None, "peak": round(float(best[1]), 2) if best else None}}
 
 
+def constituents(daily: pd.DataFrame, meta: pd.DataFrame, tickers: list, group_of: dict) -> list:
+    """One row per name: identity, size, its current MA alignment and recent moves."""
+    px = daily[tickers]
+    state = classify(px, *DAILY_MA).iloc[-1]
+    lab = {1.0: "bull", 0.0: "neither", -1.0: "bear"}
+    last = px.ffill().iloc[-1]
+    m1 = last / px.ffill().iloc[-22] - 1
+    hi = px.iloc[-252:].max()
+    cap = meta["Market Cap"].reindex(tickers)
+    tot = cap.sum()
+    rows = []
+    for t in tickers:
+        rows.append({"ticker": t, "name": str(meta.at[t, "Short Name"]) if t in meta.index else t,
+                     "group": group_of.get(t), "industry": meta.at[t, "Industry"] if t in meta.index else None,
+                     "cap_bn": round(float(cap[t]) / 1e9, 1) if pd.notna(cap[t]) else None,
+                     "weight": round(100 * float(cap[t] / tot), 2) if pd.notna(cap[t]) and tot else None,
+                     "state": lab.get(state[t]) if pd.notna(state[t]) else None,
+                     "ret_1m": round(100 * float(m1[t]), 1) if pd.notna(m1[t]) else None,
+                     "from_high": round(100 * float(last[t] / hi[t] - 1), 1) if pd.notna(hi[t]) else None})
+    return sorted(rows, key=lambda r: -(r["cap_bn"] or 0))
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--data-dir", default=os.environ.get("FETCH_BASE", str(REPO / "data" / "weekly_reutin")))
@@ -352,6 +375,12 @@ def main() -> None:
     res["zero_crosses"] = [t.date().isoformat() for t in crosses]
     res["slide"] = slide_study(df)
     res["cycles"] = cycle_study(df)
+    # constituent lists: the regime universe (every name counts once in the spread) and each
+    # rebuilt index (cap-weighted)
+    res["constituents"] = {"universe": constituents(daily, meta, [t for t in reg["group_of"] if t in daily.columns], reg["group_of"])}
+    for key, (label, sel) in INDICES.items():
+        cols = [t for t in meta.index[sel(meta)] if t in w.columns and t in shares.index]
+        res["constituents"][key] = constituents(daily, meta, [t for t in cols if t in daily.columns], reg["group_of"])
     res["net_now"] = round(float(df["net"].iloc[-1]), 1)
     res["d4_now"] = round(float(d4.iloc[-1]), 1)
     with open(out_dir / "regime_backtest.json", "w", encoding="utf-8") as fh:

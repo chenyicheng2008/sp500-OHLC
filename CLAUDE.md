@@ -250,6 +250,14 @@ the template for the spread page. `applyView()` must run after every `renderStat
 attribute; and never overwrite an element that renderStatic fills (`#h-dek` holds
 `#st-dek-n` — replacing its text crashed the resize handler).
 
+## Constituents (section 「成分股」)
+
+`regime_backtest.py` → `constituents`: the regime universe (22 AI-hardware names) and both
+rebuilt indices (semi 18, tech 83), each row with market cap, weight, current alignment
+(latest daily close vs MA50/MA200), 1-month return and distance from the 1-year high. The
+universe's weight column is informational only — the spread counts every name once; the
+caption says so. Tech is collapsed in a `<details>`. Shown in both files.
+
 ## Adjustable time range
 
 Every spread time series (07 daily stack + net, 07 weekly long run, 08 timeline) has a

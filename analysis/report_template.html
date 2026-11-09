@@ -169,6 +169,12 @@ tbody tr:last-child td{border-bottom:none}
 #t-kd-down td:last-child,#t-kd-down th:last-child,#t-kd-up td:last-child,#t-kd-up th:last-child{text-align:left; white-space:normal}
 #t-tech-moves td:last-child,#t-tech-moves th:last-child{text-align:left; white-space:normal; min-width:320px}
 #t-tech-trans td.diag{color:var(--ink-3)}
+#members td:not(.n),#members th{text-align:left}
+#members th:nth-child(n+5){text-align:right}
+#members td.c,#members th.c{text-align:center}
+.mem-more{margin-top:22px}
+.mem-more summary{cursor:pointer; font-size:14px; font-weight:600; color:var(--ink-2); padding:8px 0}
+.mem-more summary:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
 #t-bt-eps td:nth-child(8),#t-bt-eps th:nth-child(8){text-align:left; white-space:normal; min-width:220px; max-width:300px}
 #t-bt-eps td:nth-child(9) .sub{white-space:nowrap}
 #t-signals td:last-child,#t-signals th:last-child{text-align:left; white-space:normal; min-width:280px}
@@ -488,6 +494,17 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     <div class="panel-head"><h3>解讀</h3><p>以下每一句都由上方數據推導，資料改變時措辭會跟著改。</p></div>
     <ul class="take" id="bt-take" style="padding:0 20px 8px; margin-top:6px"></ul>
   </div>
+</section>
+
+<section id="members" data-toc="成分股" data-q="AI 硬體股名單、重建的半導體與科技類股指數各由哪些個股組成，各自的規模、權重與目前的均線排列。">
+  <div class="sec-head"><span class="sec-no">09</span><h2>成分股名單</h2></div>
+  <p class="sec-sub" id="mem-sub">—</p>
+  <div class="tw"><table id="t-mem-ai"><caption id="mem-ai-h">—<small id="mem-ai-cap">—</small></caption></table></div>
+  <div class="tw"><table id="t-mem-semi"><caption id="mem-semi-h">—<small id="mem-semi-cap">—</small></caption></table></div>
+  <details class="mem-more">
+    <summary id="mem-tech-sum">—</summary>
+    <div class="tw"><table id="t-mem-tech"><caption id="mem-tech-h">—<small id="mem-tech-cap">—</small></caption></table></div>
+  </details>
 </section>
 
 <section id="rotation" data-toc="輪動" data-q="類股排名怎麼移動：誰從落後轉領先、誰反過來。">
@@ -2262,6 +2279,62 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     ];
   }
 
+  /* ------------------------------------------------------------------ *
+   * constituents of the regime universe and the rebuilt indices
+   * ------------------------------------------------------------------ */
+  function renderMembersStatic() {
+    var sec = document.getElementById("members"), B = D.backtest;
+    if (!B || !B.constituents) { sec.hidden = true; return; }
+    var C = B.constituents, U = B.universe_label, sU = /^[A-Za-z0-9]/.test(U) ? " " + U : U;
+    var stTxt = { bull: "多頭", neither: "整理", bear: "空頭" };
+    var stCol = { bull: css("--pos"), bear: css("--neg"), neither: css("--ink-3") };
+    var gName = function (g) { return GRP_TC[g] || g; };
+    var count = function (rows) {
+      var c = { bull: 0, neither: 0, bear: 0 };
+      rows.forEach(function (r) { if (r.state) c[r.state]++; });
+      return "目前多頭 " + c.bull + " 檔、整理 " + c.neither + " 檔、空頭 " + c.bear + " 檔";
+    };
+    var top = function (rows, k) { return rows.slice(0, k).reduce(function (a, r) { return a + (r.weight || 0); }, 0); };
+    var cells = function (r, extra) {
+      return [{ html: r.ticker, cls: "mono" }, { html: r.name }].concat(extra).concat([
+        { html: r.cap_bn === null ? "—" : r.cap_bn.toLocaleString("en-US", { maximumFractionDigits: 0 }), cls: "n" },
+        { html: r.weight === null ? "—" : r.weight.toFixed(1) + "%", cls: "n" },
+        { html: r.state ? stTxt[r.state] : "—", color: r.state ? stCol[r.state] : null },
+        { html: pct(r.ret_1m, 1), cls: "n", color: r.ret_1m === null ? null : r.ret_1m >= 0 ? css("--pos") : css("--neg") },
+        { html: pct(r.from_high, 1), cls: "n" }]);
+    };
+    var tail = ["市值（十億美元）", "權重", "目前排列", "近一月", "距一年高點"];
+    document.getElementById("mem-sub").textContent =
+      "多空排列差以" + sU + "名單計算，每檔一票（不論市值）；預警檢驗的科技與半導體指數則依市值加權，權重＝最新市值÷名單合計市值，" +
+      "並以固定股數回推歷史，忽略期間的增資、買回與成分變動。排列依最新日線判斷（收盤、" + D.trend.ma_daily[0] + " 日與 " +
+      D.trend.ma_daily[1] + " 日均線），資料日 " + D.asof + "。";
+
+    var ai = C.universe;
+    document.getElementById("mem-ai-h").firstChild.nodeValue = U + "名單（" + ai.length + " 檔）";
+    fillTable("t-mem-ai", ["代號", "名稱", "族群"].concat(tail), ai.map(function (r) { return cells(r, [{ html: gName(r.group) }]); }));
+    document.getElementById("mem-ai-cap").textContent = "依市值排序。權重是名單內的市值占比，只供參考——多空排列差每檔一票，不用權重。" +
+      count(ai) + "。前五大占名單市值 " + top(ai, 5).toFixed(0) + "%。";
+
+    var inAI = {}; ai.forEach(function (r) { inAI[r.ticker] = true; });
+    var semi = C.semi, nOv = semi.filter(function (r) { return inAI[r.ticker]; }).length;
+    document.getElementById("mem-semi-h").firstChild.nodeValue = B.indices.semi.label + "指數成分股（" + semi.length + " 檔）";
+    fillTable("t-mem-semi", ["代號", "名稱", "產業", "也在" + sU + "名單"].concat(tail), semi.map(function (r) {
+      return cells(r, [{ html: indName(r.industry) }, { html: inAI[r.ticker] ? "是" : "", cls: "c" }]);
+    }));
+    document.getElementById("mem-semi-cap").textContent = "Yahoo 產業分類為半導體與半導體設備的 S&P 500 成分股，依指數權重排序。" +
+      "其中 " + nOv + " 檔也在" + sU + "名單，合計權重 " + semi.filter(function (r) { return inAI[r.ticker]; })
+        .reduce(function (a, r) { return a + (r.weight || 0); }, 0).toFixed(0) + "%。前三大權重合計 " + top(semi, 3).toFixed(0) + "%。" + count(semi) + "。";
+
+    var tech = C.tech;
+    document.getElementById("mem-tech-sum").textContent = "展開：" + B.indices.tech.label + "指數成分股（" + tech.length + " 檔）";
+    document.getElementById("mem-tech-h").firstChild.nodeValue = B.indices.tech.label + "指數成分股（" + tech.length + " 檔）";
+    fillTable("t-mem-tech", ["代號", "名稱", "產業", "也在" + sU + "名單"].concat(tail), tech.map(function (r) {
+      return cells(r, [{ html: indName(r.industry) }, { html: inAI[r.ticker] ? "是" : "", cls: "c" }]);
+    }));
+    document.getElementById("mem-tech-cap").textContent = "Yahoo 的 technology 類股，依指數權重排序；分類以 Yahoo 為準，部分常被視為科技股的公司歸在其他類股，不在此列。" +
+      "前三大權重合計 " + top(tech, 3).toFixed(0) + "%。" + count(tech) + "。";
+  }
+
   function renderBacktestStatic() {
     var sec = document.getElementById("bt"), B = D.backtest;
     if (!B) { sec.hidden = true; return; }
@@ -2596,7 +2669,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
    * (build_report.py writes ai_spread_<asof>.html with view "spread"). Same data, same code,
    * so the two files can never disagree. */
   var VIEW = window.__VIEW__ === "spread" ? "spread" : "full";
-  var SPREAD_SECTIONS = ["ai", "bt", "method"];
+  var SPREAD_SECTIONS = ["ai", "bt", "members", "method"];
   function applyView() {
     if (VIEW !== "spread" || !D.trend) return;
     var T = D.trend, U = T.universe.kind !== "sector" ? T.universe.label : secName(T.universe.label) + "類股";
@@ -2628,6 +2701,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     renderKDStatic();
     renderTrendStatic();
     renderBacktestStatic();
+    renderMembersStatic();
     renderSubtitles();
     document.getElementById("st-asof").textContent = D.asof;
     document.getElementById("st-gen").textContent = D.generated || D.asof;
