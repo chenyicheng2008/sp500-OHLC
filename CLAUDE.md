@@ -149,6 +149,11 @@ Every name is classified each session: **bull** = close > MA50 > MA200, **bear**
 close < MA50 < MA200, **neither** otherwise. The universe's three shares, and net = bull −
 bear, form the time series; the whole S&P 500 is computed the same way as the baseline.
 
+On the page `net` is called **多空排列差（Bull–Bear Spread）** = 多頭排列占比 − 空頭排列占比,
+in percentage points, −100…+100. It was 「淨值」 until 2026-11-09; the user asked for a name
+that says what it is (淨值 reads as NAV / book value). Code and CSV columns keep `net`;
+every page label says 多空排列差 — don't reintroduce 淨值.
+
 - **Universe** (since 2026-11-09, second change that day): AI **hardware** only, per the
   user ("AI概念股先排除軟體"). `data/tableau/AIhardware_en.csv` is a list Claude proposed and
   the user accepted — the 22 "core" names: compute chips NVDA/AVGO/AMD; memory & storage

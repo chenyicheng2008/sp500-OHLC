@@ -408,7 +408,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
   </figure>
   <div class="grid2">
     <figure class="panel">
-      <div class="panel-head"><h3 id="tech-h-net">—</h3><p>淨值 = 多頭比例 − 空頭比例；零軸以上代表多頭家數多於空頭。</p></div>
+      <div class="panel-head"><h3 id="tech-h-net">—</h3><p>多空排列差 = 多頭排列占比 − 空頭排列占比（百分點）；零軸以上代表多頭排列的家數多於空頭排列。整理的個股不進差值，但會讓兩邊的占比同時變小。</p></div>
       <div class="legend" id="lg-tech-net"></div>
       <div class="panel-body"><div id="c-tech-net"></div></div>
       <figcaption id="cap-tech-net"></figcaption>
@@ -429,8 +429,8 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
   </div>
 </section>
 
-<section id="bt" data-toc="預警檢驗" data-q="把多空淨值和重建的科技、半導體週線指數放在同一條時間軸上：它在歷次大跌之前還是之後轉弱，低讀數之後再大跌的機率與報酬是多少。">
-  <div class="sec-head"><span class="sec-no">08</span><h2 id="bt-h2">淨值能預警大跌嗎</h2></div>
+<section id="bt" data-toc="預警檢驗" data-q="把多空排列差和重建的科技、半導體週線指數放在同一條時間軸上：它在歷次大跌之前還是之後轉弱，低讀數之後再大跌的機率與報酬是多少。">
+  <div class="sec-head"><span class="sec-no">08</span><h2 id="bt-h2">多空排列差能預警大跌嗎</h2></div>
   <p class="sec-sub" id="bt-sub">—</p>
   <div class="stats" id="bt-stats" style="margin-top:22px"></div>
   <figure class="panel">
@@ -445,9 +445,9 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     <div class="panel-body"><div id="c-bt-bucket"></div></div>
     <figcaption id="cap-bt-bucket"></figcaption>
   </figure>
-  <div class="tw"><table id="t-bt-buckets"><caption>依淨值區間分組<small id="bt-buckets-cap">—</small></caption></table></div>
-  <div class="tw"><table id="t-bt-eps"><caption>歷次大跌與淨值跌破 0 的先後<small id="bt-eps-cap">—</small></caption></table></div>
-  <div class="tw"><table id="t-bt-sig"><caption>把淨值當訊號用<small id="bt-sig-cap">—</small></caption></table></div>
+  <div class="tw"><table id="t-bt-buckets"><caption>依多空排列差區間分組<small id="bt-buckets-cap">—</small></caption></table></div>
+  <div class="tw"><table id="t-bt-eps"><caption>歷次大跌與多空排列差跌破 0 的先後<small id="bt-eps-cap">—</small></caption></table></div>
+  <div class="tw"><table id="t-bt-sig"><caption>把多空排列差當訊號用<small id="bt-sig-cap">—</small></caption></table></div>
   <div class="panel">
     <div class="panel-head"><h3>解讀</h3><p>以下每一句都由上方數據推導，資料改變時措辭會跟著改。</p></div>
     <ul class="take" id="bt-take" style="padding:0 20px 8px; margin-top:6px"></ul>
@@ -1464,6 +1464,8 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
                : "全部都有日線資料。")
       : "以 Yahoo 的「" + secName(UV.label) + "」類股為範圍（" + T.n_members + " 檔）。") +
       "逐日判斷每一檔是多頭排列、空頭排列或整理，再看三者的比例怎麼隨時間變化，以及和全體 S&P 500 成分股的差距。" +
+      "整體強弱用一個數字概括：多空排列差（Bull–Bear Spread）＝多頭排列占比 − 空頭排列占比，單位是百分點，" +
+      "範圍 −100（全部空頭排列）到 +100（全部多頭排列），0 代表兩邊家數相同。" +
       "樣本只有 " + T.n_members + " 檔，一檔改變狀態，比例就移動 " + per.toFixed(1) + " 個百分點。";
     var miss = document.getElementById("tech-missing");
     if (nMiss) {
@@ -1475,12 +1477,12 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     } else { miss.hidden = true; }
     document.getElementById("tech-h2").textContent = U + "多空結構";
     document.getElementById("tech-h-stack").textContent = U + "多頭／整理／空頭比例（日線）";
-    document.getElementById("tech-h-net").textContent = "多空淨值：" + U + " vs 全體（日線）";
-    document.getElementById("tech-h-long").textContent = "長線對照：" + U + "多空淨值（週線）";
+    document.getElementById("tech-h-net").textContent = "多空排列差：" + U + " vs 全體（日線）";
+    document.getElementById("tech-h-long").textContent = "長線對照：" + U + "多空排列差（週線）";
     document.getElementById("tech-moves-cap").textContent = "依" + GK + "分組；只列狀態有改變的個股。";
     document.getElementById("tech-ind-h").firstChild.nodeValue = U + "內各" + GK + "的多空";
-    document.getElementById("tech-ind-cap").textContent = "淨值 = 多頭比例 − 空頭比例，依目前淨值排序。" + GK +
-      "內只有一兩檔時，一檔就會讓淨值移動 50 到 100 點，判讀時請看檔數。";
+    document.getElementById("tech-ind-cap").textContent = "多空排列差 = 多頭比例 − 空頭比例，依目前多空排列差排序。" + GK +
+      "內只有一兩檔時，一檔就會讓多空排列差移動 50 到 100 點，判讀時請看檔數。";
     document.getElementById("tech-def").textContent =
       "多頭排列：收盤 > " + T.ma_daily[0] + " 日均線 > " + T.ma_daily[1] + " 日均線；空頭排列：收盤 < " + T.ma_daily[0] + " 日均線 < " +
       T.ma_daily[1] + " 日均線；其餘為整理（均線糾結或方向不一致）。" + T.ma_daily[1] + " 日均線需要足夠歷史，所以日線序列從 " +
@@ -1495,23 +1497,23 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
       stat("多頭排列", L.sec_bull.toFixed(1) + "%", M1 ? "一個月前 " + M1.sec_bull.toFixed(1) + "%" : "") +
       stat("整理", L.sec_neither.toFixed(1) + "%", "均線之間拉鋸") +
       stat("空頭排列", L.sec_bear.toFixed(1) + "%", M1 ? "一個月前 " + M1.sec_bear.toFixed(1) + "%" : "") +
-      stat("多空淨值", (L.sec_net >= 0 ? "+" : "") + L.sec_net.toFixed(1), "全體 " + (L.mkt_net >= 0 ? "+" : "") + L.mkt_net.toFixed(1) + "；" + pctTxt(T.pctile_daily, "近一年"));
+      stat("多空排列差", (L.sec_net >= 0 ? "+" : "") + L.sec_net.toFixed(1), "全體 " + (L.mkt_net >= 0 ? "+" : "") + L.mkt_net.toFixed(1) + "；" + pctTxt(T.pctile_daily, "近一年"));
 
     var D1 = T.daily;
     var hiI = D1.sec_net.indexOf(Math.max.apply(null, D1.sec_net.filter(function (v) { return v !== null; })));
     var loI = D1.sec_net.indexOf(Math.min.apply(null, D1.sec_net.filter(function (v) { return v !== null; })));
     document.getElementById("cap-tech-stack").textContent =
-      "日線期間內，淨值最高在 " + D1.dates[hiI] + "（" + pct(D1.sec_net[hiI]).replace("%", "") + "，多頭 " + D1.sec_bull[hiI].toFixed(0) +
+      "日線期間內，多空排列差最高在 " + D1.dates[hiI] + "（" + pct(D1.sec_net[hiI]).replace("%", "") + "，多頭 " + D1.sec_bull[hiI].toFixed(0) +
       "%），最低在 " + D1.dates[loI] + "（" + pct(D1.sec_net[loI]).replace("%", "") + "，空頭 " + D1.sec_bear[loI].toFixed(0) + "%）。";
     document.getElementById("cap-tech-net").textContent = M1
-      ? "一個月前（" + M1.date + "）" + U + "淨值 " + pct(M1.sec_net).replace("%", "") + "、全體 " + pct(M1.mkt_net).replace("%", "") + "，" +
+      ? "一個月前（" + M1.date + "）" + U + "多空排列差 " + pct(M1.sec_net).replace("%", "") + "、全體 " + pct(M1.mkt_net).replace("%", "") + "，" +
         (gapThen >= 0 ? "領先 " : "落後 ") + Math.abs(gapThen).toFixed(1) + " 點；現在 " + pct(L.sec_net).replace("%", "") + "、全體 " +
         pct(L.mkt_net).replace("%", "") + "，" + (gapNow >= 0 ? "領先 " : "落後 ") + Math.abs(gapNow).toFixed(1) + " 點" +
         ((gapThen >= 0) !== (gapNow >= 0) ? "——對全體的相對位置在一個月內翻轉。" : "。")
       : "";
     var ex = T.weekly_extremes;
     document.getElementById("cap-tech-long").textContent =
-      "週線淨值最高 " + pct(ex.max.net).replace("%", "") + "（" + ex.max.date + "），最低 " + pct(ex.min.net).replace("%", "") + "（" + ex.min.date +
+      "週線多空排列差最高 " + pct(ex.max.net).replace("%", "") + "（" + ex.max.date + "），最低 " + pct(ex.min.net).replace("%", "") + "（" + ex.min.date +
       "）；目前 " + pct(T.weekly_latest.sec_net).replace("%", "") + "，" + pctTxt(T.pctile_weekly, "這段期間") + "。";
 
     // transition matrix
@@ -1540,7 +1542,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
       ];
     }));
 
-    fillTable("t-tech-ind", [GK, "檔數", "多頭", "空頭", "淨值", "一個月前", "三個月前", "一個月變化"],
+    fillTable("t-tech-ind", [GK, "檔數", "多頭", "空頭", "多空排列差", "一個月前", "三個月前", "一個月變化"],
       T.groups.map(function (r) {
         var ch = r.net_now - r.net_1M;
         return [
@@ -1557,7 +1559,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     // read-out
     var take = [];
     take.push("目前" + sU + "多頭 " + L.sec_bull.toFixed(0) + "%、整理 " + L.sec_neither.toFixed(0) + "%、空頭 " + L.sec_bear.toFixed(0) +
-      "%，淨值 " + pct(L.sec_net).replace("%", "") + "，日線" + pctTxt(T.pctile_daily, "近一年") + "、週線" +
+      "%，多空排列差 " + pct(L.sec_net).replace("%", "") + "，日線" + pctTxt(T.pctile_daily, "近一年") + "、週線" +
       pctTxt(T.pctile_weekly, " " + T.weekly_start.slice(0, 4) + " 年以來") + "。" +
       (L.sec_bull >= 50 ? "過半數多頭排列，屬全面多頭。"
         : L.sec_bear >= 50 ? "過半數空頭排列，屬全面空頭。"
@@ -1565,14 +1567,14 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
             (L.sec_bull === 0 ? "，而且沒有一檔維持多頭排列，空頭 " + L.sec_bear.toFixed(0) + "% 是唯一成形的方向，屬偏弱整理。"
               : L.sec_bear > L.sec_bull ? "，空頭排列多於多頭排列，屬偏弱整理。" : "，屬中期修正而非全面轉空。")
         : "多空與整理三分，沒有單一主導狀態。"));
-    if (M1) take.push("和全體比：一個月前" + sU + "淨值" + (gapThen >= 0 ? "領先" : "落後") + "全體 " + Math.abs(gapThen).toFixed(0) +
+    if (M1) take.push("和全體比：一個月前" + sU + "多空排列差" + (gapThen >= 0 ? "領先" : "落後") + "全體 " + Math.abs(gapThen).toFixed(0) +
       " 點，現在" + (gapNow >= 0 ? "領先 " : "落後 ") + Math.abs(gapNow).toFixed(0) + " 點" +
       ((gapThen >= 0) !== (gapNow >= 0) ? "，相對位置在一個月內翻轉" : "") +
       (L.mkt_net > M1.mkt_net && L.sec_net < M1.sec_net
-        ? "。全體淨值上升（" + pct(M1.mkt_net).replace("%", "") + " → " + pct(L.mkt_net).replace("%", "") + "）、" + U + "淨值下降（" +
+        ? "。全體多空排列差上升（" + pct(M1.mkt_net).replace("%", "") + " → " + pct(L.mkt_net).replace("%", "") + "）、" + U + "多空排列差下降（" +
           pct(M1.sec_net).replace("%", "") + " → " + pct(L.sec_net).replace("%", "") + "），走勢從" + sU + "移往其他股票。"
         : L.mkt_net < M1.mkt_net && L.sec_net > M1.sec_net
-          ? "。" + U + "淨值上升、全體下降，強勢往" + sU + "集中。"
+          ? "。" + U + "多空排列差上升、全體下降，強勢往" + sU + "集中。"
           : "。"));
     var bull0 = states.reduce(function (a, c) { return a + tr.bull[c]; }, 0);
     var newBull = tr.neither.bull + tr.bear.bull;
@@ -1600,7 +1602,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     }
     if (worst && worst.ch < 0) {
       var evs = (D.events_all || []).filter(function (e) { return e.date === dd[worst.i]; });
-      take.push("單日衝擊：一個月內淨值降幅最大的是 " + dd[worst.i] + "（" + pct(dn[worst.i - 1]).replace("%", "") + " → " +
+      take.push("單日衝擊：一個月內多空排列差降幅最大的是 " + dd[worst.i] + "（" + pct(dn[worst.i - 1]).replace("%", "") + " → " +
         pct(dn[worst.i]).replace("%", "") + "，一天少了 " + Math.abs(worst.ch).toFixed(0) + " 點）" +
         (evs.length ? "；同日事件紀錄：" + evs.map(function (e) { return e.id + "「" + e.title + "」"; }).join("、") + "。" : "，當天沒有事件紀錄。"));
     }
@@ -1614,10 +1616,10 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
       take.push(GK + "（3 檔以上，共 " + srt.length + " 個）：一個月內" +
         (!up_.length && dn_.length ? (flat ? "沒有一個上升；" : "全部下降；") + "依降幅為" + dn_.map(f).join("、")
           : !dn_.length && up_.length ? (flat ? "沒有一個下降；" : "全部上升；") + "依升幅為" + up_.map(f).join("、")
-          : dn_.length ? "淨值下降最多的是 " + dn_.slice(0, 2).map(f).join("、") + "，上升最多的是 " + up_.slice(0, 2).map(f).join("、")
-          : "淨值都沒有變化") + "。");
+          : dn_.length ? "多空排列差下降最多的是 " + dn_.slice(0, 2).map(f).join("、") + "，上升最多的是 " + up_.slice(0, 2).map(f).join("、")
+          : "多空排列差都沒有變化") + "。");
     }
-    take.push("長線位置：" + T.weekly_start.slice(0, 4) + " 年以來週線淨值的極值是 " + pct(ex.max.net).replace("%", "") + "（" + ex.max.date.slice(0, 7) + "）與 " +
+    take.push("長線位置：" + T.weekly_start.slice(0, 4) + " 年以來週線多空排列差的極值是 " + pct(ex.max.net).replace("%", "") + "（" + ex.max.date.slice(0, 7) + "）與 " +
       pct(ex.min.net).replace("%", "") + "（" + ex.min.date.slice(0, 7) + "），目前 " + pct(T.weekly_latest.sec_net).replace("%", "") +
       (T.pctile_weekly < 30 ? "，處於歷史偏低區" : T.pctile_weekly > 70 ? "，處於歷史偏高區" : "，在歷史中段") +
       "。早年數字受存活者偏差影響偏樂觀，實際的歷史位置可能比這裡顯示的再高一些。");
@@ -1651,8 +1653,8 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
       ]
     });
     document.getElementById("lg-tech-net").innerHTML =
-      "<span><i class='swatch' style='background:" + css("--s1") + "'></i>" + U + "淨值</span>" +
-      "<span><i class='swatch' style='background:" + css("--ink-3") + "'></i>全體成分股淨值</span>";
+      "<span><i class='swatch' style='background:" + css("--s1") + "'></i>" + U + "多空排列差</span>" +
+      "<span><i class='swatch' style='background:" + css("--ink-3") + "'></i>全體成分股多空排列差</span>";
 
     var ex = T.weekly_extremes;
     lineChart(document.getElementById("c-tech-long"), {
@@ -1750,7 +1752,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
       return { y: LY(W[k][n - 1]), c: css(BT_COL[k]), t: btShort(B.indices[k].label) + " " + pct(W[k + "_dd"][n - 1], 0) };
     }).sort(function (a, b) { return a.y - b.y; });
     if (labs[1].y - labs[0].y < 14) labs[1].y = labs[0].y + 14;
-    labs.push({ y: NY(W.net[n - 1]), c: css("--s3"), t: "淨值 " + (W.net[n - 1] >= 0 ? "+" : "") + W.net[n - 1].toFixed(0) });
+    labs.push({ y: NY(W.net[n - 1]), c: css("--s3"), t: (small ? "" : "多空排列差 ") + (W.net[n - 1] >= 0 ? "+" : "") + W.net[n - 1].toFixed(0) });
     labs.forEach(function (lb) {
       svg.appendChild(el("line", { x1: m.l + iw + 4, x2: m.l + iw + 12, y1: lb.y, y2: lb.y, stroke: lb.c, "stroke-width": 2 }));
       svg.appendChild(el("text", { x: m.l + iw + 15, y: lb.y + 4, fill: css("--ink-2"), "font-size": 11, "font-weight": 600 }, lb.t));
@@ -1776,7 +1778,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
         rows += "<div class='tt-r'><span><i style='width:10px;height:2px;background:" + css(BT_COL[k]) + ";display:inline-block'></i>" +
           B.indices[k].label + "</span><b>距高點 " + pct(W[k + "_dd"][i], 1) + "</b></div>";
       });
-      rows += "<div class='tt-r'><span><i style='width:10px;height:2px;background:" + css("--s3") + ";display:inline-block'></i>淨值</span><b>" +
+      rows += "<div class='tt-r'><span><i style='width:10px;height:2px;background:" + css("--s3") + ";display:inline-block'></i>多空排列差</span><b>" +
         (W.net[i] >= 0 ? "+" : "") + W.net[i].toFixed(1) + "</b></div>";
       showTip(rows, ev);
     });
@@ -1809,7 +1811,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
           fill: css(BT_COL[k]) });
         if (r.p_big < 1) bar = el("rect", { x: x, y: Y(0) - 1, width: bw, height: 1, fill: css(BT_COL[k]) });
         bar.addEventListener("mousemove", function (ev) {
-          showTip("<div class='tt-h'>" + B.indices[k].label + "・淨值 " + bucketName(r) + "</div>" +
+          showTip("<div class='tt-h'>" + B.indices[k].label + "・多空排列差 " + bucketName(r) + "</div>" +
             "<div class='tt-r'><span>13 週內再跌 ≥" + Math.abs(B.big_drop) + "%</span><b>" + r.p_big.toFixed(0) + "%</b></div>" +
             "<div class='tt-r'><span>13 週報酬中位數</span><b>" + pct(r.med_fwd_ret, 1) + "</b></div>" +
             "<div class='tt-r'><span>週數</span><b>" + r.weeks + "</b></div>", ev);
@@ -1825,7 +1827,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
         stroke: css("--surface"), "stroke-width": 3, "paint-order": "stroke" },
         B.indices[k].label.replace(/（.*）/, "") + "全期 " + B.by_index[k].base_p_big.toFixed(0) + "%"));
     });
-    svg.appendChild(el("text", { x: m.l + iw / 2, y: h - 1, "text-anchor": "middle", fill: css("--ink-3"), "font-size": 10.5 }, "週線多空淨值區間"));
+    svg.appendChild(el("text", { x: m.l + iw / 2, y: h - 1, "text-anchor": "middle", fill: css("--ink-3"), "font-size": 10.5 }, "週線多空排列差區間"));
     host.innerHTML = ""; host.appendChild(svg);
   }
 
@@ -1840,9 +1842,9 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     var I = B.indices, R = B.by_index, H = B.horizon, BIG = Math.abs(B.big_drop);
     var nm = function (k) { return I[k].label.replace(/（.*）/, ""); };
     var sgn = function (v, d) { return (v >= 0 ? "+" : "") + v.toFixed(d === undefined ? 0 : d); };
-    document.getElementById("bt-h2").textContent = U + "淨值能預警大跌嗎";
+    document.getElementById("bt-h2").textContent = U + "多空排列差能預警大跌嗎";
     document.getElementById("bt-sub").textContent =
-      "把上一節的週線淨值（" + B.start.slice(0, 7) + " 起，" + B.weeks + " 週）和兩個用成分股重建的週線指數對照：" +
+      "把上一節的週線多空排列差（" + B.start.slice(0, 7) + " 起，" + B.weeks + " 週）和兩個用成分股重建的週線指數對照：" +
       BT_KEYS.map(function (k) { return I[k].label + " " + I[k].n + " 檔"; }).join("、") +
       "，皆為市值加權、逐週連鎖。半導體有 " + I.semi.overlap_n + " 檔（市值 " + I.semi.overlap_cap.toFixed(0) + "%）也在" + sU +
       "名單裡，科技類股則是 " + I.tech.overlap_n + " 檔（" + I.tech.overlap_cap.toFixed(0) + "%），兩者部分是拿自己比自己，判讀時要記得。" +
@@ -1853,17 +1855,17 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
       stat("與過去 " + H + " 週報酬的相關", R.tech.corr_past.toFixed(2), "半導體 " + R.semi.corr_past.toFixed(2) + "；排名相關（Spearman）") +
       stat("與未來 " + H + " 週最大跌幅的相關", sgn(R.tech.corr_fwd_mdd, 2), "半導體 " + sgn(R.semi.corr_fwd_mdd, 2) + "；接近 0 代表沒有預測力") +
       stat("與未來 " + H + " 週報酬的相關", sgn(R.tech.corr_fwd_ret, 2), "半導體 " + sgn(R.semi.corr_fwd_ret, 2)) +
-      stat("目前淨值", sgn(B.net_now, 1), "科技距高點 " + pct(R.tech.dd_now, 1) + "；半導體 " + pct(R.semi.dd_now, 1));
+      stat("目前多空排列差", sgn(B.net_now, 1), "科技距高點 " + pct(R.tech.dd_now, 1) + "；半導體 " + pct(R.semi.dd_now, 1));
 
-    document.getElementById("bt-h-time").textContent = "時間序列：" + BT_KEYS.map(nm).join("、") + "指數與" + sU + "淨值（週線）";
+    document.getElementById("bt-h-time").textContent = "時間序列：" + BT_KEYS.map(nm).join("、") + "指數與" + sU + "多空排列差（週線）";
     document.getElementById("bt-time-def").textContent =
       "上：兩個指數，" + B.start.slice(0, 7) + " = 100，對數刻度，方便比較不同年代的漲跌幅。中：每段色條是一次跌幅達 " +
-      Math.abs(B.episode_dd) + "% 的下跌，從高點畫到低點。下：淨值。虛線與三角形標出淨值由正轉負的每一週。";
+      Math.abs(B.episode_dd) + "% 的下跌，從高點畫到低點。下：多空排列差。虛線與三角形標出多空排列差由正轉負的每一週。";
     document.getElementById("lg-bt-time").innerHTML = BT_KEYS.map(function (k) {
       return "<span><i class='swatch' style='background:" + css(BT_COL[k]) + "'></i>" + I[k].label + "指數</span>";
-    }).join("") + "<span><i class='swatch' style='background:" + css("--s3") + "'></i>" + U + "淨值</span>" +
+    }).join("") + "<span><i class='swatch' style='background:" + css("--s3") + "'></i>" + U + "多空排列差</span>" +
       "<span><i style='display:inline-block;width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid " +
-      css("--ink-2") + "'></i>淨值跌破 0</span>";
+      css("--ink-2") + "'></i>多空排列差跌破 0</span>";
 
     // episodes table + per-episode verdict
     var verdict = function (e) {
@@ -1884,11 +1886,11 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
         ]);
       });
     });
-    fillTable("t-bt-eps", ["指數", "高點", "低點", "跌幅", "高點時淨值", "期間最低淨值", "淨值跌破 0", "先後"], epRows);
+    fillTable("t-bt-eps", ["指數", "高點", "低點", "跌幅", "高點時多空排列差", "期間最低多空排列差", "多空排列差跌破 0", "先後"], epRows);
     document.getElementById("bt-eps-cap").textContent = "跌幅達 " + Math.abs(B.episode_dd) + "% 的每一次下跌；只看高點前 " + H +
       " 週到低點之間的第一次跌破。*進行中：到資料日仍在高點之下，跌幅是到目前為止。";
 
-    fillTable("t-bt-buckets", ["週線淨值", "週數"].concat(BT_KEYS.reduce(function (a, k) {
+    fillTable("t-bt-buckets", ["週線多空排列差", "週數"].concat(BT_KEYS.reduce(function (a, k) {
       return a.concat([nm(k) + " 再跌 ≥" + BIG + "%", nm(k) + " 報酬中位數"]);
     }, [])), R.tech.buckets.map(function (b, j) {
       return [{ html: bucketName(b), cls: "mono" }, { html: String(b.weeks), cls: "n" }].concat(BT_KEYS.reduce(function (a, k) {
@@ -1900,8 +1902,8 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
       BT_KEYS.reduce(function (a, k) { return a.concat([{ html: R[k].base_p_big.toFixed(0) + "%", cls: "n" }, { html: pct(R[k].base_med_fwd_ret, 1), cls: "n" }]); }, []))]));
     document.getElementById("bt-buckets-cap").textContent = "未來 " + H + " 週內再跌 ≥" + BIG + "% 的週數比例，以及 " + H +
       " 週後報酬的中位數。紅字＝高於全期平均。最近 " + H + " 週還看不到結果，不計入。";
-    document.getElementById("bt-h-bucket").textContent = "淨值低的時候，接下來 " + H + " 週再跌 ≥" + BIG + "% 的機率";
-    document.getElementById("bt-bucket-def").textContent = "依當週淨值分組；虛線是不分淨值的全期比例。";
+    document.getElementById("bt-h-bucket").textContent = "多空排列差低的時候，接下來 " + H + " 週再跌 ≥" + BIG + "% 的機率";
+    document.getElementById("bt-bucket-def").textContent = "依當週多空排列差分組；虛線是不分多空排列差的全期比例。";
     document.getElementById("lg-bt-bucket").innerHTML = BT_KEYS.map(function (k) {
       return "<span><i class='swatch' style='height:10px;background:" + css(BT_COL[k]) + "'></i>" + I[k].label + "</span>";
     }).join("");
@@ -1922,9 +1924,9 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     var take = [], T = R.tech, S = R.semi;
     var follows = Math.min(T.corr_past, S.corr_past) >= 0.5 &&
       Math.max(Math.abs(T.corr_fwd_mdd), Math.abs(S.corr_fwd_mdd), Math.abs(T.corr_fwd_ret), Math.abs(S.corr_fwd_ret)) < 0.2;
-    take.push("先看相關：淨值和過去 " + H + " 週報酬的排名相關是 " + T.corr_past.toFixed(2) + "（科技）與 " + S.corr_past.toFixed(2) +
+    take.push("先看相關：多空排列差和過去 " + H + " 週報酬的排名相關是 " + T.corr_past.toFixed(2) + "（科技）與 " + S.corr_past.toFixed(2) +
       "（半導體），和未來 " + H + " 週最大跌幅只有 " + sgn(T.corr_fwd_mdd, 2) + " 與 " + sgn(S.corr_fwd_mdd, 2) + "。" +
-      (follows ? "淨值描述的是已經發生的漲跌，對接下來會不會大跌幾乎沒有解釋力——均線排列本來就要等價格先動。"
+      (follows ? "多空排列差描述的是已經發生的漲跌，對接下來會不會大跌幾乎沒有解釋力——均線排列本來就要等價格先動。"
         : "兩邊都有一定關聯，不能只當成落後指標。"));
     var agg = function (r, low) {
       var bs = r.buckets.filter(function (b) { return low ? b.hi <= 20 : b.lo >= 20; });
@@ -1934,16 +1936,16 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     };
     var tl = agg(T, true), th = agg(T, false), sl = agg(S, true), sh = agg(S, false);
     var retGap = Math.max(Math.abs(tl.ret - th.ret), Math.abs(sl.ret - sh.ret));
-    take.push("風險，而非方向：淨值 ≤ +20 的週，之後 " + H + " 週內再跌 ≥" + BIG + "% 的比例是科技 " + tl.p.toFixed(0) + "%、半導體 " +
+    take.push("風險，而非方向：多空排列差 ≤ +20 的週，之後 " + H + " 週內再跌 ≥" + BIG + "% 的比例是科技 " + tl.p.toFixed(0) + "%、半導體 " +
       sl.p.toFixed(0) + "%，" + (tl.p > 1.5 * th.p && sl.p > 1.5 * sh.p ? "明顯高於" : tl.p > th.p && sl.p > sh.p ? "略高於" : "對照") +
-      "淨值 > +20 時的 " + th.p.toFixed(0) + "% 與 " + sh.p.toFixed(0) + "%。但同樣兩組的 " + H + " 週報酬中位數（加權）是科技 " +
+      "多空排列差 > +20 時的 " + th.p.toFixed(0) + "% 與 " + sh.p.toFixed(0) + "%。但同樣兩組的 " + H + " 週報酬中位數（加權）是科技 " +
       pct(tl.ret, 1) + " 對 " + pct(th.ret, 1) + "、半導體 " + pct(sl.ret, 1) + " 對 " + pct(sh.ret, 1) +
-      (retGap < 3 ? "，相差不大——低淨值代表接下來波動變大，不代表報酬變差。" : tl.ret < th.ret && sl.ret < sh.ret ? "，低淨值之後報酬也較差。" : "，低淨值之後報酬反而較好，多半是跌深後的反彈。"));
+      (retGap < 3 ? "，相差不大——低多空排列差代表接下來波動變大，不代表報酬變差。" : tl.ret < th.ret && sl.ret < sh.ret ? "，低多空排列差之後報酬也較差。" : "，低多空排列差之後報酬反而較好，多半是跌深後的反彈。"));
     BT_KEYS.forEach(function (k) {
       var eps = R[k].episodes, early = eps.filter(function (e) { return e.cross && e.lead_weeks < 0; }),
         late = eps.filter(function (e) { return e.cross && e.lead_weeks >= 0; }), none = eps.filter(function (e) { return !e.cross; });
       take.push(nm(k) + "的 " + eps.length + " 次大跌（≥" + Math.abs(B.episode_dd) + "%）：" +
-        (early.length ? "淨值提前跌破 0 的 " + early.length + " 次，之後指數又漲 " + early.map(function (e) { return e.cross_to_peak.toFixed(0) + "%"; }).join("、") + " 才見頂" : "沒有一次提前跌破 0") +
+        (early.length ? "多空排列差提前跌破 0 的 " + early.length + " 次，之後指數又漲 " + early.map(function (e) { return e.cross_to_peak.toFixed(0) + "%"; }).join("、") + " 才見頂" : "沒有一次提前跌破 0") +
         (late.length ? "；落後的 " + late.length + " 次，跌破時指數已從高點跌了 " + late.map(function (e) { return Math.abs(e.at_cross).toFixed(0) + "%"; }).join("、") : "") +
         (none.length ? "；" + none.length + " 次從頭到尾沒跌破 0（" + none.map(function (e) { return e.peak.slice(0, 7); }).join("、") + "）" : "") + "。");
     });
@@ -1956,11 +1958,11 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     take.push("當訊號用：" + c0.txt + "。" + dv.txt + (dv.t.n_done < 8 ? "——這是唯一偏向領先的組合，但樣本只有 " + dv.t.n_done + " 次，不足以下結論。" : "。"));
     var now = T.signals.filter(function (s) { return s.pending.length; }).map(function (s) { return s.id; });
     var dp = sigTxt("deep40");
-    take.push("現在：淨值 " + sgn(B.net_now, 1) + "（4 週變化 " + sgn(B.d4_now, 0) + "），科技距高點 " + pct(T.dd_now, 1) + "、半導體 " +
-      pct(S.dd_now, 1) + "。" + (now.indexOf("deep40") >= 0 ? "淨值剛跌破 -40；歷史上" + dp.txt +
-        (dp.t.hits * 2 === dp.t.n_done ? "——繼續大跌與見底各占一半，淨值本身分不出這次是哪一種。" : "。")
+    take.push("現在：多空排列差 " + sgn(B.net_now, 1) + "（4 週變化 " + sgn(B.d4_now, 0) + "），科技距高點 " + pct(T.dd_now, 1) + "、半導體 " +
+      pct(S.dd_now, 1) + "。" + (now.indexOf("deep40") >= 0 ? "多空排列差剛跌破 -40；歷史上" + dp.txt +
+        (dp.t.hits * 2 === dp.t.n_done ? "——繼續大跌與見底各占一半，多空排列差本身分不出這次是哪一種。" : "。")
         : now.length ? "近 " + H + " 週有訊號出現，結果還要等。" : "近 " + H + " 週沒有訊號。"));
-    take.push("限制：相鄰週的 " + H + " 週窗口彼此重疊，真正獨立的只有約 " + B.independent_windows + " 段；指數與淨值都用今天的成分股回推，" +
+    take.push("限制：相鄰週的 " + H + " 週窗口彼此重疊，真正獨立的只有約 " + B.independent_windows + " 段；指數與多空排列差都用今天的成分股回推，" +
       "早年有存活者偏差；半導體指數與" + sU + "名單重疊很高，兩者的同步有一部分是同一批股票。");
     document.getElementById("bt-take").innerHTML = take.map(function (t, i) {
       return "<li data-i='" + String(i + 1).padStart(2, "0") + "'><span>" + t + "</span></li>";
@@ -1969,8 +1971,8 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     var cr = B.zero_crosses.length, all = R.tech.episodes.concat(R.semi.episodes);
     var nE = all.filter(function (e) { return e.cross && e.lead_weeks < 0; }).length,
       nL = all.filter(function (e) { return e.cross && e.lead_weeks >= 0; }).length, nN = all.length - nE - nL;
-    document.getElementById("cap-bt-time").textContent = "期間淨值共 " + cr + " 週由正轉負（" + H + " 週內重複的只算一次則為 " +
-      R.tech.signals[0].n + " 次），最近一次是 " + B.zero_crosses[cr - 1] + "。兩個指數合計 " + all.length + " 次大跌中，淨值在高點之後才跌破 0 的 " +
+    document.getElementById("cap-bt-time").textContent = "期間多空排列差共 " + cr + " 週由正轉負（" + H + " 週內重複的只算一次則為 " +
+      R.tech.signals[0].n + " 次），最近一次是 " + B.zero_crosses[cr - 1] + "。兩個指數合計 " + all.length + " 次大跌中，多空排列差在高點之後才跌破 0 的 " +
       nL + " 次、高點之前 " + nE + " 次、沒跌破 " + nN + " 次" + (nL > nE + nN ? "——多數時候它確認下跌，而不是預告。" : "。") +
       "指數為成分股重建，不是官方指數。";
     document.getElementById("cap-bt-bucket").textContent = "滑過長條可看週數與報酬中位數。";

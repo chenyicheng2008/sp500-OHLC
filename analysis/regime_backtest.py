@@ -173,10 +173,10 @@ def main() -> None:
                             "med_fwd_mdd": round(100 * float(m.median()), 1)})
         signals = []
         for sid, label, cond in [
-            ("cross0", "淨值由正轉負（跌破 0）", (df["net"] < 0) & (df["net"].shift(1) >= 0)),
-            ("drop50", "4 週內淨值下降 50 點以上", d4 <= -50),
-            ("diverge", "指數距高點 3% 以內，淨值卻 ≤ 0", near_high & (df["net"] <= 0)),
-            ("deep40", "淨值跌破 -40", (df["net"] <= -40) & (df["net"].shift(1) > -40)),
+            ("cross0", "多空排列差由正轉負（跌破 0）", (df["net"] < 0) & (df["net"].shift(1) >= 0)),
+            ("drop50", "4 週內多空排列差下降 50 點以上", d4 <= -50),
+            ("diverge", "指數距高點 3% 以內，多空排列差卻 ≤ 0", near_high & (df["net"] <= 0)),
+            ("deep40", "多空排列差跌破 -40", (df["net"] <= -40) & (df["net"].shift(1) > -40)),
         ]:
             idx = declustered(cond)
             done = [t for t in idx if base[t]]
