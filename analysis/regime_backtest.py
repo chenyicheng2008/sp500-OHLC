@@ -35,6 +35,11 @@ REPO = Path(__file__).resolve().parent.parent
 H = 13                      # forward / backward horizon, weeks
 BIG_DROP = -0.10            # "large fall": max drawdown within the next H weeks
 EPISODE_DD = -0.15          # peak-to-trough drawdown that counts as an episode
+# "Spread slides from a high": it reaches `zone`, then falls `drop` points below the highest
+# reading since it got there. One trigger per visit to the zone.
+SLIDES = [{"id": "base", "zone": 60, "drop": 30}, {"id": "strict", "zone": 80, "drop": 40}]
+CORRECTIONS = (-0.10, -0.15, -0.20)  # drawdown from the index's running high
+WAIT_MAX = 52                         # weeks of follow-up for the waiting-time view
 BUCKETS = [-101, -50, -20, 20, 50, 80, 101]
 INDICES = {
     "tech": ("科技類股", lambda m: m["Sector"] == "technology"),
@@ -103,8 +108,15 @@ def episodes(level: pd.Series, net: pd.Series) -> list:
         win = net.loc[pk - pd.Timedelta(weeks=H): tr]
         cross = win[(win <= 0) & (win.shift(1) > 0)].index
         c = cross.min() if len(cross) else None
+        # the spread's own high in the year before the index peak; at the start of the series
+        # the window is cut short, so the lead is unknown rather than zero
+        prior = net.loc[pk - pd.Timedelta(weeks=52): pk]
+        full = prior.index[0] > net.index[0] or pk - pd.Timedelta(weeks=52) >= net.index[0]
         rows.append({
             "peak": pk.date().isoformat(), "trough": tr.date().isoformat(), "depth": round(100 * e["depth"], 1),
+            "spread_hi": round(float(prior.max()), 1) if full else None,
+            "spread_hi_date": prior.idxmax().date().isoformat() if full else None,
+            "spread_hi_lead": int((pk - prior.idxmax()).days // 7) if full else None,
             "ongoing": e["open"],
             "net_at_peak": round(float(net.get(pk, np.nan)), 1),
             "net_min": round(float(net.loc[pk:tr].min()), 1),
@@ -116,6 +128,76 @@ def episodes(level: pd.Series, net: pd.Series) -> list:
             "cross_to_trough": round(100 * (level[tr] / level[c] - 1), 1) if c is not None else None,
         })
     return rows
+
+
+def weeks_to(dd: np.ndarray, i: int, thr: float):
+    """Weeks from week i until the drawdown first reaches thr (None if it never does)."""
+    hit = np.nonzero(dd[i:] <= thr)[0]
+    return int(hit[0]) if len(hit) else None
+
+
+def slide_triggers(net: pd.Series, zone: float, drop: float) -> list:
+    out, armed, hi, hi_i = [], False, None, None
+    for i, v in enumerate(net.values):
+        if v >= zone and (not armed or v > hi):
+            armed, hi, hi_i = True, v, i
+        if armed and v <= hi - drop:
+            out.append((i, hi_i))
+            armed = False
+    return out
+
+
+def slide_study(df: pd.DataFrame) -> dict:
+    """After the spread slides from a high, how long until each index corrects -- vs any week."""
+    n, last_ok = len(df), len(df) - 1 - WAIT_MAX       # need a full year of follow-up
+    dd = {k: (df[k] / df[k].cummax() - 1).values for k in INDICES}
+    base = {}
+    curves = {}
+    for k in INDICES:
+        base[k] = {}
+        curves[k] = {}
+        for thr in CORRECTIONS:
+            waits = [weeks_to(dd[k], i, thr) for i in range(last_ok + 1) if dd[k][i] > thr]
+            w = np.array([x if x is not None else 10 ** 6 for x in waits])
+            key = str(round(-100 * thr))
+            base[k][key] = {"n": len(w), **{f"p{h}": round(100 * float((w <= h).mean()), 1) for h in (13, 26, 52)},
+                            "median": float(np.median(w)) if np.median(w) < 10 ** 6 else None}
+            curves[k][key] = {"base": [round(100 * float((w <= h).mean()), 1) for h in range(WAIT_MAX + 1)]}
+    defs = []
+    for d in SLIDES:
+        trig = slide_triggers(df["net"], d["zone"], d["drop"])
+        events = []
+        for i, hi_i in trig:
+            ev = {"date": df.index[i].date().isoformat(), "hi_date": df.index[hi_i].date().isoformat(),
+                  "hi": round(float(df["net"].iloc[hi_i]), 1), "now": round(float(df["net"].iloc[i]), 1),
+                  "complete": i <= last_ok}
+            for k in INDICES:
+                ev[k + "_dd"] = round(100 * float(dd[k][i]), 1)
+                for thr in CORRECTIONS:
+                    ev[f"{k}_w{round(-100 * thr)}"] = weeks_to(dd[k], i, thr)
+                nh = np.nonzero(dd[k][i + 1:] >= 0)[0]                  # next new high, if any
+                ev[k + "_newhigh"] = int(nh[0]) + 1 if len(nh) else None
+            events.append(ev)
+        stats = {}
+        for k in INDICES:
+            stats[k] = {}
+            for thr in CORRECTIONS:
+                key = str(round(-100 * thr))
+                done = [e for e in events if e["complete"]]
+                elig = [e for e in done if e[k + "_dd"] > 100 * thr]      # not already past the line
+                w = np.array([e[f"{k}_w{key}"] if e[f"{k}_w{key}"] is not None else 10 ** 6 for e in elig])
+                # median over every eligible trigger, "never" included -- same basis as the baseline
+                med = float(np.median(w)) if len(w) else None
+                stats[k][key] = {"n": len(elig), "already": len(done) - len(elig),
+                                 **{f"hit{h}": int((w <= h).sum()) for h in (13, 26, 52)},
+                                 "median": med if med is not None and med < 10 ** 6 else None}
+                if d["id"] == SLIDES[0]["id"]:
+                    curves[k][key]["event"] = [round(100 * float((w <= h).mean()), 1) if len(w) else None
+                                               for h in range(WAIT_MAX + 1)]
+        defs.append({**d, "n": len(events), "n_complete": sum(e["complete"] for e in events),
+                     "events": events, "stats": stats})
+    return {"defs": defs, "baseline": base, "curves": curves, "wait_max": WAIT_MAX,
+            "thresholds": [round(-100 * t) for t in CORRECTIONS]}
 
 
 def main() -> None:
@@ -196,6 +278,7 @@ def main() -> None:
         }
     crosses = df.index[(df["net"] < 0) & (df["net"].shift(1) >= 0)]
     res["zero_crosses"] = [t.date().isoformat() for t in crosses]
+    res["slide"] = slide_study(df)
     res["net_now"] = round(float(df["net"].iloc[-1]), 1)
     res["d4_now"] = round(float(d4.iloc[-1]), 1)
     with open(out_dir / "regime_backtest.json", "w", encoding="utf-8") as fh:
@@ -207,6 +290,14 @@ def main() -> None:
               f"base P(≤{res['big_drop']}%) {r['base_p_big']}%; {len(r['episodes'])} episodes; dd now {r['dd_now']}%")
         for s in r["signals"]:
             print(f"    {s['id']}: {s['hits']}/{s['n_done']} hits, median fwd {s['med_fwd_ret']}%, pending {s['pending']}")
+    sl = res["slide"]
+    for d in sl["defs"]:
+        print(f"  slide ≥{d['zone']} then -{d['drop']}: {d['n']} triggers ({d['n_complete']} with {WAIT_MAX}w follow-up)")
+        for k in INDICES:
+            for key, st in d["stats"][k].items():
+                b = sl["baseline"][k][key]
+                print(f"    {k} -{key}%: 13/26/52w {st['hit13']}/{st['hit26']}/{st['hit52']} of {st['n']} "
+                      f"(baseline {b['p13']}/{b['p26']}/{b['p52']}%), median wait {st['median']} vs {b['median']}")
 
 
 if __name__ == "__main__":

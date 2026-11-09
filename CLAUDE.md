@@ -209,6 +209,19 @@ net (2015-08 → 2026-11, 587 weeks): **no — it confirms, it doesn't warn.**
   before it 5× (index then rose another 7-28% first), never 2× (tech 2025-10, semi 2024-03).
 - Signals are declustered (13w); signals inside the last 13w are "尚無結果", never counted.
   Only 45 non-overlapping 13w windows exist — say so whenever quoting these rates.
+- **Slide from a high → how long to a correction?** (asked 2026-11-09, `slide_study()`).
+  A slide = net reaches `zone`, then falls `drop` below the highest reading since; one
+  trigger per visit (base 60/30 → 33 triggers, strict 80/40 → 11). Correction = index
+  drawdown from its running high reaching -10/-15/-20%. Compared against **any week**,
+  and both sides count only start weeks not already past the line and with 52 weeks of
+  follow-up. That eligibility rule matters: the first chat answer counted already-down
+  triggers as "0 weeks" and showed tech -10% within 26w as 9/29 (31%); on the fair basis
+  it is 5/25 (20%) vs 40% for any week; semi 12/25 (48%) vs 63%. Median wait for -10%:
+  tech 47 w vs 36, semi 30 vs 17 — slides are followed by corrections *later*, not sooner.
+  Strict slides: tech -15% within 26w 0/9, and every one saw a new high within 52 weeks.
+  The spread's own high led the index peak by 0-52 weeks (median 45) across 13 episodes —
+  only matchable in hindsight; the read-out says so. "只有" and 「多半是行情中的休息」 are
+  conditional on those comparisons, not fixed text.
 - Every read-out clause picks its connective from the numbers (「明顯高於/略高於/對照」,
   「相差不大」 only when the return gap < 3 points, 「各占一半」 only when hits = half).
   The first draft put 「明顯較高」 after the *lower* group's figures — read the sentence
