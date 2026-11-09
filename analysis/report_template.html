@@ -469,6 +469,12 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     <figcaption id="cap-bt-cyc"></figcaption>
   </figure>
   <div class="tw"><table id="t-bt-cyc"><caption>週期比較表<small id="bt-cyc-cap">—</small></caption></table></div>
+  <div class="panel" style="margin-top:22px">
+    <div class="panel-head"><h3>多空排列差與指數的背離</h3><p id="bt-div-def">—</p></div>
+    <div style="height:14px"></div>
+  </div>
+  <div class="tw"><table id="t-bt-div"><caption>背離清單<small id="bt-div-cap">—</small></caption></table></div>
+  <div class="tw"><table id="t-bt-div-sum"><caption>背離之後：與所有高點比較<small id="bt-div-sum-cap">—</small></caption></table></div>
   <div class="tw"><table id="t-bt-legs"><caption id="bt-legs-h">—<small id="bt-legs-cap">—</small></caption></table></div>
   <figure class="panel">
     <div class="panel-head"><h3 id="bt-h-bucket">—</h3><p id="bt-bucket-def">—</p></div>
@@ -1929,6 +1935,22 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     };
     BT_KEYS.forEach(function (k) { line(W[k], LY, css(BT_COL[k])); });
     line(W.net, NY, css("--s3"));
+    // divergences: connect the two compared highs, on the spread and on that index
+    if (B.divergence) {
+      var seenNet = {};
+      BT_KEYS.forEach(function (k) {
+        B.divergence.by_index[k].rows.forEach(function (r) {
+          var a = idx[r.h1], b = idx[r.h2], ia = idx[r.i1], ib = idx[r.i2], col = css(DIV_COL[r.type]);
+          if (ia !== undefined && ib !== undefined)
+            svg.appendChild(el("line", { x1: X(ia), y1: LY(W[k][ia]) - 6, x2: X(ib), y2: LY(W[k][ib]) - 6, stroke: col, "stroke-width": 2.5, "stroke-linecap": "round" }));
+          if (a === undefined || b === undefined || seenNet[r.h1 + r.h2 + r.type]) return;
+          seenNet[r.h1 + r.h2 + r.type] = true;
+          svg.appendChild(el("line", { x1: X(a), y1: NY(r.h1_val) - 6, x2: X(b), y2: NY(r.h2_val) - 6, stroke: col, "stroke-width": 2.5, "stroke-linecap": "round" }));
+          svg.appendChild(el("text", { x: X(b), y: NY(r.h2_val) - 11, "text-anchor": "middle", fill: css("--ink"), "font-size": 10.5, "font-weight": 700,
+            stroke: css("--surface"), "stroke-width": 3, "paint-order": "stroke" }, r.type));
+        });
+      });
+    }
     // cycle turning points of the spread (main swing): filled = high, hollow = low
     (B.cycles ? B.cycles.pivots : []).forEach(function (pv) {
       var i = idx[pv.date]; if (i === undefined) return;
@@ -2335,6 +2357,74 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
       "前三大權重合計 " + top(tech, 3).toFixed(0) + "%。" + count(tech) + "。";
   }
 
+  var DIV_TC = { A: "多空強、指數弱", B: "指數強、多空弱" }, DIV_COL = { A: "--warn", B: "--serious" };
+
+  function renderDivergenceStatic(B) {
+    var V = B.divergence;
+    if (!V) return [];
+    var U = B.universe_label, H = V.horizon, BIG = Math.abs(B.big_drop);
+    var nm = function (k) { return btShort(B.indices[k].label); };
+    document.getElementById("bt-div-def").textContent =
+      "高點＝前後 " + V.k + " 週內最高、且至少 +" + V.level + " 的多空排列差讀數；指數在該高點的位置取前後 " + V.w + " 週內的最高點。" +
+      "比較相鄰兩個高點：A 型「" + DIV_TC.A + "」＝多空排列差的高點守住或更高（不比前一個低超過 " + V.tol + " 點），指數卻沒有突破前一個高點；" +
+      "B 型「" + DIV_TC.B + "」（傳統的頂背離）＝指數創了更高的高點，多空排列差的高點卻比前一個低超過 " + V.tol + " 點。" +
+      "時間序列圖上以連線標出（黃色 A、橘色 B），兩端是被比較的兩個高點。";
+    var rows = [];
+    BT_KEYS.forEach(function (k) {
+      V.by_index[k].rows.forEach(function (r) {
+        rows.push([{ html: "<b style='color:" + css(DIV_COL[r.type]) + "'>" + r.type + "</b> " + DIV_TC[r.type] },
+          { html: nm(k) },
+          { html: r.h1 + " → " + r.h2, cls: "mono" },
+          { html: "+" + r.h1_val.toFixed(0) + " → " + (r.h2_val >= 0 ? "+" : "") + r.h2_val.toFixed(0), cls: "n" },
+          { html: pct(r.idx_chg, 1), cls: "n" },
+          { html: r.ret13 === null ? "—" : pct(r.ret13, 1), cls: "n" },
+          { html: r.ret26 === null ? "尚無結果" : pct(r.ret26, 1), cls: "n" },
+          { html: pct(r.mdd26, 1) + (r.complete ? "" : "*"), cls: "n", color: r.mdd26 <= -BIG ? css("--neg") : null }]);
+      });
+    });
+    rows.sort(function (a, b) { return a[2].html < b[2].html ? 1 : -1; });
+    fillTable("t-bt-div", ["型態", "指數", "兩個高點", "多空排列差", "指數高點變化", H + " 週後", 2 * H + " 週後", 2 * H + " 週內最大跌幅"], rows);
+    document.getElementById("bt-div-cap").textContent = "新到舊。報酬與跌幅都從第二個高點那週起算。*尚未滿 " + 2 * H +
+      " 週，是到資料日為止的跌幅。紅字＝跌幅達 " + BIG + "%。";
+    var sumRows = [];
+    BT_KEYS.forEach(function (k) {
+      ["A", "B", "all_highs"].forEach(function (t) {
+        var x = V.by_index[k].summary[t];
+        sumRows.push([{ html: nm(k) }, { html: t === "all_highs" ? "所有相鄰高點（對照）" : t + " " + DIV_TC[t] },
+          { html: x.n + " 次", cls: "n" }, { html: x.n_done ? x.hits + " / " + x.n_done : "—", cls: "n" },
+          { html: x.med_ret13 === null ? "—" : pct(x.med_ret13, 1), cls: "n" }, { html: x.med_ret26 === null ? "—" : pct(x.med_ret26, 1), cls: "n" },
+          { html: x.med_mdd26 === null ? "—" : pct(x.med_mdd26, 1), cls: "n" }]);
+      });
+    });
+    fillTable("t-bt-div-sum", ["指數", "型態", "次數", 2 * H + " 週內跌 ≥" + BIG + "%", H + " 週報酬中位數", 2 * H + " 週報酬中位數", 2 * H + " 週最大跌幅中位數"], sumRows);
+    document.getElementById("bt-div-sum-cap").textContent = "只計已滿 " + 2 * H + " 週的次數。對照組是每一對相鄰高點（不論是否背離）之後的表現。";
+
+    // read-out
+    var lines = [];
+    var txt = BT_KEYS.map(function (k) {
+      var S = V.by_index[k].summary;
+      return nm(k) + "：A 型 " + S.A.n + " 次、B 型 " + S.B.n + " 次；B 型之後 " + 2 * H + " 週內跌 ≥" + BIG + "% 的 " + S.B.hits + "/" + S.B.n_done +
+        "（所有高點 " + S.all_highs.hits + "/" + S.all_highs.n_done + "），" + 2 * H + " 週報酬中位數 " + pct(S.B.med_ret26, 1) + "（所有高點 " + pct(S.all_highs.med_ret26, 1) + "）";
+    });
+    var bWeaker = BT_KEYS.every(function (k) {
+      var S = V.by_index[k].summary;
+      return S.B.n_done && S.B.hits / S.B.n_done > S.all_highs.hits / S.all_highs.n_done + 0.1;
+    });
+    var aRare = BT_KEYS.every(function (k) { return V.by_index[k].summary.A.n <= 2; });
+    lines.push("背離：" + txt.join("；") + "。" +
+      (aRare ? "A 型（多空排列差守在高檔、指數卻過不了前高）在這段期間很少出現，樣本不足以下結論。" : "") +
+      (bWeaker ? "B 型之後下跌的比例明顯偏高。" : "B 型（傳統頂背離）之後並沒有比一般高點更常大跌——這個指標的頂背離不是可靠的賣出訊號。"));
+    var latest = [];
+    BT_KEYS.forEach(function (k) { var r = V.by_index[k].rows; if (r.length && !r[r.length - 1].complete) latest.push({ k: k, r: r[r.length - 1] }); });
+    if (latest.length) {
+      lines.push("最近一次：" + latest.map(function (x) {
+        return nm(x.k) + " " + x.r.type + " 型（" + x.r.h1 + " +" + x.r.h1_val.toFixed(0) + " → " + x.r.h2 + " +" + x.r.h2_val.toFixed(0) +
+          "，指數高點 " + pct(x.r.idx_chg, 1) + "），之後到資料日最大跌幅 " + pct(x.r.mdd26, 1);
+      }).join("；") + "。還沒滿 " + 2 * H + " 週，不計入上面的統計。");
+    }
+    return lines;
+  }
+
   function renderBacktestStatic() {
     var sec = document.getElementById("bt"), B = D.backtest;
     if (!B) { sec.hidden = true; return; }
@@ -2368,7 +2458,9 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
       "<span><i style='display:inline-block;width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid " +
       css("--ink-2") + "'></i>多空排列差跌破 0</span>" +
       (B.cycles ? "<span><i class='swatch dot' style='background:" + css("--s3") + "'></i>週期高點</span><span><i class='swatch dot' style='background:transparent;border:2px solid " +
-        css("--s3") + ";box-sizing:border-box'></i>週期低點</span>" : "");
+        css("--s3") + ";box-sizing:border-box'></i>週期低點</span>" : "") +
+      (B.divergence ? "<span><i class='swatch' style='height:3px;background:" + css(DIV_COL.A) + "'></i>A 背離（多空強、指數弱）</span>" +
+        "<span><i class='swatch' style='height:3px;background:" + css(DIV_COL.B) + "'></i>B 背離（指數強、多空弱）</span>" : "");
 
     // episodes table + per-episode verdict
     var verdict = function (e) {
@@ -2469,6 +2561,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
         : now.length ? "近 " + H + " 週有訊號出現，結果還要等。" : "近 " + H + " 週沒有訊號。"));
     renderSlideStatic(B).forEach(function (t) { take.push(t); });
     renderCycleStatic(B).forEach(function (t) { take.push(t); });
+    renderDivergenceStatic(B).forEach(function (t) { take.push(t); });
     var leads = [];
     BT_KEYS.forEach(function (k) { R[k].episodes.forEach(function (e) { if (e.spread_hi_lead !== null) leads.push(e.spread_hi_lead); }); });
     if (leads.length) {

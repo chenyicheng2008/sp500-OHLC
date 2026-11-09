@@ -232,6 +232,18 @@ net (2015-08 → 2026-11, 587 weeks): **no — it confirms, it doesn't warn.**
   leg (from the final confirmed pivot to the data date) is shown as 進行中 and kept out
   of the averages; on 2026-11-06 it ran 57 weeks from +100 (2025-10-03) because the
   2026 swings never reversed 60 points.
+- **Divergence** (asked 2026-11-09, `divergence_study()`): spread highs = max within ±6
+  weeks and ≥ +40; the index "at" a high = its max within ±3 weeks. Consecutive highs:
+  **A 多空強、指數弱** (the user's definition: spread holds/rises, ≥ previous − 5, but the
+  index doesn't clear the previous high) and **B 指數強、多空弱** (classic top divergence:
+  index higher high, spread > 5 points lower). As of 2026-11-06: A only 1× per index; B
+  8× tech / 7× semi, and after B the 26w ≥10% fall rate (0/7, 1/6) is not above all highs
+  (5/30, 7/30) — not a reliable sell signal; the read-out picks that wording from the
+  rates. Latest: B on 2026-04-24 (+86) → 2026-10-02 (+68) with tech +11.9% / semi +7.4%
+  higher highs, then -14.3% / -24.9% so far (pending, not counted). Drawn on the timeline
+  as connectors between the two compared highs (amber A, orange B) on the spread and the
+  index panels. The zig-zag pivots (R=60) are too coarse for this — 2026-10-02 is not a
+  confirmed pivot — which is why divergence uses its own local-high rule.
 - Every read-out clause picks its connective from the numbers (「明顯高於/略高於/對照」,
   「相差不大」 only when the return gap < 3 points, 「各占一半」 only when hits = half).
   The first draft put 「明顯較高」 after the *lower* group's figures — read the sentence

@@ -46,6 +46,14 @@ WAIT_MAX = 52                         # weeks of follow-up for the waiting-time 
 SPREAD_SWINGS = (40, 60, 80)          # points of 多空排列差
 MAIN_SWING = 60
 INDEX_SWING = 0.15                    # index reversal, same size as an episode
+# Divergence between the spread's highs and the index's highs (asked 2026-11-09).
+# A spread high = the highest reading within ±DIV_K weeks, at least DIV_LEVEL. For two
+# consecutive highs, the index high "at" each is its max within ±DIV_W weeks.
+#   A ("多空強、指數弱"): spread holds or rises (≥ previous − DIV_TOL) but the index does not
+#     clear the previous high -- the pattern the user described.
+#   B ("指數強、多空弱", classic top divergence): index makes a higher high while the spread's
+#     high is more than DIV_TOL lower.
+DIV_K, DIV_LEVEL, DIV_W, DIV_TOL = 6, 40, 3, 5
 BUCKETS = [-101, -50, -20, 20, 50, 80, 101]
 INDICES = {
     "tech": ("科技類股", lambda m: m["Sector"] == "technology"),
@@ -295,6 +303,53 @@ def constituents(daily: pd.DataFrame, meta: pd.DataFrame, tickers: list, group_o
     return sorted(rows, key=lambda r: -(r["cap_bn"] or 0))
 
 
+def spread_highs(net: np.ndarray) -> list:
+    out = []
+    for i in range(len(net)):
+        win = net[max(0, i - DIV_K): i + DIV_K + 1]
+        if net[i] >= DIV_LEVEL and net[i] == win.max() and (not out or i - out[-1] > DIV_K):
+            out.append(i)
+    return out
+
+
+def divergence_study(df: pd.DataFrame) -> dict:
+    net, n = df["net"].values, len(df)
+    dates = [d.date().isoformat() for d in df.index]
+    highs = spread_highs(net)
+    res = {"k": DIV_K, "level": DIV_LEVEL, "w": DIV_W, "tol": DIV_TOL, "horizon": H,
+           "highs": [{"date": dates[i], "value": round(float(net[i]), 1)} for i in highs], "by_index": {}}
+    for k in INDICES:
+        lv = df[k].values
+        near = lambda i: max(range(max(0, i - DIV_W), min(n, i + DIV_W + 1)), key=lambda j: lv[j])
+        def after(b):
+            done = b + 2 * H < n
+            return {"complete": done,
+                    "ret13": round(100 * float(lv[b + H] / lv[b] - 1), 1) if b + H < n else None,
+                    "ret26": round(100 * float(lv[b + 2 * H] / lv[b] - 1), 1) if done else None,
+                    "mdd26": round(100 * float(lv[b:min(n, b + 2 * H + 1)].min() / lv[b] - 1), 1)}
+        rows, base = [], []
+        for a, b in zip(highs, highs[1:]):
+            ia, ib = near(a), near(b)
+            hold, new_hi = net[b] >= net[a] - DIV_TOL, lv[ib] > lv[ia]
+            typ = "A" if hold and not new_hi else "B" if new_hi and not hold else None
+            out = after(b)
+            base.append(out)
+            if typ:
+                rows.append({"type": typ, "h1": dates[a], "h1_val": round(float(net[a]), 1),
+                             "h2": dates[b], "h2_val": round(float(net[b]), 1),
+                             "i1": dates[ia], "i2": dates[ib], "i1_lvl": round(float(lv[ia]), 2), "i2_lvl": round(float(lv[ib]), 2),
+                             "idx_chg": round(100 * float(lv[ib] / lv[ia] - 1), 1), **out})
+        def summ(xs):
+            done = [x for x in xs if x["complete"]]
+            med = lambda key: round(float(np.median([x[key] for x in done])), 1) if done else None
+            return {"n": len(xs), "n_done": len(done), "hits": sum(x["mdd26"] <= 100 * BIG_DROP for x in done),
+                    "med_ret13": med("ret13"), "med_ret26": med("ret26"), "med_mdd26": med("mdd26")}
+        res["by_index"][k] = {"rows": rows, "summary": {
+            "A": summ([r for r in rows if r["type"] == "A"]), "B": summ([r for r in rows if r["type"] == "B"]),
+            "all_highs": summ(base)}}
+    return res
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--data-dir", default=os.environ.get("FETCH_BASE", str(REPO / "data" / "weekly_reutin")))
@@ -375,6 +430,7 @@ def main() -> None:
     res["zero_crosses"] = [t.date().isoformat() for t in crosses]
     res["slide"] = slide_study(df)
     res["cycles"] = cycle_study(df)
+    res["divergence"] = divergence_study(df)
     # constituent lists: the regime universe (every name counts once in the spread) and each
     # rebuilt index (cap-weighted)
     res["constituents"] = {"universe": constituents(daily, meta, [t for t in reg["group_of"] if t in daily.columns], reg["group_of"])}
@@ -396,6 +452,9 @@ def main() -> None:
         print(f"  cycle {row['series']} swing {row['swing']}: {row['n_cycles']} cycles, peak-peak mean {row['pp_mean']} "
               f"median {row['pp_median']} ({row['min']}-{row['max']}), up {row['up_mean']} down {row['down_mean']}")
     print(f"  acf: {res['cycles']['acf']}")
+    for k, v in res["divergence"]["by_index"].items():
+        print(f"  divergence {k}: " + ", ".join(f"{t} {s['n']} ({s['hits']}/{s['n_done']} fell ≥{-round(100*BIG_DROP)}% in 26w, "
+              f"median 26w {s['med_ret26']}%)" for t, s in v["summary"].items()))
     sl = res["slide"]
     for d in sl["defs"]:
         print(f"  slide ≥{d['zone']} then -{d['drop']}: {d['n']} triggers ({d['n_complete']} with {WAIT_MAX}w follow-up)")
