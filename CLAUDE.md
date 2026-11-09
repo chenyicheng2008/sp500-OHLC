@@ -222,6 +222,16 @@ net (2015-08 → 2026-11, 587 weeks): **no — it confirms, it doesn't warn.**
   The spread's own high led the index peak by 0-52 weeks (median 45) across 13 episodes —
   only matchable in hindsight; the read-out says so. "只有" and 「多半是行情中的休息」 are
   conditional on those comparisons, not fixed text.
+- **Average cycle** (asked 2026-11-09, `cycle_study()`): turning points by zig-zag — a
+  high/low is confirmed once the series reverses by ≥R. The answer depends on R, so the
+  page lists R = 40/60/80 points (mean peak-to-peak 18 / 34 / 57 weeks as of 2026-11-06);
+  60 drives the chart markers and the legs table. Indices use the same zig-zag on log
+  level with a 15% reversal: tech 86 w, semi 63 w (rises ~73/47 w, falls ~14/13 w).
+  Autocorrelation is the model-free cross-check: zero at 34 w, most negative at 90 w,
+  best re-match only 0.19 at 132 w — weak periodicity; the read-out says so. The last
+  leg (from the final confirmed pivot to the data date) is shown as 進行中 and kept out
+  of the averages; on 2026-11-06 it ran 57 weeks from +100 (2025-10-03) because the
+  2026 swings never reversed 60 points.
 - Every read-out clause picks its connective from the numbers (「明顯高於/略高於/對照」,
   「相差不大」 only when the return gap < 3 points, 「各占一半」 only when hits = half).
   The first draft put 「明顯較高」 after the *lower* group's figures — read the sentence

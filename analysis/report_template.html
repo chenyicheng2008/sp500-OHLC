@@ -442,6 +442,14 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     <figcaption id="cap-bt-time"></figcaption>
   </figure>
   <figure class="panel">
+    <div class="panel-head"><h3>多空排列差的週期，和指數自己的週期比較</h3><p id="bt-cyc-def">—</p></div>
+    <div class="legend" id="lg-bt-cyc"></div>
+    <div class="panel-body"><div id="c-bt-cyc"></div></div>
+    <figcaption id="cap-bt-cyc"></figcaption>
+  </figure>
+  <div class="tw"><table id="t-bt-cyc"><caption>週期比較表<small id="bt-cyc-cap">—</small></caption></table></div>
+  <div class="tw"><table id="t-bt-legs"><caption id="bt-legs-h">—<small id="bt-legs-cap">—</small></caption></table></div>
+  <figure class="panel">
     <div class="panel-head"><h3 id="bt-h-bucket">—</h3><p id="bt-bucket-def">—</p></div>
     <div class="legend" id="lg-bt-bucket"></div>
     <div class="panel-body"><div id="c-bt-bucket"></div></div>
@@ -1760,6 +1768,12 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     };
     BT_KEYS.forEach(function (k) { line(W[k], LY, css(BT_COL[k])); });
     line(W.net, NY, css("--s3"));
+    // cycle turning points of the spread (main swing): filled = high, hollow = low
+    (B.cycles ? B.cycles.pivots : []).forEach(function (pv) {
+      var i = idx[pv.date]; if (i === undefined) return;
+      svg.appendChild(el("circle", { cx: X(i), cy: NY(pv.value), r: 4, fill: pv.kind === "P" ? css("--s3") : css("--surface"),
+        stroke: pv.kind === "P" ? css("--surface") : css("--s3"), "stroke-width": pv.kind === "P" ? 1.5 : 2 }));
+    });
     // end labels: ink text beside a colored tick, spaced so they cannot collide
     var labs = BT_KEYS.map(function (k) {
       return { y: LY(W[k][n - 1]), c: css(BT_COL[k]), t: btShort(B.indices[k].label) + " " + pct(W[k + "_dd"][n - 1], 0) };
@@ -1979,6 +1993,122 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     ];
   }
 
+  // Cycle lengths side by side: one row per series / swing size, a dot per completed cycle,
+  // a tick at the mean. Weeks on one shared x-axis.
+  function btCycleDots(host, B) {
+    var C = B.cycles, rows = C.table, w = Math.max(320, host.clientWidth), small = w < 520;
+    var rowH = 34, m = { t: 8, r: small ? 12 : 20, b: 34, l: small ? 112 : 168 };
+    var h = m.t + rows.length * rowH + m.b, iw = w - m.l - m.r;
+    var mx = 0; rows.forEach(function (r) { r.pp.forEach(function (v) { mx = Math.max(mx, v); }); });
+    mx = Math.ceil((mx + 4) / 26) * 26;
+    var X = function (v) { return m.l + iw * v / mx; };
+    var svg = mkSvg(w, h), mono = "IBM Plex Mono, monospace";
+    for (var v = 0; v <= mx; v += 26) {
+      svg.appendChild(el("line", { x1: X(v), x2: X(v), y1: m.t, y2: h - m.b, stroke: css("--rule"), "stroke-width": 1 }));
+      svg.appendChild(el("text", { x: X(v), y: h - m.b + 15, "text-anchor": "middle", fill: css("--ink-3"), "font-size": 10.5, "font-family": mono }, v));
+    }
+    svg.appendChild(el("text", { x: m.l + iw / 2, y: h - 3, "text-anchor": "middle", fill: css("--ink-3"), "font-size": 10.5 }, "一個完整週期的長度（週，高點到高點）"));
+    rows.forEach(function (r, j) {
+      var y = m.t + rowH * (j + 0.5), col = css(r.series === "net" ? "--s3" : BT_COL[r.series]);
+      svg.appendChild(el("text", { x: m.l - 10, y: y + 4, "text-anchor": "end", fill: css("--ink-2"), "font-size": 11.5,
+        "font-weight": r.series === "net" && r.swing === C.main_swing ? 700 : 500 }, cycName(B, r, small)));
+      r.pp.forEach(function (v) {
+        var d = el("circle", { cx: X(v), cy: y, r: 5, fill: col, "fill-opacity": 0.75, stroke: css("--surface"), "stroke-width": 1.5 });
+        d.addEventListener("mousemove", function (ev) { showTip("<div class='tt-h'>" + cycName(B, r) + "</div><div class='tt-r'><span>這個週期</span><b>" + v + " 週</b></div>", ev); });
+        d.addEventListener("mouseleave", hideTip);
+        svg.appendChild(d);
+      });
+      if (r.pp_mean !== null) {
+        svg.appendChild(el("line", { x1: X(r.pp_mean), x2: X(r.pp_mean), y1: y - 11, y2: y + 11, stroke: css("--ink"), "stroke-width": 2 }));
+        svg.appendChild(el("text", { x: X(r.pp_mean) + 5, y: y - 6, fill: css("--ink"), "font-size": 10.5, "font-weight": 600,
+          stroke: css("--surface"), "stroke-width": 3, "paint-order": "stroke" }, "平均 " + r.pp_mean.toFixed(0)));
+      }
+    });
+    host.innerHTML = ""; host.appendChild(svg);
+  }
+
+  function cycName(B, r, short) {
+    if (r.series === "net") return (short ? "排列差" : "多空排列差") + " ≥" + r.swing + " 點";
+    return btShort(B.indices[r.series].label) + (short ? "" : "指數") + " ≥" + r.swing + "%";
+  }
+
+  function renderCycleStatic(B) {
+    var C = B.cycles, rows = C.table, U = B.universe_label;
+    var main = rows.filter(function (r) { return r.series === "net" && r.swing === C.main_swing; })[0];
+    var nets = rows.filter(function (r) { return r.series === "net"; });
+    var idx = rows.filter(function (r) { return r.series !== "net"; });
+    var wk = function (v) { return v === null ? "—" : v.toFixed(0) + " 週"; };
+    document.getElementById("bt-cyc-def").textContent =
+      "轉折點的認定：從一個高點（或低點）反向走了至少門檻那麼多，才確認它是轉折（zig-zag）。門檻越小，抓到的擺盪越細、週期越短，" +
+      "所以多空排列差並列 " + nets.map(function (r) { return r.swing; }).join("、") + " 點三種門檻；指數用和「大跌」相同的 " + C.index_swing +
+      "%。每個點是一個完整週期（高點到下一個高點），黑色短線是平均。";
+    document.getElementById("lg-bt-cyc").innerHTML =
+      "<span><i class='swatch dot' style='background:" + css("--s3") + "'></i>" + U + "多空排列差</span>" +
+      BT_KEYS.map(function (k) { return "<span><i class='swatch dot' style='background:" + css(BT_COL[k]) + "'></i>" + B.indices[k].label + "指數</span>"; }).join("") +
+      "<span><i class='swatch' style='width:2px;height:12px;background:" + css("--ink") + "'></i>平均</span>";
+
+    fillTable("t-bt-cyc", ["序列", "轉折門檻", "完整週期", "平均週期", "中位數", "最短～最長", "低點到低點平均", "上升段平均", "下降段平均"],
+      rows.map(function (r) {
+        var isMain = r.series === "net" && r.swing === C.main_swing;
+        return [{ html: (isMain ? "<b>" : "") + (r.series === "net" ? U + "多空排列差" : B.indices[r.series].label + "指數") + (isMain ? "</b>" : "") +
+            (isMain ? "<div class='sub'>圖表採用</div>" : "") },
+          { html: r.series === "net" ? r.swing + " 點" : r.swing + "%", cls: "n" },
+          { html: r.n_cycles + " 次", cls: "n" }, { html: wk(r.pp_mean), cls: "n" }, { html: wk(r.pp_median), cls: "n" },
+          { html: r.min === null ? "—" : r.min + "～" + r.max + " 週", cls: "n" }, { html: wk(r.tt_mean), cls: "n" },
+          { html: wk(r.up_mean), cls: "n" }, { html: wk(r.down_mean), cls: "n" }];
+      }));
+    var a = C.acf;
+    document.getElementById("bt-cyc-cap").textContent = "週期＝高點到下一個高點的週數；上升段＝低點到高點，下降段＝高點到低點。" +
+      "另以自我相關（autocorrelation）交叉檢查：多空排列差和自己相隔 " + a.zero + " 週後就不再正相關，相隔 " + a.min_lag + " 週時最相反（" +
+      a.min.toFixed(2) + "）" + (a.peak_lag ? "，相隔 " + a.peak_lag + " 週時再度最相似（" + a.peak.toFixed(2) + "）" : "") + "。";
+
+    // legs of the main-swing cycles, with what the indices did in each
+    var L = C.legs;
+    document.getElementById("bt-legs-h").firstChild.nodeValue = "多空排列差的每一段升降（門檻 " + C.main_swing + " 點），與同期指數報酬";
+    var legRows = L.slice().reverse().map(function (l) {
+      return [{ html: l.dir === "up" ? "上升" : "下降", color: l.dir === "up" ? css("--pos") : css("--neg") },
+        { html: l.start, cls: "mono" }, { html: l.end || "進行中", cls: "mono" }, { html: String(l.weeks), cls: "n" },
+        { html: (l.from >= 0 ? "+" : "") + l.from.toFixed(0) + " → " + (l.to >= 0 ? "+" : "") + l.to.toFixed(0), cls: "n" },
+        { html: pct(l.tech, 1), cls: "n", color: l.tech >= 0 ? css("--pos") : css("--neg") },
+        { html: pct(l.semi, 1), cls: "n", color: l.semi >= 0 ? css("--pos") : css("--neg") }];
+    });
+    var done = L.filter(function (l) { return !l.open; });
+    var avg = function (dir, k) { var x = done.filter(function (l) { return l.dir === dir; }); return x.reduce(function (s, l) { return s + l[k]; }, 0) / x.length; };
+    var avgW = function (dir) { var x = done.filter(function (l) { return l.dir === dir; }); return x.reduce(function (s, l) { return s + l.weeks; }, 0) / x.length; };
+    ["up", "down"].forEach(function (dir) {
+      legRows.push([{ html: "<b>" + (dir === "up" ? "上升段平均" : "下降段平均") + "</b>" }, { html: "" }, { html: "" },
+        { html: avgW(dir).toFixed(0), cls: "n" }, { html: "" },
+        { html: pct(avg(dir, "tech"), 1), cls: "n" }, { html: pct(avg(dir, "semi"), 1), cls: "n" }]);
+    });
+    fillTable("t-bt-legs", ["段落", "起點", "終點", "週數", "多空排列差", "科技報酬", "半導體報酬"], legRows);
+    var openLeg = L.filter(function (l) { return l.open; })[0];
+    document.getElementById("bt-legs-cap").textContent = "新到舊；平均只算已確認的段落。" +
+      (openLeg ? "最上一列從最後一個轉折點（" + openLeg.start + "）算到資料日，反向幅度還沒達到門檻，轉折尚未確認。" : "");
+
+    // caption + read-out
+    var tMain = main.pp_mean, iTxt = idx.map(function (r) { return btShort(B.indices[r.series].label) + " " + wk(r.pp_mean); }).join("、");
+    document.getElementById("cap-bt-cyc").textContent = "門檻 " + C.main_swing + " 點時，多空排列差平均 " + wk(tMain) + "走完一個週期（中位數 " +
+      wk(main.pp_median) + "，" + main.min + "～" + main.max + " 週）；同樣定義下指數的週期是 " + iTxt + "。";
+    var shorter = idx.every(function (r) { return r.pp_mean > tMain; });
+    var upT = avg("up", "tech"), dnT = avg("down", "tech"), upS = avg("up", "semi"), dnS = avg("down", "semi");
+    return [
+      "平均週期：多空排列差的週期長短取決於門檻——" + nets.map(function (r) { return r.swing + " 點時平均 " + wk(r.pp_mean); }).join("、") +
+        "。以 " + C.main_swing + " 點為準，一個完整週期平均 " + wk(tMain) + "（上升段 " + wk(main.up_mean) + "、下降段 " + wk(main.down_mean) + "），" +
+        "但最短 " + main.min + " 週、最長 " + main.max + " 週，" + (main.max >= 3 * main.min ? "長短差距很大，不是固定節奏。" : "長短差距不大。") +
+        "自我相關在 " + (a.peak_lag || "—") + " 週處只有 " + (a.peak === null ? "—" : a.peak.toFixed(2)) + "，" +
+        (a.peak !== null && a.peak < 0.3 ? "週期性很弱。" : "有一定的週期性。"),
+      "和指數比：指數以 " + C.index_swing + "% 認定轉折，" + iTxt + "一個週期，" +
+        (shorter ? "比多空排列差長，約是它的 " + idx.map(function (r) { return (r.pp_mean / tMain).toFixed(1); }).join("、") +
+          " 倍；排列差在指數的一個週期裡會來回不只一次，所以單看它的高低點，對不上指數的高低點。" : "和多空排列差相近。") +
+        "指數的上升段平均" + idx.map(function (r) { return btShort(B.indices[r.series].label) + " " + wk(r.up_mean); }).join("、") + "，下降段" +
+        idx.map(function (r) { return btShort(B.indices[r.series].label) + " " + wk(r.down_mean); }).join("、") +
+        (idx.every(function (r) { return r.up_mean > 2 * r.down_mean; }) ? "：漲得慢、跌得快。" : "。"),
+      "各段的指數表現：多空排列差上升段，科技平均 " + pct(upT, 1) + "、半導體 " + pct(upS, 1) + "；下降段平均 " + pct(dnT, 1) + " 與 " + pct(dnS, 1) +
+        "。" + (dnT < 0 && dnS < 0 ? "下降段平均是下跌，" : "下降段平均並沒有下跌，") +
+        "但這是事後確認了高低點才分得出段落；即時看，你不知道一段下降何時結束。"
+    ];
+  }
+
   function renderBacktestStatic() {
     var sec = document.getElementById("bt"), B = D.backtest;
     if (!B) { sec.hidden = true; return; }
@@ -2004,12 +2134,15 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     document.getElementById("bt-h-time").textContent = "時間序列：" + BT_KEYS.map(nm).join("、") + "指數與" + sU + "多空排列差（週線）";
     document.getElementById("bt-time-def").textContent =
       "上：兩個指數，" + B.start.slice(0, 7) + " = 100，對數刻度，方便比較不同年代的漲跌幅。中：每段色條是一次跌幅達 " +
-      Math.abs(B.episode_dd) + "% 的下跌，從高點畫到低點。下：多空排列差。虛線與三角形標出多空排列差由正轉負的每一週。";
+      Math.abs(B.episode_dd) + "% 的下跌，從高點畫到低點。下：多空排列差。虛線與三角形標出多空排列差由正轉負的每一週" +
+      (B.cycles ? "；實心圓與空心圓是門檻 " + B.cycles.main_swing + " 點認定的週期高點與低點（見下一張圖）。" : "。");
     document.getElementById("lg-bt-time").innerHTML = BT_KEYS.map(function (k) {
       return "<span><i class='swatch' style='background:" + css(BT_COL[k]) + "'></i>" + I[k].label + "指數</span>";
     }).join("") + "<span><i class='swatch' style='background:" + css("--s3") + "'></i>" + U + "多空排列差</span>" +
       "<span><i style='display:inline-block;width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid " +
-      css("--ink-2") + "'></i>多空排列差跌破 0</span>";
+      css("--ink-2") + "'></i>多空排列差跌破 0</span>" +
+      (B.cycles ? "<span><i class='swatch dot' style='background:" + css("--s3") + "'></i>週期高點</span><span><i class='swatch dot' style='background:transparent;border:2px solid " +
+        css("--s3") + ";box-sizing:border-box'></i>週期低點</span>" : "");
 
     // episodes table + per-episode verdict
     var verdict = function (e) {
@@ -2109,6 +2242,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
         (dp.t.hits * 2 === dp.t.n_done ? "——繼續大跌與見底各占一半，多空排列差本身分不出這次是哪一種。" : "。")
         : now.length ? "近 " + H + " 週有訊號出現，結果還要等。" : "近 " + H + " 週沒有訊號。"));
     renderSlideStatic(B).forEach(function (t) { take.push(t); });
+    renderCycleStatic(B).forEach(function (t) { take.push(t); });
     var leads = [];
     BT_KEYS.forEach(function (k) { R[k].episodes.forEach(function (e) { if (e.spread_hi_lead !== null) leads.push(e.spread_hi_lead); }); });
     if (leads.length) {
@@ -2138,6 +2272,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     if (!B) return;
     btTimeline(document.getElementById("c-bt-time"), B);
     btBuckets(document.getElementById("c-bt-bucket"), B);
+    btCycleDots(document.getElementById("c-bt-cyc"), B);
     BT_KEYS.forEach(function (k) { btWaitCurve(document.getElementById("c-bt-slide-" + k), B, k, String(B.slide.thresholds[0])); });
   }
 

@@ -40,6 +40,11 @@ EPISODE_DD = -0.15          # peak-to-trough drawdown that counts as an episode
 SLIDES = [{"id": "base", "zone": 60, "drop": 30}, {"id": "strict", "zone": 80, "drop": 40}]
 CORRECTIONS = (-0.10, -0.15, -0.20)  # drawdown from the index's running high
 WAIT_MAX = 52                         # weeks of follow-up for the waiting-time view
+# Cycles: a turning point is confirmed once the series reverses by at least R from it
+# (zig-zag). The answer depends on R, so several are reported; MAIN_SWING drives the chart.
+SPREAD_SWINGS = (40, 60, 80)          # points of 多空排列差
+MAIN_SWING = 60
+INDEX_SWING = 0.15                    # index reversal, same size as an episode
 BUCKETS = [-101, -50, -20, 20, 50, 80, 101]
 INDICES = {
     "tech": ("科技類股", lambda m: m["Sector"] == "technology"),
@@ -200,6 +205,73 @@ def slide_study(df: pd.DataFrame) -> dict:
             "thresholds": [round(-100 * t) for t in CORRECTIONS]}
 
 
+def zigzag(v: np.ndarray, r: float) -> list:
+    """Alternating turning points [(i, 'P'|'T')]: each confirmed by a reversal of at least r."""
+    piv, hi, lo, trend = [], 0, 0, 0
+    for i in range(1, len(v)):
+        if trend >= 0 and v[i] > v[hi]:
+            hi = i
+        if trend <= 0 and v[i] < v[lo]:
+            lo = i
+        if trend >= 0 and v[hi] - v[i] >= r:
+            piv.append((hi, "P")); trend, lo = -1, i
+        elif trend <= 0 and v[i] - v[lo] >= r:
+            piv.append((lo, "T")); trend, hi = 1, i
+    return piv
+
+
+def cycle_stats(piv: list) -> dict:
+    P = [i for i, k in piv if k == "P"]
+    T = [i for i, k in piv if k == "T"]
+    pp, tt = np.diff(P), np.diff(T)
+    up = [b[0] - a[0] for a, b in zip(piv, piv[1:]) if a[1] == "T"]
+    dn = [b[0] - a[0] for a, b in zip(piv, piv[1:]) if a[1] == "P"]
+    f = lambda x: round(float(x), 1)
+    return {"n_peaks": len(P), "n_troughs": len(T), "n_cycles": len(pp),
+            "pp": [int(x) for x in pp], "pp_mean": f(pp.mean()) if len(pp) else None,
+            "pp_median": f(np.median(pp)) if len(pp) else None,
+            "tt_mean": f(tt.mean()) if len(tt) else None, "tt_median": f(np.median(tt)) if len(tt) else None,
+            "min": int(pp.min()) if len(pp) else None, "max": int(pp.max()) if len(pp) else None,
+            "up_mean": f(np.mean(up)) if up else None, "down_mean": f(np.mean(dn)) if dn else None}
+
+
+def cycle_study(df: pd.DataFrame) -> dict:
+    """Average cycle of the spread under several swing sizes, against the indices' own cycles."""
+    net = df["net"].values
+    dates = [d.date().isoformat() for d in df.index]
+    rows = []
+    for r in SPREAD_SWINGS:
+        rows.append({"series": "net", "swing": r, **cycle_stats(zigzag(net, r))})
+    for k in INDICES:
+        rows.append({"series": k, "swing": round(100 * INDEX_SWING),
+                     **cycle_stats(zigzag(np.log(df[k].values), np.log(1 / (1 - INDEX_SWING))))})
+    main = zigzag(net, MAIN_SWING)
+    legs = []
+    for (a, ka), (b, _) in zip(main, main[1:]):
+        legs.append({"dir": "up" if ka == "T" else "down", "start": dates[a], "end": dates[b], "weeks": b - a,
+                     "from": round(float(net[a]), 1), "to": round(float(net[b]), 1),
+                     **{k: round(100 * float(df[k].iloc[b] / df[k].iloc[a] - 1), 1) for k in INDICES}})
+    # the leg still open at the data date: from the last turning point to now (not confirmed)
+    if main:
+        a, ka = main[-1]
+        legs.append({"dir": "down" if ka == "P" else "up", "start": dates[a], "end": None, "weeks": len(net) - 1 - a,
+                     "from": round(float(net[a]), 1), "to": round(float(net[-1]), 1), "open": True,
+                     **{k: round(100 * float(df[k].iloc[-1] / df[k].iloc[a] - 1), 1) for k in INDICES}})
+    # autocorrelation: where the series best resembles itself again (a weak, model-free cycle estimate)
+    x = pd.Series(net - net.mean())
+    lags = range(1, min(260, len(net) // 2))
+    ac = np.array([x.autocorr(l) for l in lags])
+    zero = next((l for l, a in zip(lags, ac) if a < 0), None)
+    lo_lag = int(np.argmin(ac)) + 1
+    peaks = [(l, a) for l, a in zip(list(lags)[1:-1], ac[1:-1]) if l > lo_lag and a > ac[l - 2] and a >= ac[l]]
+    best = max(peaks, key=lambda t: t[1]) if peaks else None
+    return {"main_swing": MAIN_SWING, "index_swing": round(100 * INDEX_SWING), "table": rows,
+            "pivots": [{"date": dates[i], "kind": k, "value": round(float(net[i]), 1)} for i, k in main],
+            "legs": legs,
+            "acf": {"zero": zero, "min_lag": lo_lag, "min": round(float(ac[lo_lag - 1]), 2),
+                    "peak_lag": best[0] if best else None, "peak": round(float(best[1]), 2) if best else None}}
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--data-dir", default=os.environ.get("FETCH_BASE", str(REPO / "data" / "weekly_reutin")))
@@ -279,6 +351,7 @@ def main() -> None:
     crosses = df.index[(df["net"] < 0) & (df["net"].shift(1) >= 0)]
     res["zero_crosses"] = [t.date().isoformat() for t in crosses]
     res["slide"] = slide_study(df)
+    res["cycles"] = cycle_study(df)
     res["net_now"] = round(float(df["net"].iloc[-1]), 1)
     res["d4_now"] = round(float(d4.iloc[-1]), 1)
     with open(out_dir / "regime_backtest.json", "w", encoding="utf-8") as fh:
@@ -290,6 +363,10 @@ def main() -> None:
               f"base P(≤{res['big_drop']}%) {r['base_p_big']}%; {len(r['episodes'])} episodes; dd now {r['dd_now']}%")
         for s in r["signals"]:
             print(f"    {s['id']}: {s['hits']}/{s['n_done']} hits, median fwd {s['med_fwd_ret']}%, pending {s['pending']}")
+    for row in res["cycles"]["table"]:
+        print(f"  cycle {row['series']} swing {row['swing']}: {row['n_cycles']} cycles, peak-peak mean {row['pp_mean']} "
+              f"median {row['pp_median']} ({row['min']}-{row['max']}), up {row['up_mean']} down {row['down_mean']}")
+    print(f"  acf: {res['cycles']['acf']}")
     sl = res["slide"]
     for d in sl["defs"]:
         print(f"  slide ≥{d['zone']} then -{d['drop']}: {d['n']} triggers ({d['n_complete']} with {WAIT_MAX}w follow-up)")
