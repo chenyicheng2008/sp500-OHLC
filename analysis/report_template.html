@@ -141,6 +141,8 @@ tbody tr:hover td{background:var(--sunken)}
 tbody tr:hover td:first-child{background:var(--sunken)}
 tbody tr:last-child td{border-bottom:none}
 #t-kd-down td:last-child,#t-kd-down th:last-child,#t-kd-up td:last-child,#t-kd-up th:last-child{text-align:left; white-space:normal}
+#t-tech-moves td:last-child,#t-tech-moves th:last-child{text-align:left; white-space:normal; min-width:320px}
+#t-tech-trans td.diag{color:var(--ink-3)}
 #t-signals td:last-child,#t-signals th:last-child{text-align:left; white-space:normal; min-width:280px}
 #t-signals td:nth-child(2),#t-signals th:nth-child(2){text-align:left}
 td.n{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums}
@@ -261,11 +263,12 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
   <a href="#partic">04 參與度</a>
   <a href="#conc">05 集中度</a>
   <a href="#sector">06 類股</a>
-  <a href="#rotation">07 輪動</a>
-  <a href="#industry">08 產業</a>
-  <a href="#stocks">09 個股</a>
-  <a href="#kd">10 週月KD</a>
-  <a href="#method">11 方法</a>
+  <a href="#tech">07 科技多空</a>
+  <a href="#rotation">08 輪動</a>
+  <a href="#industry">09 產業</a>
+  <a href="#stocks">10 個股</a>
+  <a href="#kd">11 週月KD</a>
+  <a href="#method">12 方法</a>
 </div></nav>
 
 <div class="wrap">
@@ -385,8 +388,41 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
   </table></div>
 </section>
 
+<section id="tech">
+  <div class="sec-head"><span class="sec-no">07</span><h2>科技股多空結構</h2></div>
+  <p class="sec-sub" id="tech-sub">—</p>
+  <div class="stats" id="tech-stats" style="margin-top:22px"></div>
+  <figure class="panel">
+    <div class="panel-head"><h3>科技股多頭／整理／空頭比例（日線）</h3><p id="tech-def">—</p></div>
+    <div class="legend" id="lg-tech-stack"></div>
+    <div class="panel-body"><div id="c-tech-stack"></div></div>
+    <figcaption id="cap-tech-stack"></figcaption>
+  </figure>
+  <div class="grid2">
+    <figure class="panel">
+      <div class="panel-head"><h3>多空淨值：科技 vs 全體（日線）</h3><p>淨值 = 多頭比例 − 空頭比例；零軸以上代表多頭家數多於空頭。</p></div>
+      <div class="legend" id="lg-tech-net"></div>
+      <div class="panel-body"><div id="c-tech-net"></div></div>
+      <figcaption id="cap-tech-net"></figcaption>
+    </figure>
+    <figure class="panel">
+      <div class="panel-head"><h3>長線對照：科技股多空淨值（週線）</h3><p id="tech-long-def">—</p></div>
+      <div class="legend" id="lg-tech-long"></div>
+      <div class="panel-body"><div id="c-tech-long"></div></div>
+      <figcaption id="cap-tech-long"></figcaption>
+    </figure>
+  </div>
+  <div class="tw"><table id="t-tech-trans"><caption>一個月內的狀態轉換<small id="tech-trans-cap">—</small></caption></table></div>
+  <div class="tw"><table id="t-tech-moves"><caption>轉換名單<small>依產業分組；只列狀態有改變的個股。</small></caption></table></div>
+  <div class="tw"><table id="t-tech-ind"><caption>科技類股內各產業的多空<small>淨值 = 多頭比例 − 空頭比例，依目前淨值排序。檔數少的產業一檔就會大幅改變比例，判讀時請看檔數。</small></caption></table></div>
+  <div class="panel">
+    <div class="panel-head"><h3>解讀</h3><p>以下每一句都由上方數據推導，資料改變時措辭會跟著改。</p></div>
+    <ul class="take" id="tech-take" style="padding:0 20px 8px; margin-top:6px"></ul>
+  </div>
+</section>
+
 <section id="rotation">
-  <div class="sec-head"><span class="sec-no">07</span><h2>輪動</h2></div>
+  <div class="sec-head"><span class="sec-no">08</span><h2>輪動</h2></div>
   <p class="sec-sub">同一批類股在 12 個月、3 個月、1 個月三個期間的排名。排名往前跑代表資金正在流入，往後掉代表領導地位在流失。</p>
   <div class="tw"><table id="t-rot">
     <caption>類股排名變化<small>排名 1 = 該期間表現最好。「12M→3M」為正代表名次前進（改善）；達 ±3 名以上標記為改善／轉弱。</small></caption>
@@ -394,7 +430,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
 </section>
 
 <section id="industry">
-  <div class="sec-head"><span class="sec-no">08</span><h2>產業</h2></div>
+  <div class="sec-head"><span class="sec-no">09</span><h2>產業</h2></div>
   <p class="sec-sub">細分到產業層級（成分股至少 3 檔，共 <span id="n-ind">—</span> 個產業）。這一層才看得出領導權實際換到哪裡。</p>
   <div class="grid2">
     <div class="tw" style="margin-top:0"><table id="t-indup"><caption>近三個月最強產業<small>市值加權報酬前 12 名。</small></caption></table></div>
@@ -406,7 +442,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
 </section>
 
 <section id="stocks">
-  <div class="sec-head"><span class="sec-no">09</span><h2>個股</h2></div>
+  <div class="sec-head"><span class="sec-no">10</span><h2>個股</h2></div>
   <p class="sec-sub">近三個月漲跌幅最極端的各 <span id="n-lead">—</span> 檔，附上 12 個月報酬作對照。</p>
   <div class="grid2">
     <div class="tw" style="margin-top:0"><table id="t-lead"><caption>近三個月領漲<small>依 3 個月報酬排序。</small></caption></table></div>
@@ -415,7 +451,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
 </section>
 
 <section id="kd">
-  <div class="sec-head"><span class="sec-no">10</span><h2>週月 KD 同步交叉</h2></div>
+  <div class="sec-head"><span class="sec-no">11</span><h2>週月 KD 同步交叉</h2></div>
   <p class="sec-sub" id="kd-sub">—</p>
   <div class="note-box" id="kd-note" hidden></div>
   <div class="tw"><table id="t-kd-down"><caption>高檔同步向下交叉（死叉）<small id="kd-down-cap">—</small></caption></table></div>
@@ -434,7 +470,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
 </section>
 
 <section id="method">
-  <div class="sec-head"><span class="sec-no">11</span><h2>方法與限制</h2></div>
+  <div class="sec-head"><span class="sec-no">12</span><h2>方法與限制</h2></div>
   <ul class="take" id="method-list"></ul>
 </section>
 
@@ -487,7 +523,8 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     "banks-regional": "區域銀行", "aerospace-defense": "航太國防",
     "specialty-retail": "專業零售", "internet-content-information": "網路內容",
     "packaged-foods": "包裝食品", "insurance-diversified": "綜合保險",
-    "financial-data-stock-exchanges": "金融資訊與交易所"
+    "financial-data-stock-exchanges": "金融資訊與交易所",
+    "consumer-electronics": "消費電子", "solar": "太陽能"
   };
   var STATUS_TC = {
     "bullish": "偏多", "bearish": "偏空", "neutral": "中性", "oversold": "超賣",
@@ -662,19 +699,26 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
       svg.appendChild(el("text", { x: lb.x, y: lb.y, fill: lb.color, "font-size": 12, "font-weight": 600,
         "font-family": "IBM Plex Mono, monospace" }, lb.text));
     });
-    // annotation
-    if (opt.mark) {
-      var mi = opt.dates.indexOf(opt.mark.date);
+    // annotations: a vertical rule (no value), or a labelled point on the line (with value)
+    (opt.marks || (opt.mark ? [opt.mark] : [])).forEach(function (mk) {
+      var mi = opt.dates.indexOf(mk.date);
       if (mi < 0) { // nearest
-        for (var k = 0; k < n; k++) if (opt.dates[k] >= opt.mark.date) { mi = k; break; }
+        for (var k = 0; k < n; k++) if (opt.dates[k] >= mk.date) { mi = k; break; }
       }
-      if (mi >= 0) {
+      if (mi < 0) return;
+      if (mk.value === undefined) {
         svg.appendChild(el("line", { x1: X(mi), x2: X(mi), y1: m.t, y2: m.t + ih,
           stroke: css("--rule-strong"), "stroke-width": 1 }));
         svg.appendChild(el("text", { x: X(mi) - 6, y: m.t + 12, "text-anchor": "end", fill: css("--ink-3"),
-          "font-size": 11, "font-family": "IBM Plex Mono, monospace" }, opt.mark.text));
+          "font-size": 11, "font-family": "IBM Plex Mono, monospace" }, mk.text));
+      } else {
+        var px = X(mi), py = Y(mk.value);
+        svg.appendChild(el("circle", { cx: px, cy: py, r: 3.5, fill: css("--ink-2"), stroke: css("--surface"), "stroke-width": 1.5 }));
+        var anchor = px < m.l + 60 ? "start" : px > m.l + iw - 60 ? "end" : "middle";
+        svg.appendChild(el("text", { x: px, y: mk.below ? py + 16 : py - 9, "text-anchor": anchor, fill: css("--ink-2"),
+          "font-size": 11, "font-family": "IBM Plex Mono, monospace" }, mk.text));
       }
-    }
+    });
     // crosshair
     var cross = el("line", { x1: 0, x2: 0, y1: m.t, y2: m.t + ih, stroke: css("--rule-strong"),
       "stroke-width": 1, opacity: 0 });
@@ -1277,6 +1321,264 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     });
   }
 
+  /* ------------------------------------------------------------------ *
+   * sector bull / bear regime (technology)
+   * ------------------------------------------------------------------ */
+  var ST_TC = { bull: "多頭", neither: "整理", bear: "空頭" };
+
+  // Stacked shares that sum to 100: bear anchored to the bottom edge, bull to the top,
+  // so both extremes read against a fixed edge and the middle band is "neither".
+  function stackChart(host, dates, layers) {
+    var w = Math.max(320, host.clientWidth), h = 280;
+    var m = { t: 12, r: 60, b: 26, l: 42 }, iw = w - m.l - m.r, ih = h - m.t - m.b;
+    var n = dates.length;
+    var X = function (i) { return m.l + iw * i / Math.max(1, n - 1); };
+    var Y = function (v) { return m.t + ih * (1 - v / 100); };
+    var svg = mkSvg(w, h);
+    var base = dates.map(function () { return 0; });
+    layers.forEach(function (L) {
+      var top = base.map(function (b, i) { return b + (L.values[i] === null ? 0 : L.values[i]); });
+      var d = "M" + X(0).toFixed(1) + " " + Y(top[0]).toFixed(1);
+      for (var i = 1; i < n; i++) d += "L" + X(i).toFixed(1) + " " + Y(top[i]).toFixed(1);
+      for (var j = n - 1; j >= 0; j--) d += "L" + X(j).toFixed(1) + " " + Y(base[j]).toFixed(1);
+      svg.appendChild(el("path", { d: d + "Z", fill: L.color, stroke: css("--surface"), "stroke-width": 1.5,
+        "stroke-linejoin": "round" }));
+      L._mid = (base[n - 1] + top[n - 1]) / 2;
+      base = top;
+    });
+    [0, 25, 50, 75, 100].forEach(function (v) {
+      svg.appendChild(el("text", { x: m.l - 8, y: Y(v) + 4, "text-anchor": "end", fill: css("--ink-3"),
+        "font-size": 11, "font-family": "IBM Plex Mono, monospace" }, v + "%"));
+    });
+    svg.appendChild(el("line", { x1: m.l, x2: m.l + iw, y1: Y(50), y2: Y(50), stroke: css("--surface"),
+      "stroke-width": 1, opacity: 0.7 }));
+    var step = Math.max(1, Math.round(n / (w < 460 ? 4 : 7)));
+    for (var i = 0; i < n; i += step) {
+      if (n - 1 - i < step * 0.55 && i !== 0) continue;
+      svg.appendChild(el("text", { x: X(i), y: h - 8, "text-anchor": "middle", fill: css("--ink-3"),
+        "font-size": 11, "font-family": "IBM Plex Mono, monospace" }, fmtDate(dates[i])));
+    }
+    svg.appendChild(el("text", { x: X(n - 1), y: h - 8, "text-anchor": "end", fill: css("--ink-3"),
+      "font-size": 11, "font-family": "IBM Plex Mono, monospace" }, fmtDate(dates[n - 1])));
+    // end labels, spaced so thin bands cannot overlap
+    var labs = layers.map(function (L) {
+      return { y: Y(L._mid) + 4, text: L.name + " " + L.values[n - 1].toFixed(0) + "%", color: L.ink };
+    }).sort(function (a, b) { return a.y - b.y; });
+    for (var q = 1; q < labs.length; q++) if (labs[q].y - labs[q - 1].y < 14) labs[q].y = labs[q - 1].y + 14;
+    labs.forEach(function (lb) {
+      svg.appendChild(el("text", { x: m.l + iw + 6, y: lb.y, fill: lb.color, "font-size": 11.5, "font-weight": 600 }, lb.text));
+    });
+    var cross = el("line", { x1: 0, x2: 0, y1: m.t, y2: m.t + ih, stroke: css("--ink"), "stroke-width": 1, opacity: 0 });
+    svg.appendChild(cross);
+    var hit = el("rect", { x: m.l, y: m.t, width: iw, height: ih, fill: "transparent" });
+    hit.addEventListener("mousemove", function (ev) {
+      var bb = svg.getBoundingClientRect();
+      var i = Math.max(0, Math.min(n - 1, Math.round((ev.clientX - bb.left - m.l) / (iw / Math.max(1, n - 1)))));
+      cross.setAttribute("x1", X(i)); cross.setAttribute("x2", X(i)); cross.setAttribute("opacity", 0.35);
+      var rows = "<div class='tt-h'>" + dates[i] + "</div>";
+      layers.slice().reverse().forEach(function (L) {
+        rows += "<div class='tt-r'><span><i style='width:9px;height:9px;border-radius:2px;background:" + L.color +
+          ";display:inline-block'></i>" + L.name + "</span><b>" + (L.values[i] === null ? "—" : L.values[i].toFixed(1) + "%") + "</b></div>";
+      });
+      showTip(rows, ev);
+    });
+    hit.addEventListener("mouseleave", function () { hideTip(); cross.setAttribute("opacity", 0); });
+    svg.appendChild(hit);
+    host.innerHTML = ""; host.appendChild(svg);
+  }
+
+  function byIndustry(tks, indOf) {
+    var g = {};
+    tks.forEach(function (t) { var k = indOf[t] || "unknown"; (g[k] = g[k] || []).push(t); });
+    return Object.keys(g).sort(function (a, b) { return g[b].length - g[a].length; })
+      .map(function (k) { return { ind: k, tks: g[k] }; });
+  }
+
+  function renderTrendStatic() {
+    var sec = document.getElementById("tech");
+    var T = D.trend;
+    if (!T) { sec.hidden = true; return; }
+    var L = T.latest, M1 = T.lookback["1M"], M3 = T.lookback["3M"];
+    var secLabel = secName(T.sector);
+    var gapNow = L.sec_net - L.mkt_net, gapThen = M1 ? M1.sec_net - M1.mkt_net : null;
+
+    document.getElementById("tech-sub").textContent =
+      "以 Yahoo 的「" + secLabel + "」類股為範圍（目前 " + T.n_members + " 檔；Alphabet、Meta 歸在通訊服務、Amazon 歸在非必需消費，不在此列），" +
+      "逐日判斷每一檔是多頭排列、空頭排列或整理，再看三者的比例怎麼隨時間變化，以及和全體成分股的差距。";
+    document.getElementById("tech-def").textContent =
+      "多頭排列：收盤 > " + T.ma_daily[0] + " 日均線 > " + T.ma_daily[1] + " 日均線；空頭排列：收盤 < " + T.ma_daily[0] + " 日均線 < " +
+      T.ma_daily[1] + " 日均線；其餘為整理（均線糾結或方向不一致）。" + T.ma_daily[1] + " 日均線需要足夠歷史，所以日線序列從 " +
+      T.daily_start + " 開始。";
+    document.getElementById("tech-long-def").textContent =
+      "同樣的分類改用週線，" + T.ma_weekly[0] + " 週與 " + T.ma_weekly[1] + " 週均線（約當 50 與 200 日），從 " + T.weekly_start.slice(0, 7) +
+      " 起。成分股用的是今天的名單，已退出指數的公司不在其中（存活者偏差），早年數字會偏樂觀，只適合看位置高低。";
+
+    var stat = function (k, v, n) { return "<div class='stat'><div class='stat-k'>" + k + "</div><div class='stat-v'>" + v + "</div><div class='stat-n'>" + n + "</div></div>"; };
+    document.getElementById("tech-stats").innerHTML =
+      stat("多頭排列", L.sec_bull.toFixed(1) + "%", M1 ? "一個月前 " + M1.sec_bull.toFixed(1) + "%" : "") +
+      stat("整理", L.sec_neither.toFixed(1) + "%", "均線之間拉鋸") +
+      stat("空頭排列", L.sec_bear.toFixed(1) + "%", M1 ? "一個月前 " + M1.sec_bear.toFixed(1) + "%" : "") +
+      stat("多空淨值", (L.sec_net >= 0 ? "+" : "") + L.sec_net.toFixed(1), "全體 " + (L.mkt_net >= 0 ? "+" : "") + L.mkt_net.toFixed(1) + "；近一年第 " + T.pctile_daily.toFixed(0) + " 百分位");
+
+    var D1 = T.daily;
+    var hiI = D1.sec_net.indexOf(Math.max.apply(null, D1.sec_net.filter(function (v) { return v !== null; })));
+    var loI = D1.sec_net.indexOf(Math.min.apply(null, D1.sec_net.filter(function (v) { return v !== null; })));
+    document.getElementById("cap-tech-stack").textContent =
+      "日線期間內，淨值最高在 " + D1.dates[hiI] + "（" + pct(D1.sec_net[hiI]).replace("%", "") + "，多頭 " + D1.sec_bull[hiI].toFixed(0) +
+      "%），最低在 " + D1.dates[loI] + "（" + pct(D1.sec_net[loI]).replace("%", "") + "，空頭 " + D1.sec_bear[loI].toFixed(0) + "%）。";
+    document.getElementById("cap-tech-net").textContent = M1
+      ? "一個月前（" + M1.date + "）科技淨值 " + pct(M1.sec_net).replace("%", "") + "、全體 " + pct(M1.mkt_net).replace("%", "") + "，科技" +
+        (gapThen >= 0 ? "領先 " : "落後 ") + Math.abs(gapThen).toFixed(1) + " 點；現在科技 " + pct(L.sec_net).replace("%", "") + "、全體 " +
+        pct(L.mkt_net).replace("%", "") + "，" + (gapNow >= 0 ? "領先 " : "落後 ") + Math.abs(gapNow).toFixed(1) + " 點" +
+        ((gapThen >= 0) !== (gapNow >= 0) ? "——科技對全體的相對位置在一個月內翻轉。" : "。")
+      : "";
+    var ex = T.weekly_extremes;
+    document.getElementById("cap-tech-long").textContent =
+      "週線淨值最高 " + pct(ex.max.net).replace("%", "") + "（" + ex.max.date + "），最低 " + pct(ex.min.net).replace("%", "") + "（" + ex.min.date +
+      "）；目前 " + pct(T.weekly_latest.sec_net).replace("%", "") + "，位於這段期間的第 " + T.pctile_weekly.toFixed(0) + " 百分位。";
+
+    // transition matrix
+    var tr = T.transitions, states = ["bull", "neither", "bear"];
+    var total = function (r) { return states.reduce(function (a, c) { return a + tr[r][c]; }, 0); };
+    fillTable("t-tech-trans", ["一個月前 ＼ 現在", "多頭", "整理", "空頭", "一個月前合計"],
+      states.map(function (r) {
+        return [{ html: ST_TC[r] }].concat(states.map(function (c) {
+          return { html: String(tr[r][c]), cls: "n" + (r === c ? " diag" : "") };
+        })).concat([{ html: String(total(r)), cls: "n" }]);
+      }).concat([[{ html: "現在合計" }].concat(states.map(function (c) {
+        return { html: String(states.reduce(function (a, r) { return a + tr[r][c]; }, 0)), cls: "n" };
+      })).concat([{ html: String(states.reduce(function (a, r) { return a + total(r); }, 0)), cls: "n" }])]));
+    document.getElementById("tech-trans-cap").textContent =
+      "比較 " + T.then_date + " 與 " + T.asof + " 每一檔的狀態；對角線（灰字）是狀態不變的檔數。";
+
+    var order = ["bull->bear", "bull->neither", "neither->bear", "bear->bull", "neither->bull", "bear->neither"];
+    fillTable("t-tech-moves", ["轉換", "檔數", "個股"], order.filter(function (k) { return T.moved[k]; }).map(function (k) {
+      var ab = k.split("->");
+      return [
+        { html: ST_TC[ab[0]] + " → " + ST_TC[ab[1]] },
+        { html: String(T.moved[k].length), cls: "n" },
+        { html: byIndustry(T.moved[k], T.industry_of).map(function (g) {
+            return "<b style='font-weight:500'>" + indName(g.ind) + "</b> <span class='mono' style='font-size:12px'>" + g.tks.join("、") + "</span>";
+          }).join("；") }
+      ];
+    }));
+
+    fillTable("t-tech-ind", ["產業", "檔數", "多頭", "空頭", "淨值", "一個月前", "三個月前", "一個月變化"],
+      T.industry.map(function (r) {
+        var ch = r.net_now - r.net_1M;
+        return [
+          { html: indName(r.Industry) + "<div class='sub'>" + r.Industry + "</div>" },
+          { html: String(r.n), cls: "n" },
+          heat(r.bull_now), { html: num(r.bear_now, 0) + "%", cls: "n" },
+          { html: (r.net_now >= 0 ? "+" : "") + num(r.net_now, 0), cls: "n", color: r.net_now >= 0 ? css("--pos") : css("--neg") },
+          { html: (r.net_1M >= 0 ? "+" : "") + num(r.net_1M, 0), cls: "n" },
+          { html: (r.net_3M >= 0 ? "+" : "") + num(r.net_3M, 0), cls: "n" },
+          { html: (ch >= 0 ? "+" : "") + num(ch, 0), cls: "n", color: ch >= 0 ? css("--pos") : css("--neg") }
+        ];
+      }));
+
+    // read-out
+    var take = [];
+    take.push("目前科技股多頭 " + L.sec_bull.toFixed(0) + "%、整理 " + L.sec_neither.toFixed(0) + "%、空頭 " + L.sec_bear.toFixed(0) +
+      "%，淨值 " + pct(L.sec_net).replace("%", "") + "，在近一年日線中排第 " + T.pctile_daily.toFixed(0) + " 百分位、十年週線中排第 " +
+      T.pctile_weekly.toFixed(0) + " 百分位。" +
+      (L.sec_bull >= 50 ? "過半數多頭排列，屬全面多頭。"
+        : L.sec_bear >= 50 ? "過半數空頭排列，屬全面空頭。"
+        : L.sec_neither >= 50 ? "過半數處於整理，多數個股在均線之間拉鋸，屬中期修正而非全面轉空。" : "多空與整理三分，沒有單一主導狀態。"));
+    if (M1) take.push("和全體比：一個月前科技淨值" + (gapThen >= 0 ? "領先" : "落後") + "全體 " + Math.abs(gapThen).toFixed(0) +
+      " 點，現在" + (gapNow >= 0 ? "領先 " : "落後 ") + Math.abs(gapNow).toFixed(0) + " 點" +
+      ((gapThen >= 0) !== (gapNow >= 0) ? "，相對位置在一個月內翻轉" : "") +
+      (L.mkt_net > M1.mkt_net && L.sec_net < M1.sec_net
+        ? "。全體淨值上升（" + pct(M1.mkt_net).replace("%", "") + " → " + pct(L.mkt_net).replace("%", "") + "）、科技淨值下降（" +
+          pct(M1.sec_net).replace("%", "") + " → " + pct(L.sec_net).replace("%", "") + "），資金從科技移往其他類股。"
+        : L.mkt_net < M1.mkt_net && L.sec_net > M1.sec_net
+          ? "。科技淨值上升、全體下降，資金往科技集中。"
+          : "。"));
+    var bull0 = states.reduce(function (a, c) { return a + tr.bull[c]; }, 0);
+    var newBull = tr.neither.bull + tr.bear.bull;
+    take.push("流向：一個月前的 " + bull0 + " 檔多頭只剩 " + tr.bull.bull + " 檔維持，" + tr.bull.neither + " 檔退回整理、" + tr.bull.bear +
+      " 檔直接轉空頭；同期新進多頭 " + newBull + " 檔（" + tr.neither.bull + " 檔來自整理、" + tr.bear.bull + " 檔來自空頭）。" +
+      (bull0 - tr.bull.bull > newBull ? "退出多於進入，多頭比例因此下降。" : newBull > bull0 - tr.bull.bull ? "進入多於退出，多頭比例因此上升。" : ""));
+    var out = (T.moved["bull->neither"] || []).concat(T.moved["bull->bear"] || []);
+    var inn = (T.moved["neither->bull"] || []).concat(T.moved["bear->bull"] || []);
+    var top = function (a) { return byIndustry(a, T.industry_of).slice(0, 3).map(function (g) { return indName(g.ind) + " " + g.tks.length + " 檔"; }).join("、"); };
+    if (out.length || inn.length) take.push("誰進誰出：" + (out.length ? "退出多頭的 " + out.length + " 檔以" + top(out) + "為主" : "") +
+      (out.length && inn.length ? "；" : "") + (inn.length ? "新進多頭的 " + inn.length + " 檔以" + top(inn) + "為主" : "") +
+      "。科技類股內部也在輪動。");
+    // The single session that moved the ratio most this month, and what was catalogued that day.
+    var dn = T.daily.sec_net, dd = T.daily.dates, worst = null;
+    for (var i = Math.max(1, dn.length - 21); i < dn.length; i++) {
+      if (dn[i] === null || dn[i - 1] === null) continue;
+      var ch = dn[i] - dn[i - 1];
+      if (!worst || ch < worst.ch) worst = { i: i, ch: ch };
+    }
+    if (worst && worst.ch < 0) {
+      var evs = (D.events_all || []).filter(function (e) { return e.date === dd[worst.i]; });
+      take.push("單日衝擊：一個月內淨值降幅最大的是 " + dd[worst.i] + "（" + pct(dn[worst.i - 1]).replace("%", "") + " → " +
+        pct(dn[worst.i]).replace("%", "") + "，一天少了 " + Math.abs(worst.ch).toFixed(0) + " 點）" +
+        (evs.length ? "；同日事件紀錄：" + evs.map(function (e) { return e.id + "「" + e.title + "」"; }).join("、") + "。" : "，當天沒有事件紀錄。"));
+    }
+    var multi = T.industry.filter(function (r) { return r.n >= 3; });
+    var srt = multi.slice().sort(function (a, b) { return (a.net_now - a.net_1M) - (b.net_now - b.net_1M); });
+    if (srt.length >= 2) {
+      var f = function (r) { return indName(r.Industry) + "（" + pct(r.net_1M).replace("%", "") + " → " + pct(r.net_now).replace("%", "") + "）"; };
+      take.push("產業（3 檔以上）：一個月內淨值下降最多的是 " + srt.slice(0, 2).map(f).join("、") + "，上升最多的是 " +
+        srt.slice(-2).reverse().map(f).join("、") + "。");
+    }
+    take.push("長線位置：十年週線淨值的極值是 " + pct(ex.max.net).replace("%", "") + "（" + ex.max.date.slice(0, 7) + "）與 " +
+      pct(ex.min.net).replace("%", "") + "（" + ex.min.date.slice(0, 7) + "），目前 " + pct(T.weekly_latest.sec_net).replace("%", "") +
+      (T.pctile_weekly < 30 ? "，處於歷史偏低區" : T.pctile_weekly > 70 ? "，處於歷史偏高區" : "，在歷史中段") +
+      "。早年數字受存活者偏差影響偏樂觀，實際的歷史位置可能比這裡顯示的再高一些。");
+    document.getElementById("tech-take").innerHTML = take.map(function (t, i) {
+      return "<li data-i='" + String(i + 1).padStart(2, "0") + "'><span>" + t + "</span></li>";
+    }).join("");
+  }
+
+  function renderTrendCharts() {
+    var T = D.trend;
+    if (!T) return;
+    var neutral = css("--rule-strong");
+    stackChart(document.getElementById("c-tech-stack"), T.daily.dates, [
+      { name: "空頭", color: css("--neg"), ink: css("--neg"), values: T.daily.sec_bear },
+      { name: "整理", color: neutral, ink: css("--ink-2"), values: T.daily.sec_neither },
+      { name: "多頭", color: css("--pos"), ink: css("--pos"), values: T.daily.sec_bull }
+    ]);
+    document.getElementById("lg-tech-stack").innerHTML =
+      "<span><i class='swatch' style='height:10px;background:" + css("--pos") + "'></i>多頭排列</span>" +
+      "<span><i class='swatch' style='height:10px;background:" + neutral + "'></i>整理</span>" +
+      "<span><i class='swatch' style='height:10px;background:" + css("--neg") + "'></i>空頭排列</span>";
+
+    var nf = function (v) { return (v >= 0 ? "+" : "") + v.toFixed(0); };
+    lineChart(document.getElementById("c-tech-net"), {
+      dates: T.daily.dates, height: 250, right: 46, zeroLine: 0, min: -100, max: 100, yTicks: 4,
+      yFmt: nf, tipFmt: function (v) { return (v >= 0 ? "+" : "") + v.toFixed(1); },
+      series: [
+        { name: "科技", color: css("--s1"), values: T.daily.sec_net, label: nf(T.latest.sec_net) },
+        { name: "全體", color: css("--ink-3"), values: T.daily.mkt_net, label: nf(T.latest.mkt_net) }
+      ]
+    });
+    document.getElementById("lg-tech-net").innerHTML =
+      "<span><i class='swatch' style='background:" + css("--s1") + "'></i>科技股淨值</span>" +
+      "<span><i class='swatch' style='background:" + css("--ink-3") + "'></i>全體成分股淨值</span>";
+
+    var ex = T.weekly_extremes;
+    lineChart(document.getElementById("c-tech-long"), {
+      dates: T.weekly.dates, height: 250, right: 46, zeroLine: 0, min: -100, max: 100, yTicks: 4,
+      yFmt: nf, tipFmt: function (v) { return (v >= 0 ? "+" : "") + v.toFixed(1); },
+      marks: [
+        { date: ex.max.date, value: ex.max.net, text: ex.max.date.slice(0, 7) + " " + nf(ex.max.net) },
+        { date: ex.min.date, value: ex.min.net, text: ex.min.date.slice(0, 7) + " " + nf(ex.min.net), below: true }
+      ],
+      series: [
+        { name: "科技", color: css("--s1"), values: T.weekly.sec_net, label: nf(T.weekly_latest.sec_net) },
+        { name: "全體", color: css("--ink-3"), values: T.weekly.mkt_net, label: nf(T.weekly_latest.mkt_net) }
+      ]
+    });
+    document.getElementById("lg-tech-long").innerHTML =
+      "<span><i class='swatch' style='background:" + css("--s1") + "'></i>科技股（週線）</span>" +
+      "<span><i class='swatch' style='background:" + css("--ink-3") + "'></i>全體（週線）</span>";
+  }
+
   function scatter(host, opt) {
     var w = Math.max(300, host.clientWidth), h = opt.height || 340;
     var m = { t: 16, r: 18, b: 44, l: 48 };
@@ -1400,6 +1702,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
   function renderStatic() {
     renderEventsStatic();
     renderKDStatic();
+    renderTrendStatic();
     renderSubtitles();
     document.getElementById("st-asof").textContent = D.asof;
     document.getElementById("st-gen").textContent = D.generated || D.asof;
@@ -1455,7 +1758,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
       "），" + (D.latest.pct_above_50dma < D.latest.pct_above_200dma ? "但站上 50 日均線的只剩" : "站上 50 日均線的有") + " <b>" +
       D.latest.pct_above_50dma.toFixed(0) + "%</b>（近一年第 " + D.pctile.pct_above_50dma.toFixed(0) +
       " 百分位），" + (D.latest.pct_above_20dma < D.latest.pct_above_50dma
-        ? "20 日更只有 <b>" + D.latest.pct_above_20dma.toFixed(0) + "%</b>。"
+        ? (D.latest.pct_above_20dma < 40 ? "20 日更只有 <b>" : "20 日為 <b>") + D.latest.pct_above_20dma.toFixed(0) + "%</b>。"
         : "20 日則反彈到 <b>" + D.latest.pct_above_20dma.toFixed(0) + "%</b>（" +
           (improving && D.latest.pct_above_50dma >= D.latest.pct_above_200dma
             ? "短中期同步轉強" : "短線止跌，但中長線結構未修復") + "）。") +
@@ -1465,7 +1768,9 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
         ? "，但近四週淨上漲家數轉正（麥克連 " + D.latest.mcclellan_osc.toFixed(0) + "），參與面正在修復。"
         : nearHigh
           ? "，指數卻還在高點附近——這是典型的廣度背離，而非崩盤訊號。"
-          : "，指數也已離開高點，內外同步轉弱。");
+          : deteriorating
+            ? "，指數也已離開高點，內外同步轉弱。"
+            : "，指數也已離開高點，但參與面近四週沒有明顯惡化。");
 
     var stats = [
       { k: "站上 200 日均線", v: D.latest.pct_above_200dma.toFixed(1) + "%", n: "近一年第 " + D.pctile.pct_above_200dma.toFixed(0) + " 百分位" },
@@ -1654,6 +1959,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
   function renderCharts() {
     candleChart(document.getElementById("c-candle"));
     renderKDCharts();
+    renderTrendCharts();
     var s1 = css("--s1"), s2 = css("--s2"), s3 = css("--s3");
 
     lineChart(document.getElementById("c-ma"), {

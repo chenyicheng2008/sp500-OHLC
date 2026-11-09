@@ -144,6 +144,23 @@ def main() -> None:
         kb["crosses"] = pd.read_csv(kd_csv, encoding=ENC).round(2).replace({np.nan: None}).to_dict("records")
         payload["kd"] = kb
 
+    # --- sector bull / bear regime (trend_regime.py) ------------------------------
+    tr_json = d / "trend_regime_bundle.json"
+    if tr_json.exists():
+        tr = json.load(open(tr_json, encoding="utf-8"))
+        td = pd.read_csv(d / "trend_regime_daily.csv", index_col=0, parse_dates=True)
+        tw = pd.read_csv(d / "trend_regime_weekly.csv", index_col=0, parse_dates=True)
+        col = lambda df, c: [None if pd.isna(v) else round(float(v), 1) for v in df[c]]
+        tr["daily"] = {"dates": [x.strftime("%Y-%m-%d") for x in td.index],
+                       **{c: col(td, c) for c in ("sec_bull", "sec_neither", "sec_bear", "sec_net", "mkt_net")}}
+        tr["weekly"] = {"dates": [x.strftime("%Y-%m-%d") for x in tw.index],
+                        **{c: col(tw, c) for c in ("sec_net", "mkt_net")}}
+        tr["latest"] = {c: round(float(td[c].iloc[-1]), 1)
+                        for c in ("sec_bull", "sec_neither", "sec_bear", "sec_net", "mkt_bull", "mkt_bear", "mkt_net")}
+        tr["weekly_latest"] = {c: round(float(tw[c].iloc[-1]), 1) for c in ("sec_net", "mkt_net")}
+        tr["industry"] = read("trend_regime_industry.csv").to_dict("records")
+        payload["trend"] = tr
+
     txt = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
     out.write_text(txt, encoding="utf-8")
     print(f"wrote {out} ({len(txt):,} bytes, {len(wk)} chart points)")

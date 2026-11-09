@@ -17,6 +17,7 @@ data/weekly_reutin/              fetched CSVs (sp500_ohlc.csv, sp500_stocks.csv,
 data/tableau/                    ticker lists
 analysis/breadth_sector.py       breadth + sector/industry analysis -> data/analysis/*.csv
 analysis/kd_signals.py           weekly/monthly KD(9,3,3) crosses + their factors -> kd_crosses.csv, kd_bundle.json
+analysis/trend_regime.py         sector bull/bear share over time (default: technology) -> trend_regime_*.csv/json
 data/events/market_events.csv    hand-curated, sourced market events (the only non-computed input)
 analysis/build_report_data.py    condenses those CSVs -> data/analysis/report_data.json
 analysis/build_report.py         bakes the JSON into the template -> analysis/reports/*.html
@@ -31,6 +32,7 @@ Always in this order — each step consumes the previous one's output:
 ```bash
 python analysis/breadth_sector.py        # data/analysis/*.csv + analysis_bundle.json + index_ohlc_daily.csv
 python analysis/kd_signals.py            # data/analysis/kd_crosses.csv + kd_bundle.json (reads market_events.csv)
+python analysis/trend_regime.py          # data/analysis/trend_regime_{daily,weekly,industry}.csv + trend_regime_bundle.json
 python analysis/build_report_data.py     # data/analysis/report_data.json
 python analysis/build_report.py          # analysis/reports/sp500_internals_<asof>.html
 ```
@@ -72,6 +74,10 @@ on 3.11), so it reports "already satisfied" while the import still fails.
   were the counts 「11 個類股」「70 個產業」「各 15 檔」. The verdict body's 「但…只有」「僅」
   「就吃掉了」 flipped wrong that day — the 12-month median stock (+14.7%) beat the index
   (+10.8%) and the top ten supplied only 17% of the gain — and now follow the readings.
+  Branches must agree with each other too: on 2026-11-06 the headline said 「內部原地踏步」
+  (neither improving nor deteriorating) while the body's off-the-high branch still said
+  「內外同步轉弱」; and 「20 日更只有 61%」 called an above-average reading weak just because
+  it was below the 50-day one. Both now key off `deteriorating` / an absolute level.
 - Prose, labels and tables are Traditional Chinese. Metric names keep their standard
   English term in parentheses on first use (例如「騰落線（A/D Line）」).
 - Charts are hand-built inline SVG re-rendered on resize and on theme change; there
@@ -99,7 +105,10 @@ be computed, so they live in a hand-maintained CSV — and it is the one place w
 - Date an earnings event to the **session the market reacted**, not the after-hours release
   (Alphabet reported 10-28 after the close → row dated 10-29), so the measured move lines up.
 - No source, no row: the 11-02 optical drop (LITE -18.6%) had no coverage, so it appears
-  only as a data move.
+  only as a data move. Same for a preview whose outcome can't be found — the Lumentum
+  11-05 earnings row was deleted rather than left as a stale preview.
+- Commentary is labelled as commentary: E20's "fear of Democratic AI regulation" is an
+  FXStreet market-wrap opinion and the row says 「屬評論觀點」.
 - Sources reachable from this container: WebSearch works. Yahoo (`yfinance` direct) is
   blocked by the proxy (403), Alpha Vantage needs a premium plan for recent US prices, and
   some recap sites fail WebFetch DNS — so the candles are built from our own data.
@@ -131,6 +140,25 @@ seeded at 50. Weekly and monthly bars are resampled from the daily slice with th
   from the name's own event is shown separately, never fused into that event.
 - Group read-outs are generated: "concentrated in one sector" needs ≥50% of the group
   *and* ≥2× that sector's universe share (3 of 10 industrials at 2× is not concentration).
+
+## Sector bull / bear regime (`trend_regime.py`)
+
+Every constituent is classified each session: **bull** = close > MA50 > MA200, **bear** =
+close < MA50 < MA200, **neither** otherwise. The sector's three shares, and net = bull −
+bear, form the time series; the whole market is computed the same way as the baseline.
+
+- Daily series starts only once MA200 exists (~2025-08 with the current file). The long
+  run uses 10/40-week averages on the spliced weekly bars from 2015 — with **today's**
+  constituents, so it carries survivorship bias (early years read too bullish); the page
+  says so, and the percentile it reports is a lower bound on the true one.
+- "Tech" is Yahoo's `technology` sector (83 names): Alphabet and Meta are communication
+  services, Amazon consumer cyclical. The page states this; don't silently add them.
+- The transition matrix (state 21 sessions ago → now) explains *why* the ratio moved;
+  the read-out's "單日衝擊" line names the session with the largest one-day fall in net
+  and the events catalogued that day (on 2026-11-06 that was 10-14: CPI + Barclays).
+- As of 2026-11-06: tech net +4.8 vs market +18.9, down from +33.7 vs -5.1 a month
+  earlier — 31 of 40 tech bulls slid to neither (chips, AI hardware), 14 new bulls were
+  mostly IT services/payments.
 
 ## Index K-line
 

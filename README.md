@@ -80,7 +80,7 @@ and writes a self-contained Traditional-Chinese report to
 and JS inlined, so it opens straight from disk with no server and no network.
 
 ```bash
-python analysis/breadth_sector.py && python analysis/kd_signals.py && python analysis/build_report_data.py && python analysis/build_report.py
+python analysis/breadth_sector.py && python analysis/kd_signals.py && python analysis/trend_regime.py && python analysis/build_report_data.py && python analysis/build_report.py
 ```
 
 The filename carries the data date, and the page prints both the data date (`資料日`,
@@ -103,3 +103,12 @@ step.
   high (≥80) or low (≤20) zone, with a ≥70 / ≤30 watch list. Each flagged name is lined
   up against sector, returns, position vs moving averages, valuation, growth and any
   catalogued event or large one-day move in the last two weeks.
+
+### Sector bull / bear regime
+
+`trend_regime.py` classifies each constituent every session as bull (close > MA50 > MA200),
+bear (close < MA50 < MA200) or neither, and tracks the share of each over time for one
+sector (technology by default, `--sector` to change) against the whole market. It also
+writes a ten-year weekly version (10/40-week averages; today's constituents, so it carries
+survivorship bias), per-industry shares now vs one and three months ago, and the
+one-month transition matrix between states.

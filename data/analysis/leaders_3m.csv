@@ -1,16 +1,16 @@
 ﻿Ticker,ret_3m,ret_12m,Short Name,Sector,Industry,Market Cap
-MRNA,306.07945623324093,741.0898517113679,"Moderna, Inc.",healthcare,biotechnology,103154573312
-ACN,50.29702927481612,4.714026914951397,Accenture plc,technology,information-technology-services,161717927936
-MPC,43.916072201216274,122.91204176071689,Marathon Petroleum Corporation,energy,oil-gas-refining-marketing,106919796736
-RVTY,42.195054214906634,75.10722101085618,"Revvity, Inc.",healthcare,diagnostics-research,17790218240
-VEEV,42.01208339470508,4.124305887565782,Veeva Systems Inc.,healthcare,health-information-services,50293747712
-PTC,39.180956574992074,-2.256470171771685,PTC Inc.,technology,software-application,21202837504
-APA,38.52235523265506,116.9370955963271,APA Corporation,energy,oil-gas-e-p,15587139584
-PSX,34.97078778134439,105.66529124566615,Phillips 66,energy,oil-gas-refining-marketing,101274484736
-CRL,34.96087506509507,95.40733092970908,Charles River Laboratories Inte,healthcare,diagnostics-research,15576717312
-TYL,31.854657165982168,-15.121995980030356,"Tyler Technologies, Inc.",technology,software-application,16826230784
-HAS,30.380851325043402,59.5804040925483,"Hasbro, Inc.",consumer-cyclical,leisure,17004493824
-VLO,28.19536860275338,133.4683597674711,Valero Energy Corporation,energy,oil-gas-refining-marketing,101887631360
-GILD,27.818182178148177,43.25801701464969,"Gilead Sciences, Inc.",healthcare,drug-manufacturers-general,216414273536
-SWKS,27.481720031620014,13.443896773448149,"Skyworks Solutions, Inc.",technology,semiconductors,19499927552
-REGN,26.79181804535762,50.09989542205355,"Regeneron Pharmaceuticals, Inc.",healthcare,biotechnology,96275816448
+MRNA,324.99581442062686,978.9049584184227,"Moderna, Inc.",healthcare,biotechnology,102850600960
+EPAM,63.61301536903363,-0.994348435213166,"EPAM Systems, Inc.",technology,information-technology-services,8128527360
+ACN,47.31543534396283,8.143337496786817,Accenture plc,technology,information-technology-services,153887113216
+RVTY,33.75197234143113,67.97257985493468,"Revvity, Inc.",healthcare,diagnostics-research,17308166144
+TYL,31.990079751989974,-8.734619520680443,"Tyler Technologies, Inc.",technology,software-application,16721265664
+VEEV,29.41753284192781,2.86865845036941,Veeva Systems Inc.,healthcare,health-information-services,49176576000
+PTC,29.168323272118002,2.684637611593499,PTC Inc.,technology,software-application,21190889472
+HAS,26.788274882237538,59.68014326958739,"Hasbro, Inc.",consumer-cyclical,leisure,16631061504
+EL,26.658835464056718,22.54434271339121,"Estee Lauder Companies, Inc. (T",consumer-defensive,household-personal-products,39878090752
+GILD,26.13103956567011,39.512528386926114,"Gilead Sciences, Inc.",healthcare,drug-manufacturers-general,207000109056
+KDP,25.923567375970702,41.45575610708248,Keurig Dr Pepper Inc.,consumer-defensive,beverages-non-alcoholic,49851240448
+GDDY,25.01912769058332,-14.064619077131068,GoDaddy Inc.,technology,software-infrastructure,13871399936
+CBOE,24.289992025693863,41.55545846199147,"Cboe Global Markets, Inc.",financial-services,financial-data-stock-exchanges,36856741888
+VTRS,23.21452052498445,91.7754039981999,Viatris Inc.,healthcare,drug-manufacturers-specialty-generic,22825914368
+BBY,22.13442406028987,29.742948326775643,"Best Buy Co., Inc.",consumer-cyclical,specialty-retail,20895170560
