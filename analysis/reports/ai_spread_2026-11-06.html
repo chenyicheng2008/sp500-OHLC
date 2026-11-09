@@ -261,6 +261,17 @@ footer{margin-top:56px; padding-top:24px; border-top:1px solid var(--rule);
 footer b{color:var(--ink-2); font-weight:500}
 footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:var(--sunken);
   padding:1px 5px; border-radius:2px; color:var(--ink-2)}
+/* ---------- print / PDF ---------- */
+@media print{
+  nav, #tip, .rb-row button, .rangebar svg, .rb-hint{display:none!important}
+  .rb-row{margin:0} .rb-info{margin-left:0}
+  section{padding-top:28px}
+  figure, .panel, .stats, .stat, .toc, .verdict, .note-box, tr, .sec-head{break-inside:avoid}
+  .sec-head{break-after:avoid}
+  .tw{overflow:visible!important}
+  .mem-more summary{display:none}
+  a{color:inherit; text-decoration:none}
+}
 @media (prefers-reduced-motion: reduce){*{animation:none!important; transition:none!important}}
 @media (max-width:520px){
   .mast-in{padding-block:30px 22px}
@@ -3226,6 +3237,10 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
   renderStatic(); applyView();
   renderCharts();
   buildToc();
+  // printing / PDF: open collapsed lists so they appear on paper
+  window.addEventListener("beforeprint", function () {
+    [].forEach.call(document.querySelectorAll("details"), function (d) { d.open = true; });
+  });
 
   var rt;
   window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(function () { renderStatic(); applyView(); renderCharts(); }, 180); });

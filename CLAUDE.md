@@ -262,6 +262,17 @@ the template for the spread page. `applyView()` must run after every `renderStat
 attribute; and never overwrite an element that renderStatic fills (`#h-dek` holds
 `#st-dek-n` — replacing its text crashed the resize handler).
 
+## PDF export (`analysis/export_pdf.py`, optional)
+
+Asked 2026-11-09 for the spread page. Headless Chromium (Playwright; preinstalled at
+`/opt/pw-browsers/chromium` in the cloud containers, absent in the GitHub Action, so not
+part of the daily pipeline): `python analysis/export_pdf.py analysis/reports/ai_spread_<asof>.html`
+→ same name `.pdf`, A4, light theme. Charts are sized from the window, so the page is laid
+out at the A4 content width (760 px) before printing, not printed from a desktop-width
+render. `@media print` in the template hides the nav, range controls and tooltip (the
+window's date span still prints), keeps panels/rows from splitting, and a `beforeprint`
+handler opens `<details>` so the 83-name tech list prints. 2026-11-06: 16 pages, ~4 MB.
+
 ## Constituents (section 「成分股」)
 
 `regime_backtest.py` → `constituents`: the regime universe (22 AI-hardware names) and both
