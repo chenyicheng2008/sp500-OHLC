@@ -1,0 +1,23 @@
+﻿stock,name,ethnic_group,Main_business_direction,Featured_Growth_Focus
+NVDA,NVIDIA,AI Compute Chips,GPUs and data-center computing platforms,AI accelerators
+AVGO,BROADCOM,AI Compute Chips,Custom ASICs and networking silicon,Custom AI accelerators and AI networking chips
+AMD,ADVANCED MICRO DEVICES,AI Compute Chips,CPUs and GPUs,Data-center GPUs
+MU,MICRON TECHNOLOGY,Memory and Storage,DRAM and NAND,High-bandwidth memory for AI accelerators
+SNDK,SANDISK,Memory and Storage,NAND flash and SSDs,Data-center SSDs
+WDC,WESTERN DIGITAL,Memory and Storage,Hard disk drives,High-capacity drives for data centers
+STX,SEAGATE TECHNOLOGY,Memory and Storage,Hard disk drives,High-capacity drives for data centers
+ANET,ARISTA NETWORKS,AI Servers and Networking,Data-center switching,AI cluster networking
+DELL,DELL TECHNOLOGIES,AI Servers and Networking,"Servers, storage and PCs",AI servers
+SMCI,SUPER MICRO COMPUTER,AI Servers and Networking,Servers and rack systems,AI servers
+HPE,HEWLETT PACKARD ENTERPRISE,AI Servers and Networking,Servers and networking,AI servers and networking
+LITE,LUMENTUM,Optical Communication,Optical components and lasers,Optical transceivers for data centers
+CIEN,CIENA,Optical Communication,Optical networking systems,Data-center interconnect
+COHR,COHERENT,Optical Communication,Lasers and optical components,Optical transceivers for data centers
+GLW,CORNING,Optical Communication,Specialty glass and optical fiber,Fiber and connectivity for data centers
+APH,AMPHENOL,Connectors and Components,Connectors and interconnect,High-speed interconnect for AI servers
+TEL,TE CONNECTIVITY,Connectors and Components,Connectors and sensors,High-speed interconnect for data centers
+AMAT,APPLIED MATERIALS,Semiconductor Equipment,Wafer fabrication equipment,Equipment for advanced logic and memory
+LRCX,LAM RESEARCH,Semiconductor Equipment,Etch and deposition equipment,Equipment for advanced memory and logic
+KLAC,KLA,Semiconductor Equipment,Process control and inspection,Inspection for advanced nodes and packaging
+TER,TERADYNE,Semiconductor Equipment,Semiconductor test equipment,Test for AI accelerators and memory
+VRT,VERTIV,Data Center Power and Cooling,Power and thermal management,Data-center power and liquid cooling

@@ -1,8 +1,8 @@
 ﻿group,n,bull_now,bear_now,net_now,bull_1M,bear_1M,net_1M,bull_3M,bear_3M,net_3M
-CSP,3,66.7,33.3,33.3,66.7,0.0,66.7,66.7,0.0,66.7
-Information Security and AI Protection,3,0.0,0.0,0.0,100.0,0.0,100.0,100.0,0.0,100.0
-AI-based content creation,2,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-Cloud data platform,2,0.0,0.0,0.0,100.0,0.0,100.0,50.0,0.0,50.0
-Innovation and generative AI,1,0.0,0.0,0.0,0.0,100.0,-100.0,0.0,100.0,-100.0
-Enterprise Cloud and AI Platform,3,0.0,33.3,-33.3,66.7,33.3,33.3,0.0,33.3,-33.3
-Marketing and Advertising AI,1,0.0,100.0,-100.0,0.0,100.0,-100.0,0.0,100.0,-100.0
+AI Servers and Networking,4,0.0,0.0,0.0,100.0,0.0,100.0,75.0,25.0,50.0
+Connectors and Components,2,0.0,0.0,0.0,50.0,0.0,50.0,50.0,0.0,50.0
+Memory and Storage,4,0.0,25.0,-25.0,50.0,0.0,50.0,0.0,0.0,0.0
+Semiconductor Equipment,4,0.0,25.0,-25.0,100.0,0.0,100.0,0.0,0.0,0.0
+AI Compute Chips,3,0.0,33.3,-33.3,66.7,0.0,66.7,66.7,0.0,66.7
+Optical Communication,4,0.0,75.0,-75.0,25.0,0.0,25.0,0.0,0.0,0.0
+Data Center Power and Cooling,1,0.0,100.0,-100.0,0.0,100.0,-100.0,0.0,0.0,0.0

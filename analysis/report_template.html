@@ -396,7 +396,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
 </section>
 
 <section id="ai" data-toc="AI 多空" data-q="AI 概念股裡多頭排列、空頭排列與整理各占多少，一個月內誰轉進、誰轉出，和全體成分股比是強是弱。">
-  <div class="sec-head"><span class="sec-no">07</span><h2>AI 概念股多空結構</h2></div>
+  <div class="sec-head"><span class="sec-no">07</span><h2 id="tech-h2">多空結構</h2></div>
   <p class="sec-sub" id="tech-sub">—</p>
   <div class="note-box" id="tech-missing" hidden></div>
   <div class="stats" id="tech-stats" style="margin-top:22px"></div>
@@ -1334,8 +1334,11 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
    * bull / bear regime of the AI concept list (or one sector)
    * ------------------------------------------------------------------ */
   var ST_TC = { bull: "多頭", neither: "整理", bear: "空頭" };
-  // Sub-themes of data/tableau/AIsoftware_en.csv (column ethnic_group).
+  // Sub-themes (column ethnic_group) of data/tableau/AIhardware_en.csv and AIsoftware_en.csv.
   var GRP_TC = {
+    "AI Compute Chips": "AI 運算晶片", "Memory and Storage": "記憶體與儲存", "AI Servers and Networking": "AI 伺服器與網通",
+    "Optical Communication": "光通訊", "Connectors and Components": "連接器與零組件", "Semiconductor Equipment": "半導體設備",
+    "Data Center Power and Cooling": "資料中心電力與散熱",
     "Enterprise Cloud and AI Platform": "企業雲端與 AI 平台", "Cloud data platform": "雲端資料平台",
     "Information Security and AI Protection": "資訊安全與 AI 防護", "AI-based content creation": "AI 內容創作",
     "Consumption and social AI": "消費與社群 AI", "Marketing and Advertising AI": "行銷與廣告 AI",
@@ -1410,12 +1413,17 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
       .map(function (k) { return { ind: k, tks: g[k] }; });
   }
 
+  // "第 37 百分位", or the extreme said in words when the reading is the period's lowest / highest
+  function pctTxt(p, span) {
+    return p <= 0 ? "為" + span + "最低" : p >= 99.9 ? "為" + span + "最高" : span + "第 " + p.toFixed(0) + " 百分位";
+  }
+
   function renderTrendStatic() {
     var sec = document.getElementById("ai");
     var T = D.trend;
     if (!T) { sec.hidden = true; return; }
     var L = T.latest, M1 = T.lookback["1M"], M3 = T.lookback["3M"];
-    var UV = T.universe, isAI = UV.kind === "aisoft";
+    var UV = T.universe, isAI = UV.kind !== "sector";
     var U = isAI ? UV.label : secName(UV.label) + "類股";
     var sU = /^[A-Za-z0-9]/.test(U) ? " " + U : U;
     var gName = isAI ? function (k) { return GRP_TC[k] || k; } : indName;
@@ -1426,8 +1434,9 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     var nGroups = groupsAll.filter(function (g, i) { return groupsAll.indexOf(g) === i; }).length;
 
     document.getElementById("tech-sub").textContent = (isAI
-      ? "以 repo 內的 AI 概念股清單（AIsoftware_en.csv，" + UV.list_size + " 檔、" + nGroups + " 個族群）為範圍。其中 " + UV.n_priced +
-        " 檔有日線資料可以判斷排列" + (nMiss ? "，其餘 " + nMiss + " 檔未納入（見下方說明）" : "") + "。"
+      ? "以 repo 內的" + sU + "清單（" + UV.source + "，" + UV.list_size + " 檔、" + nGroups + " 個族群）為範圍，" +
+        (nMiss ? "其中 " + UV.n_priced + " 檔有日線資料可以判斷排列，其餘 " + nMiss + " 檔未納入（見下方說明）。"
+               : "全部都有日線資料。")
       : "以 Yahoo 的「" + secName(UV.label) + "」類股為範圍（" + T.n_members + " 檔）。") +
       "逐日判斷每一檔是多頭排列、空頭排列或整理，再看三者的比例怎麼隨時間變化，以及和全體 S&P 500 成分股的差距。" +
       "樣本只有 " + T.n_members + " 檔，一檔改變狀態，比例就移動 " + per.toFixed(1) + " 個百分點。";
@@ -1439,6 +1448,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
           return gName(g) + " <span class='mono' style='font-size:12px'>" + UV.missing[g].join("、") + "</span>";
         }).join("；") + "。本章數字只代表有價格的 " + UV.n_priced + " 檔，偏向大型股。";
     } else { miss.hidden = true; }
+    document.getElementById("tech-h2").textContent = U + "多空結構";
     document.getElementById("tech-h-stack").textContent = U + "多頭／整理／空頭比例（日線）";
     document.getElementById("tech-h-net").textContent = "多空淨值：" + U + " vs 全體（日線）";
     document.getElementById("tech-h-long").textContent = "長線對照：" + U + "多空淨值（週線）";
@@ -1460,7 +1470,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
       stat("多頭排列", L.sec_bull.toFixed(1) + "%", M1 ? "一個月前 " + M1.sec_bull.toFixed(1) + "%" : "") +
       stat("整理", L.sec_neither.toFixed(1) + "%", "均線之間拉鋸") +
       stat("空頭排列", L.sec_bear.toFixed(1) + "%", M1 ? "一個月前 " + M1.sec_bear.toFixed(1) + "%" : "") +
-      stat("多空淨值", (L.sec_net >= 0 ? "+" : "") + L.sec_net.toFixed(1), "全體 " + (L.mkt_net >= 0 ? "+" : "") + L.mkt_net.toFixed(1) + "；近一年第 " + T.pctile_daily.toFixed(0) + " 百分位");
+      stat("多空淨值", (L.sec_net >= 0 ? "+" : "") + L.sec_net.toFixed(1), "全體 " + (L.mkt_net >= 0 ? "+" : "") + L.mkt_net.toFixed(1) + "；" + pctTxt(T.pctile_daily, "近一年"));
 
     var D1 = T.daily;
     var hiI = D1.sec_net.indexOf(Math.max.apply(null, D1.sec_net.filter(function (v) { return v !== null; })));
@@ -1477,7 +1487,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     var ex = T.weekly_extremes;
     document.getElementById("cap-tech-long").textContent =
       "週線淨值最高 " + pct(ex.max.net).replace("%", "") + "（" + ex.max.date + "），最低 " + pct(ex.min.net).replace("%", "") + "（" + ex.min.date +
-      "）；目前 " + pct(T.weekly_latest.sec_net).replace("%", "") + "，位於這段期間的第 " + T.pctile_weekly.toFixed(0) + " 百分位。";
+      "）；目前 " + pct(T.weekly_latest.sec_net).replace("%", "") + "，" + pctTxt(T.pctile_weekly, "這段期間") + "。";
 
     // transition matrix
     var tr = T.transitions, states = ["bull", "neither", "bear"];
@@ -1522,11 +1532,14 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     // read-out
     var take = [];
     take.push("目前" + sU + "多頭 " + L.sec_bull.toFixed(0) + "%、整理 " + L.sec_neither.toFixed(0) + "%、空頭 " + L.sec_bear.toFixed(0) +
-      "%，淨值 " + pct(L.sec_net).replace("%", "") + "，在近一年日線中排第 " + T.pctile_daily.toFixed(0) + " 百分位、" + T.weekly_start.slice(0, 4) + " 年以來週線中排第 " +
-      T.pctile_weekly.toFixed(0) + " 百分位。" +
+      "%，淨值 " + pct(L.sec_net).replace("%", "") + "，日線" + pctTxt(T.pctile_daily, "近一年") + "、週線" +
+      pctTxt(T.pctile_weekly, " " + T.weekly_start.slice(0, 4) + " 年以來") + "。" +
       (L.sec_bull >= 50 ? "過半數多頭排列，屬全面多頭。"
         : L.sec_bear >= 50 ? "過半數空頭排列，屬全面空頭。"
-        : L.sec_neither >= 50 ? "過半數處於整理，多數個股在均線之間拉鋸，屬中期修正而非全面轉空。" : "多空與整理三分，沒有單一主導狀態。"));
+        : L.sec_neither >= 50 ? "過半數處於整理，多數個股在均線之間拉鋸" +
+            (L.sec_bull === 0 ? "，而且沒有一檔維持多頭排列，空頭 " + L.sec_bear.toFixed(0) + "% 是唯一成形的方向，屬偏弱整理。"
+              : L.sec_bear > L.sec_bull ? "，空頭排列多於多頭排列，屬偏弱整理。" : "，屬中期修正而非全面轉空。")
+        : "多空與整理三分，沒有單一主導狀態。"));
     if (M1) take.push("和全體比：一個月前" + sU + "淨值" + (gapThen >= 0 ? "領先" : "落後") + "全體 " + Math.abs(gapThen).toFixed(0) +
       " 點，現在" + (gapNow >= 0 ? "領先 " : "落後 ") + Math.abs(gapNow).toFixed(0) + " 點" +
       ((gapThen >= 0) !== (gapNow >= 0) ? "，相對位置在一個月內翻轉" : "") +
@@ -1538,8 +1551,10 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
           : "。"));
     var bull0 = states.reduce(function (a, c) { return a + tr.bull[c]; }, 0);
     var newBull = tr.neither.bull + tr.bear.bull;
-    take.push("流向：一個月前的 " + bull0 + " 檔多頭" + (tr.bull.bull * 2 < bull0 ? "只剩 " : "有 ") + tr.bull.bull + " 檔維持，" + tr.bull.neither + " 檔退回整理、" + tr.bull.bear +
-      " 檔直接轉空頭；同期新進多頭 " + newBull + " 檔（" + tr.neither.bull + " 檔來自整理、" + tr.bear.bull + " 檔來自空頭）。" +
+    take.push("流向：一個月前的 " + bull0 + " 檔多頭" + (tr.bull.bull === 0 ? "沒有一檔維持，"
+        : (tr.bull.bull * 2 < bull0 ? "只剩 " : "有 ") + tr.bull.bull + " 檔維持，") + tr.bull.neither + " 檔退回整理、" + tr.bull.bear +
+      " 檔直接轉空頭；" + (newBull ? "同期新進多頭 " + newBull + " 檔（" + tr.neither.bull + " 檔來自整理、" + tr.bear.bull + " 檔來自空頭）。"
+        : "同期沒有新進多頭。") +
       (bull0 - tr.bull.bull > newBull ? "退出多於進入，多頭比例因此下降。" : newBull > bull0 - tr.bull.bull ? "進入多於退出，多頭比例因此上升。" : ""));
     var out = (T.moved["bull->neither"] || []).concat(T.moved["bull->bear"] || []);
     var inn = (T.moved["neither->bull"] || []).concat(T.moved["bear->bull"] || []);

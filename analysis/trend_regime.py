@@ -1,10 +1,11 @@
 """Bull / bear share of a stock universe over time, from moving-average alignment.
 
-The universe is the repo's AI concept list (``data/tableau/AIsoftware_en.csv``) by
-default, grouped by its own sub-themes (``ethnic_group``); ``--universe sector:<name>``
-uses one Yahoo sector instead, grouped by industry. Only names with price history in
-``sp500_ohlc.csv`` can be classified -- the fetch step saves fundamentals, not prices,
-for list names outside the S&P 500 -- so the bundle records which ones are missing.
+The universe is one of the repo's AI concept lists, grouped by its own sub-themes
+(``ethnic_group``): ``aihw`` (default, ``data/tableau/AIhardware_en.csv``) or ``aisoft``
+(``data/tableau/AIsoftware_en.csv``). ``--universe sector:<name>`` uses one Yahoo sector
+instead, grouped by industry. Only names with price history in ``sp500_ohlc.csv`` can be
+classified -- the fetch step saves fundamentals, not prices, for list names outside the
+S&P 500 -- so the bundle records which ones are missing.
 
 Each constituent is classified every session:
 
@@ -21,7 +22,7 @@ carries survivorship bias: names that left the index are missing from the past.
 Run after ``breadth_sector.py``.
 
 Usage:
-    python analysis/trend_regime.py [--universe aisoft | --universe sector:technology]
+    python analysis/trend_regime.py [--universe aihw | aisoft | sector:technology]
 """
 
 from __future__ import annotations
@@ -41,30 +42,34 @@ DAILY_MA = (50, 200)
 WEEKLY_MA = (10, 40)
 LOOKBACK = {"1M": 21, "3M": 63}   # sessions, for "then vs now" comparisons
 STATES = ("bull", "neither", "bear")
-AI_LIST = REPO / "data" / "tableau" / "AIsoftware_en.csv"
+LISTS = {   # name -> (ticker list, page label)
+    "aihw": ("AIhardware_en.csv", "AI 硬體股"),
+    "aisoft": ("AIsoftware_en.csv", "AI 軟體股"),
+}
 
 
 def universe(spec: str, meta: pd.DataFrame, priced: pd.Index) -> dict:
     """Members (with prices), their group, and the list names we cannot price."""
-    if spec == "aisoft":
-        lst = pd.read_csv(AI_LIST, encoding=ENC)
+    if spec in LISTS:
+        fname, label = LISTS[spec]
+        lst = pd.read_csv(REPO / "data" / "tableau" / fname, encoding=ENC)
         lst = lst[lst["ethnic_group"].fillna("") != "INDEX"]           # the list carries index rows too
         group = dict(zip(lst["stock"], lst["ethnic_group"].fillna("unknown")))
         missing = {}
         for t, g in group.items():
             if t not in priced:
                 missing.setdefault(g, []).append(t)
-        return {"kind": "aisoft", "label": "AI 概念股", "group_kind": "族群",
+        return {"kind": "list", "source": fname, "label": label, "group_kind": "族群",
                 "members": [t for t in group if t in priced],
                 "group_of": {t: g for t, g in group.items() if t in priced},
                 "list_size": len(group), "missing": {g: sorted(v) for g, v in missing.items()}}
     if spec.startswith("sector:"):
         sector = spec.split(":", 1)[1]
         members = [t for t in meta.index[meta["Sector"] == sector] if t in priced]
-        return {"kind": "sector", "sector": sector, "label": sector, "group_kind": "產業",
+        return {"kind": "sector", "source": "sp500_stocks.csv", "label": sector, "group_kind": "產業",
                 "members": members, "group_of": {t: meta.at[t, "Industry"] for t in members},
                 "list_size": int((meta["Sector"] == sector).sum()), "missing": {}}
-    raise SystemExit(f"unknown universe {spec!r}; use 'aisoft' or 'sector:<name>'")
+    raise SystemExit(f"unknown universe {spec!r}; use one of {sorted(LISTS)} or 'sector:<name>'")
 
 
 def classify(close: pd.DataFrame, fast: int, slow: int) -> pd.DataFrame:
@@ -94,7 +99,7 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--data-dir", default=os.environ.get("FETCH_BASE", str(REPO / "data" / "weekly_reutin")))
     ap.add_argument("--out-dir", default=str(REPO / "data" / "analysis"))
-    ap.add_argument("--universe", default="aisoft", help="aisoft (default) or sector:<yahoo sector>")
+    ap.add_argument("--universe", default="aihw", help="aihw (default), aisoft, or sector:<yahoo sector>")
     args = ap.parse_args()
     out_dir = Path(args.out_dir)
 
@@ -168,7 +173,7 @@ def main() -> None:
     sec_hist = daily_out["sec_net"]
     wk_hist = weekly_out["sec_net"]
     bundle = {
-        "universe": {k: uni[k] for k in ("kind", "label", "group_kind", "list_size", "missing")} | {"n_priced": len(members)},
+        "universe": {k: uni[k] for k in ("kind", "source", "label", "group_kind", "list_size", "missing")} | {"n_priced": len(members)},
         "asof": last.date().isoformat(),
         "ma_daily": DAILY_MA, "ma_weekly": WEEKLY_MA,
         "n_members": len(members),

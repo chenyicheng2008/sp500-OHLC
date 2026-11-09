@@ -1,57 +1,12 @@
 {
  "universe": {
-  "kind": "aisoft",
-  "label": "AI 概念股",
+  "kind": "list",
+  "source": "AIhardware_en.csv",
+  "label": "AI 硬體股",
   "group_kind": "族群",
-  "list_size": 44,
-  "missing": {
-   "Enterprise Cloud and AI Platform": [
-    "HUBS",
-    "TEAM"
-   ],
-   "Cloud data platform": [
-    "AI",
-    "ESTC",
-    "FSLY",
-    "MDB",
-    "NET",
-    "SNOW"
-   ],
-   "Information Security and AI Protection": [
-    "OKTA",
-    "ZS"
-   ],
-   "AI-based content creation": [
-    "U"
-   ],
-   "Consumption and social AI": [
-    "PINS",
-    "RBLX",
-    "RDDT",
-    "ROKU",
-    "SNAP",
-    "SPOT"
-   ],
-   "Marketing and Advertising AI": [
-    "APPS",
-    "FIG",
-    "SHOP",
-    "TWLO",
-    "ZETA"
-   ],
-   "AI health education": [
-    "DOCS",
-    "DOCU",
-    "DUOL",
-    "HIMS",
-    "SOUN"
-   ],
-   "Innovation and generative AI": [
-    "KVYO",
-    "TEM"
-   ]
-  },
-  "n_priced": 15
+  "list_size": 22,
+  "missing": {},
+  "n_priced": 22
  },
  "asof": "2026-11-06",
  "ma_daily": [
@@ -62,117 +17,137 @@
   10,
   40
  ],
- "n_members": 15,
+ "n_members": 22,
  "daily_start": "2025-08-22",
  "weekly_start": "2015-08-14",
  "then_date": "2026-10-08",
  "transitions": {
   "bull": {
-   "bull": 1,
-   "neither": 7,
+   "bull": 0,
+   "neither": 13,
    "bear": 1
   },
   "neither": {
-   "bull": 1,
+   "bull": 0,
    "neither": 2,
-   "bear": 0
+   "bear": 5
   },
   "bear": {
    "bull": 0,
-   "neither": 1,
-   "bear": 2
+   "neither": 0,
+   "bear": 1
   }
  },
  "moved": {
   "bull->neither": [
-   "CRM",
-   "CRWD",
-   "DDOG",
-   "FTNT",
-   "NOW",
-   "PANW",
-   "PLTR"
+   "AMAT",
+   "AMD",
+   "ANET",
+   "APH",
+   "DELL",
+   "HPE",
+   "LITE",
+   "LRCX",
+   "MU",
+   "NVDA",
+   "SMCI",
+   "SNDK",
+   "TER"
   ],
-  "bear->neither": [
-   "APP"
+  "neither->bear": [
+   "AVGO",
+   "CIEN",
+   "COHR",
+   "GLW",
+   "WDC"
   ],
   "bull->bear": [
-   "GOOG"
-  ],
-  "neither->bull": [
-   "AMZN"
+   "KLAC"
   ]
  },
  "names_now": {
-  "bull": [
-   "AMZN",
-   "MSFT"
-  ],
+  "bull": [],
   "neither": [
-   "ADBE",
-   "ADSK",
-   "APP",
-   "CRM",
-   "CRWD",
-   "DDOG",
-   "FTNT",
-   "NOW",
-   "PANW",
-   "PLTR"
+   "AMAT",
+   "AMD",
+   "ANET",
+   "APH",
+   "DELL",
+   "HPE",
+   "LITE",
+   "LRCX",
+   "MU",
+   "NVDA",
+   "SMCI",
+   "SNDK",
+   "STX",
+   "TEL",
+   "TER"
   ],
   "bear": [
-   "GOOG",
-   "ORCL",
-   "TTD"
+   "AVGO",
+   "CIEN",
+   "COHR",
+   "GLW",
+   "KLAC",
+   "VRT",
+   "WDC"
   ]
  },
  "group_of": {
-  "CRM": "Enterprise Cloud and AI Platform",
-  "NOW": "Enterprise Cloud and AI Platform",
-  "ORCL": "Enterprise Cloud and AI Platform",
-  "DDOG": "Cloud data platform",
-  "PLTR": "Cloud data platform",
-  "PANW": "Information Security and AI Protection",
-  "CRWD": "Information Security and AI Protection",
-  "ADBE": "AI-based content creation",
-  "ADSK": "AI-based content creation",
-  "TTD": "Marketing and Advertising AI",
-  "APP": "Innovation and generative AI",
-  "FTNT": "Information Security and AI Protection",
-  "GOOG": "CSP",
-  "AMZN": "CSP",
-  "MSFT": "CSP"
+  "NVDA": "AI Compute Chips",
+  "AVGO": "AI Compute Chips",
+  "AMD": "AI Compute Chips",
+  "MU": "Memory and Storage",
+  "SNDK": "Memory and Storage",
+  "WDC": "Memory and Storage",
+  "STX": "Memory and Storage",
+  "ANET": "AI Servers and Networking",
+  "DELL": "AI Servers and Networking",
+  "SMCI": "AI Servers and Networking",
+  "HPE": "AI Servers and Networking",
+  "LITE": "Optical Communication",
+  "CIEN": "Optical Communication",
+  "COHR": "Optical Communication",
+  "GLW": "Optical Communication",
+  "APH": "Connectors and Components",
+  "TEL": "Connectors and Components",
+  "AMAT": "Semiconductor Equipment",
+  "LRCX": "Semiconductor Equipment",
+  "KLAC": "Semiconductor Equipment",
+  "TER": "Semiconductor Equipment",
+  "VRT": "Data Center Power and Cooling"
  },
  "lookback": {
   "1M": {
    "date": "2026-10-08",
-   "sec_bull": 60.0,
-   "sec_bear": 20.0,
-   "sec_net": 40.0,
+   "sec_bull": 63.6,
+   "sec_bear": 4.5,
+   "sec_net": 59.1,
    "mkt_bull": 24.7,
    "mkt_bear": 29.8,
    "mkt_net": -5.1
   },
   "3M": {
    "date": "2026-08-10",
-   "sec_bull": 40.0,
-   "sec_bear": 20.0,
-   "sec_net": 20.0,
+   "sec_bull": 27.3,
+   "sec_bear": 4.5,
+   "sec_net": 22.7,
    "mkt_bull": 42.9,
    "mkt_bear": 9.8,
    "mkt_net": 33.1
   }
  },
- "pctile_daily": 45.2,
- "pctile_weekly": 20.8,
+ "pctile_daily": 0.0,
+ "pctile_weekly": 7.7,
  "weekly_extremes": {
   "max": {
-   "date": "2017-07-21",
+   "date": "2016-12-23",
    "net": 100.0
   },
   "min": {
-   "date": "2022-06-17",
-   "net": -100.0
+   "date": "2022-07-01",
+   "net": -95.2
   }
  }
 }

@@ -14,10 +14,10 @@ Taipei) and commits the refreshed CSVs back.
 ```
 fetch_sp500_memory_software.py   fetch step (yfinance -> data/weekly_reutin/*.csv)
 data/weekly_reutin/              fetched CSVs (sp500_ohlc.csv, sp500_stocks.csv, ...)
-data/tableau/                    ticker lists
+data/tableau/                    ticker lists (AIhardware_en.csv is hand-made, see below)
 analysis/breadth_sector.py       breadth + sector/industry analysis -> data/analysis/*.csv
 analysis/kd_signals.py           weekly/monthly KD(9,3,3) crosses + their factors -> kd_crosses.csv, kd_bundle.json
-analysis/trend_regime.py         bull/bear share over time (default: AI concept list) -> trend_regime_*.csv/json
+analysis/trend_regime.py         bull/bear share over time (default: AI hardware list) -> trend_regime_*.csv/json
 data/events/market_events.csv    hand-curated, sourced market events (the only non-computed input)
 analysis/build_report_data.py    condenses those CSVs -> data/analysis/report_data.json
 analysis/build_report.py         bakes the JSON into the template -> analysis/reports/*.html
@@ -141,22 +141,28 @@ seeded at 50. Weekly and monthly bars are resampled from the daily slice with th
 - Group read-outs are generated: "concentrated in one sector" needs ≥50% of the group
   *and* ≥2× that sector's universe share (3 of 10 industrials at 2× is not concentration).
 
-## AI-concept bull / bear regime (`trend_regime.py`)
+## AI-hardware bull / bear regime (`trend_regime.py`)
 
 Every name is classified each session: **bull** = close > MA50 > MA200, **bear** =
 close < MA50 < MA200, **neither** otherwise. The universe's three shares, and net = bull −
 bear, form the time series; the whole S&P 500 is computed the same way as the baseline.
 
-- **Universe** (since 2026-11-09): `data/tableau/AIsoftware_en.csv`, minus its INDEX rows
-  (^GSPC/^IXIC/^SOX), grouped by its own `ethnic_group` sub-themes (zh names in `GRP_TC`
-  in the template). `--universe sector:technology` restores the earlier Yahoo-sector view
-  (grouped by industry); the page wording follows `bundle.universe`, never a fixed label.
-- **Only 15 of 44 list names are priced.** The fetch step saves OHLC for S&P 500 members
-  only; the other 29 (SNOW, NET, ZS, SHOP, RDDT, …) have fundamentals but no candles. The
-  bundle lists them by group and the page shows them in a note — do not drop that note,
-  and do not describe the 15 as "the AI list". Full coverage needs the fetch step (which
-  runs on `main`) to also save OHLC for the AI list; that is the user's call. With 15
-  names one state change moves a share 6.7 points, and the page says so.
+- **Universe** (since 2026-11-09, second change that day): AI **hardware** only, per the
+  user ("AI概念股先排除軟體"). `data/tableau/AIhardware_en.csv` is a list Claude proposed and
+  the user accepted — the 22 "core" names: compute chips NVDA/AVGO/AMD; memory & storage
+  MU/SNDK/WDC/STX; servers & networking ANET/DELL/SMCI/HPE; optical LITE/CIEN/COHR/GLW;
+  connectors APH/TEL; semi equipment AMAT/LRCX/KLAC/TER; DC power & cooling VRT. Its
+  business descriptions are generic, written from model knowledge, not sourced. Offered
+  but **not** added (the user's call): CSCO, MPWR, JBL, NTAP, ETN, GEV, CEG, VST, and
+  Samsung / SK hynix / Kioxia (priced in `Memory_ohlc.csv`, different exchange holidays).
+  All 22 are S&P 500 members with full daily history; no split/spin-off cliffs as of
+  2026-11-06 (largest one-day drop SMCI -33%).
+- `--universe aisoft` gives the software list (`AIsoftware_en.csv`, INDEX rows dropped):
+  only 15 of 44 names are priced — the fetch step saves OHLC for S&P 500 members only —
+  and the page then lists the 29 unpriced names by group in a note. Do not drop that note.
+  `--universe sector:technology` gives the Yahoo-sector view, grouped by industry. All
+  page wording (h2, captions, read-out) follows `bundle.universe` (`label`, `source`,
+  `group_kind`); zh group names live in `GRP_TC` in the template.
 - Daily series starts only once MA200 exists (~2025-08 with the current file). The long
   run uses 10/40-week averages on the spliced weekly bars from 2015 — with **today's**
   list, so it carries survivorship bias (early years read too bullish; for a hand-picked
@@ -165,14 +171,16 @@ bear, form the time series; the whole S&P 500 is computed the same way as the ba
   up are dropped (`min_n`; the old fixed `>= 10` was sized for 83 tech names).
 - The transition matrix (state 21 sessions ago → now) explains *why* the ratio moved;
   the read-out's "單日衝擊" line names the session with the largest one-day fall in net
-  and the events catalogued that day (on 2026-11-06 that was 10-29: E13 Alphabet, E14
-  software earnings).
+  and the events catalogued that day.
 - Read-out verbs come from signs: on 2026-11-06 all three ≥3-name groups fell, and the
   first draft still said 「上升最多的是 CSP（+67 → +33）」. 「只剩 N 檔維持」 only when
   fewer than half held; a single new bull is named, not 「1 檔以…為主」.
-- As of 2026-11-06: AI net -6.7 vs market +18.9, down from +40.0 vs -5.1 a month earlier —
-  7 of 9 bulls slid to neither (security CRWD/FTNT/PANW, CRM/NOW, DDOG/PLTR), GOOG went
-  bull → bear, AMZN was the one new bull.
+- Extremes are said in words: a percentile of 0 reads 「為近一年最低」, not 「第 0 百分位」
+  (`pctTxt()`), and zero counts read 「沒有一檔維持」/「同期沒有新進多頭」.
+- As of 2026-11-06, AI hardware: bull 0%, neither 68%, bear 32%, net -31.8 (lowest of the
+  daily year) vs market +18.9; a month earlier +59.1 vs -5.1. All 14 bulls left (13 to
+  neither, KLAC to bear); the largest one-day fall was 10-14 (E03 CPI, E04 Barclays AI
+  hardware downgrade). The software list on the same date: net -6.7.
 
 ## Chapter index
 
