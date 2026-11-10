@@ -273,6 +273,19 @@ render. `@media print` in the template hides the nav, range controls and tooltip
 window's date span still prints), keeps panels/rows from splitting, and a `beforeprint`
 handler opens `<details>` so the 83-name tech list prints. 2026-11-06: 16 pages, ~4 MB.
 
+## Excel export (`analysis/export_xlsx.py`, optional)
+
+Asked 2026-11-10: 「多空排列差與指數數據生成xlsx」. `python analysis/export_xlsx.py` →
+`analysis/reports/ai_spread_<asof>.xlsx` (needs `openpyxl`: `python3 -m pip install openpyxl`).
+Sheets: 說明, 摘要, 週線, 日線, 背離, 週期段落, 成分股_AI硬體/半導體/科技, 圖表. Data columns are
+values from `data/analysis/*`; every derived column (distance from high, 4w/20d change, 13w
+returns, constituent weights, leg averages, the whole 摘要 sheet) is an Excel formula, so the
+workbook recalculates if data are edited. The daily sheet adds daily tech/semi indices
+(same rebuild, chain-linked daily, first daily row = 100 — a different base from weekly).
+Industry names reuse the template's `IND_TC`. Recalculate with the xlsx skill's
+`recalc.py` before shipping (2026-11-06: 3,948 formulas, 0 errors); its values matched
+the report (net -31.8 / -45.5 weekly, tech -14.3%, semi -24.9%, legs 15 / 20 weeks).
+
 ## Constituents (section 「成分股」)
 
 `regime_backtest.py` → `constituents`: the regime universe (22 AI-hardware names) and both
