@@ -3023,7 +3023,15 @@
       "complete": true,
       "ret13": 8.4,
       "ret26": 12.3,
-      "mdd26": 0.0
+      "mdd26": 0.0,
+      "dip13": 0.0,
+      "dip26": 0.0,
+      "dip52": 0.0,
+      "w5": null,
+      "w10": null,
+      "weeks_left": 508,
+      "confirm": "2017-03-24",
+      "confirm_pending": false
      },
      {
       "type": "B",
@@ -3039,7 +3047,15 @@
       "complete": true,
       "ret13": 7.3,
       "ret26": 20.3,
-      "mdd26": -0.4
+      "mdd26": -0.4,
+      "dip13": -0.4,
+      "dip26": -0.4,
+      "dip52": -0.4,
+      "w5": null,
+      "w10": null,
+      "weeks_left": 486,
+      "confirm": "2017-08-25",
+      "confirm_pending": false
      },
      {
       "type": "B",
@@ -3055,7 +3071,15 @@
       "complete": true,
       "ret13": -0.0,
       "ret26": 10.3,
-      "mdd26": -3.8
+      "mdd26": -3.8,
+      "dip13": -3.8,
+      "dip26": -3.8,
+      "dip52": -4.5,
+      "w5": null,
+      "w10": null,
+      "weeks_left": 461,
+      "confirm": "2018-02-16",
+      "confirm_pending": false
      },
      {
       "type": "B",
@@ -3071,7 +3095,15 @@
       "complete": true,
       "ret13": 7.5,
       "ret26": -7.7,
-      "mdd26": -8.4
+      "mdd26": -8.4,
+      "dip13": -4.1,
+      "dip26": -8.4,
+      "dip52": -15.0,
+      "w5": 23,
+      "w10": 27,
+      "weeks_left": 438,
+      "confirm": "2018-07-27",
+      "confirm_pending": false
      },
      {
       "type": "B",
@@ -3087,7 +3119,15 @@
       "complete": true,
       "ret13": 0.5,
       "ret26": 15.9,
-      "mdd26": -4.2
+      "mdd26": -4.2,
+      "dip13": -4.2,
+      "dip26": -4.2,
+      "dip52": -10.1,
+      "w5": 37,
+      "w10": 37,
+      "weeks_left": 383,
+      "confirm": "2019-08-16",
+      "confirm_pending": false
      },
      {
       "type": "A",
@@ -3103,7 +3143,15 @@
       "complete": true,
       "ret13": 10.7,
       "ret26": 4.1,
-      "mdd26": -1.5
+      "mdd26": -1.5,
+      "dip13": -1.5,
+      "dip26": -1.5,
+      "dip52": -10.7,
+      "w5": 27,
+      "w10": 27,
+      "weeks_left": 373,
+      "confirm": "2019-10-25",
+      "confirm_pending": false
      },
      {
       "type": "B",
@@ -3119,7 +3167,15 @@
       "complete": true,
       "ret13": 8.6,
       "ret26": 4.2,
-      "mdd26": 0.0
+      "mdd26": 0.0,
+      "dip13": 0.0,
+      "dip26": 0.0,
+      "dip52": -17.7,
+      "w5": 39,
+      "w10": 42,
+      "weeks_left": 275,
+      "confirm": "2021-09-10",
+      "confirm_pending": false
      },
      {
       "type": "B",
@@ -3135,7 +3191,15 @@
       "complete": true,
       "ret13": 7.7,
       "ret26": -7.6,
-      "mdd26": -7.6
+      "mdd26": -7.6,
+      "dip13": 0.0,
+      "dip26": -7.6,
+      "dip52": -18.0,
+      "w5": 26,
+      "w10": 27,
+      "weeks_left": 110,
+      "confirm": "2024-11-08",
+      "confirm_pending": false
      },
      {
       "type": "B",
@@ -3151,7 +3215,15 @@
       "complete": false,
       "ret13": null,
       "ret26": null,
-      "mdd26": -14.3
+      "mdd26": -14.3,
+      "dip13": null,
+      "dip26": null,
+      "dip52": null,
+      "w5": 2,
+      "w10": 5,
+      "weeks_left": 5,
+      "confirm": "2026-11-06",
+      "confirm_pending": true
      }
     ],
     "summary": {
@@ -3179,7 +3251,70 @@
       "med_ret26": 12.6,
       "med_mdd26": -2.5
      }
-    }
+    },
+    "horizons": {
+     "at_high": {
+      "13": {
+       "n": 225,
+       "median": -2.2,
+       "p5": 33.3,
+       "p10": 12.9
+      },
+      "26": {
+       "n": 221,
+       "median": -3.3,
+       "p5": 44.3,
+       "p10": 25.8
+      },
+      "52": {
+       "n": 217,
+       "median": -6.0,
+       "p5": 53.9,
+       "p10": 38.7
+      }
+     },
+     "A": {
+      "13": {
+       "n": 1,
+       "median": -1.5,
+       "p5": 0.0,
+       "p10": 0.0
+      },
+      "26": {
+       "n": 1,
+       "median": -1.5,
+       "p5": 0.0,
+       "p10": 0.0
+      },
+      "52": {
+       "n": 1,
+       "median": -10.7,
+       "p5": 100.0,
+       "p10": 100.0
+      }
+     },
+     "B": {
+      "13": {
+       "n": 7,
+       "median": -0.4,
+       "p5": 0.0,
+       "p10": 0.0
+      },
+      "26": {
+       "n": 7,
+       "median": -3.8,
+       "p5": 28.6,
+       "p10": 0.0
+      },
+      "52": {
+       "n": 7,
+       "median": -10.1,
+       "p5": 57.1,
+       "p10": 57.1
+      }
+     }
+    },
+    "n_at_high": 232
    },
    "semi": {
     "rows": [
@@ -3197,7 +3332,15 @@
       "complete": true,
       "ret13": 8.2,
       "ret26": 12.2,
-      "mdd26": -0.1
+      "mdd26": -0.1,
+      "dip13": -0.1,
+      "dip26": -0.1,
+      "dip52": -0.1,
+      "w5": null,
+      "w10": null,
+      "weeks_left": 508,
+      "confirm": "2017-03-24",
+      "confirm_pending": false
      },
      {
       "type": "B",
@@ -3213,7 +3356,15 @@
       "complete": true,
       "ret13": 11.3,
       "ret26": 21.6,
-      "mdd26": -2.3
+      "mdd26": -2.3,
+      "dip13": -2.3,
+      "dip26": -2.3,
+      "dip52": -2.3,
+      "w5": null,
+      "w10": null,
+      "weeks_left": 486,
+      "confirm": "2017-08-25",
+      "confirm_pending": false
      },
      {
       "type": "B",
@@ -3229,7 +3380,15 @@
       "complete": true,
       "ret13": -2.6,
       "ret26": 6.0,
-      "mdd26": -4.5
+      "mdd26": -4.5,
+      "dip13": -4.5,
+      "dip26": -4.5,
+      "dip52": -16.6,
+      "w5": 41,
+      "w10": 42,
+      "weeks_left": 461,
+      "confirm": "2018-02-16",
+      "confirm_pending": false
      },
      {
       "type": "B",
@@ -3245,7 +3404,15 @@
       "complete": true,
       "ret13": -6.1,
       "ret26": -20.4,
-      "mdd26": -22.4
+      "mdd26": -22.4,
+      "dip13": -10.2,
+      "dip26": -22.4,
+      "dip52": -25.9,
+      "w5": 2,
+      "w10": 9,
+      "weeks_left": 438,
+      "confirm": "2018-07-27",
+      "confirm_pending": false
      },
      {
       "type": "B",
@@ -3261,7 +3428,15 @@
       "complete": true,
       "ret13": 7.3,
       "ret26": 3.7,
-      "mdd26": -1.2
+      "mdd26": -1.2,
+      "dip13": -1.2,
+      "dip26": -1.2,
+      "dip52": -23.4,
+      "w5": 38,
+      "w10": 42,
+      "weeks_left": 275,
+      "confirm": "2021-09-10",
+      "confirm_pending": false
      },
      {
       "type": "A",
@@ -3277,7 +3452,15 @@
       "complete": true,
       "ret13": -0.7,
       "ret26": -0.9,
-      "mdd26": -21.3
+      "mdd26": -21.3,
+      "dip13": -21.3,
+      "dip26": -21.3,
+      "dip52": -30.0,
+      "w5": 1,
+      "w10": 2,
+      "weeks_left": 121,
+      "confirm": "2024-08-23",
+      "confirm_pending": false
      },
      {
       "type": "B",
@@ -3293,7 +3476,15 @@
       "complete": true,
       "ret13": -2.0,
       "ret26": 32.6,
-      "mdd26": -7.1
+      "mdd26": -7.1,
+      "dip13": -7.1,
+      "dip26": -7.1,
+      "dip52": null,
+      "w5": 12,
+      "w10": null,
+      "weeks_left": 44,
+      "confirm": "2026-02-13",
+      "confirm_pending": false
      },
      {
       "type": "B",
@@ -3309,7 +3500,15 @@
       "complete": false,
       "ret13": null,
       "ret26": null,
-      "mdd26": -24.9
+      "mdd26": -24.9,
+      "dip13": null,
+      "dip26": null,
+      "dip52": null,
+      "w5": 2,
+      "w10": 2,
+      "weeks_left": 5,
+      "confirm": "2026-11-06",
+      "confirm_pending": true
      }
     ],
     "summary": {
@@ -3337,9 +3536,78 @@
       "med_ret26": 12.9,
       "med_mdd26": -4.4
      }
-    }
+    },
+    "horizons": {
+     "at_high": {
+      "13": {
+       "n": 184,
+       "median": -3.4,
+       "p5": 38.6,
+       "p10": 19.6
+      },
+      "26": {
+       "n": 180,
+       "median": -3.8,
+       "p5": 44.4,
+       "p10": 27.2
+      },
+      "52": {
+       "n": 173,
+       "median": -4.9,
+       "p5": 49.7,
+       "p10": 36.4
+      }
+     },
+     "A": {
+      "13": {
+       "n": 1,
+       "median": -21.3,
+       "p5": 100.0,
+       "p10": 100.0
+      },
+      "26": {
+       "n": 1,
+       "median": -21.3,
+       "p5": 100.0,
+       "p10": 100.0
+      },
+      "52": {
+       "n": 1,
+       "median": -30.0,
+       "p5": 100.0,
+       "p10": 100.0
+      }
+     },
+     "B": {
+      "13": {
+       "n": 6,
+       "median": -3.4,
+       "p5": 33.3,
+       "p10": 16.7
+      },
+      "26": {
+       "n": 6,
+       "median": -3.4,
+       "p5": 33.3,
+       "p10": 16.7
+      },
+      "52": {
+       "n": 5,
+       "median": -16.6,
+       "p5": 60.0,
+       "p10": 60.0
+      }
+     }
+    },
+    "n_at_high": 185
    }
-  }
+  },
+  "horizons": [
+   13,
+   26,
+   52
+  ],
+  "at_high": 1
  },
  "constituents": {
   "universe": [

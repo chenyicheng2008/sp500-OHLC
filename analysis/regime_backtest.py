@@ -54,6 +54,11 @@ INDEX_SWING = 0.15                    # index reversal, same size as an episode
 #   B ("指數強、多空弱", classic top divergence): index makes a higher high while the spread's
 #     high is more than DIV_TOL lower.
 DIV_K, DIV_LEVEL, DIV_W, DIV_TOL = 6, 40, 3, 5
+# Horizons for "what came after": the eye judges a divergence over about a year, so the
+# max dip is reported at 13/26/52 weeks, against every week the index sat at its high
+# (within AT_HIGH of its running high) -- B requires an index high, so that is the fair base.
+DIV_HORIZONS = (13, 26, 52)
+AT_HIGH = 0.01
 BUCKETS = [-101, -50, -20, 20, 50, 80, 101]
 INDICES = {
     "tech": ("科技類股", lambda m: m["Sector"] == "technology"),
@@ -321,12 +326,23 @@ def divergence_study(df: pd.DataFrame) -> dict:
     for k in INDICES:
         lv = df[k].values
         near = lambda i: max(range(max(0, i - DIV_W), min(n, i + DIV_W + 1)), key=lambda j: lv[j])
+        def dip(i, h):          # max fall within h weeks after week i (None until h weeks have passed)
+            return round(100 * float(lv[i:i + h + 1].min() / lv[i] - 1), 1) if i + h < n else None
+
+        def weeks_down(i, thr):  # weeks until the index first sits thr below its level at week i
+            hit = np.nonzero(lv[i:] / lv[i] - 1 <= thr)[0]
+            return int(hit[0]) if len(hit) else None
+
         def after(b):
             done = b + 2 * H < n
             return {"complete": done,
                     "ret13": round(100 * float(lv[b + H] / lv[b] - 1), 1) if b + H < n else None,
                     "ret26": round(100 * float(lv[b + 2 * H] / lv[b] - 1), 1) if done else None,
-                    "mdd26": round(100 * float(lv[b:min(n, b + 2 * H + 1)].min() / lv[b] - 1), 1)}
+                    "mdd26": round(100 * float(lv[b:min(n, b + 2 * H + 1)].min() / lv[b] - 1), 1),
+                    **{f"dip{h}": dip(b, h) for h in DIV_HORIZONS},
+                    "w5": weeks_down(b, -0.05), "w10": weeks_down(b, -0.10), "weeks_left": n - 1 - b,
+                    # a high is only known once DIV_K more weeks have passed without a higher one
+                    "confirm": dates[min(b + DIV_K, n - 1)], "confirm_pending": b + DIV_K > n - 1}
         rows, base = [], []
         for a, b in zip(highs, highs[1:]):
             ia, ib = near(a), near(b)
@@ -344,9 +360,26 @@ def divergence_study(df: pd.DataFrame) -> dict:
             med = lambda key: round(float(np.median([x[key] for x in done])), 1) if done else None
             return {"n": len(xs), "n_done": len(done), "hits": sum(x["mdd26"] <= 100 * BIG_DROP for x in done),
                     "med_ret13": med("ret13"), "med_ret26": med("ret26"), "med_mdd26": med("mdd26")}
+        def horizons(xs):       # median max dip and the share of ≥5% / ≥10% dips, per horizon
+            out = {}
+            for h in DIV_HORIZONS:
+                v = np.array([x for x in xs if x is not None], dtype=float)
+                out[str(h)] = {"n": int(len(v)),
+                               "median": round(float(np.median(v)), 1) if len(v) else None,
+                               "p5": round(100 * float((v <= -5).mean()), 1) if len(v) else None,
+                               "p10": round(100 * float((v <= -10).mean()), 1) if len(v) else None}
+            return out
+        at_high = [i for i in range(n) if lv[i] >= (1 - AT_HIGH) * lv[:i + 1].max()]
+        hz = {"at_high": {}, "A": {}, "B": {}}
+        for h in DIV_HORIZONS:
+            hz["at_high"][str(h)] = horizons([dip(i, h) for i in at_high])[str(h)]
+            for t in ("A", "B"):
+                hz[t][str(h)] = horizons([r[f"dip{h}"] for r in rows if r["type"] == t])[str(h)]
         res["by_index"][k] = {"rows": rows, "summary": {
             "A": summ([r for r in rows if r["type"] == "A"]), "B": summ([r for r in rows if r["type"] == "B"]),
-            "all_highs": summ(base)}}
+            "all_highs": summ(base)}, "horizons": hz, "n_at_high": len(at_high)}
+    res["horizons"] = list(DIV_HORIZONS)
+    res["at_high"] = round(100 * AT_HIGH)
     return res
 
 

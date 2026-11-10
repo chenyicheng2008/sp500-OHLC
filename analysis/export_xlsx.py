@@ -179,16 +179,21 @@ def main() -> None:
 
     # ------------------------------------------------------------------ 背離
     dv = wb.create_sheet("背離")
-    header(dv, 1, ["型態", "指數", "高點 1", "排列差 1", "高點 2", "排列差 2", "指數高點變化",
-                   "13 週後報酬", "26 週後報酬", "26 週內最大跌幅", "已滿 26 週"], [18, 10, 12, 9, 12, 9, 11, 11, 11, 12, 9])
+    header(dv, 1, ["型態", "指數", "高點 1", "排列差 1", "高點 2", "排列差 2", "確認週", "指數高點變化",
+                   "13 週後報酬", "26 週後報酬", "26 週內最大跌幅", "52 週內最大跌幅", "回落 5% 週數", "回落 10% 週數", "已滿 26 週"],
+           [18, 10, 12, 9, 12, 9, 12, 11, 11, 11, 12, 12, 11, 11, 9])
     r = 2
     for k in INDICES:
         for x in rb["divergence"]["by_index"][k]["rows"]:
             vals = [("A 多空強、指數弱" if x["type"] == "A" else "B 指數強、多空弱"), labels[k],
                     date.fromisoformat(x["h1"]), x["h1_val"], date.fromisoformat(x["h2"]), x["h2_val"],
+                    "待確認" if x["confirm_pending"] else date.fromisoformat(x["confirm"]),
                     x["idx_chg"] / 100, None if x["ret13"] is None else x["ret13"] / 100,
-                    None if x["ret26"] is None else x["ret26"] / 100, x["mdd26"] / 100, "是" if x["complete"] else "否"]
-            fmts = [None, None, "yyyy-mm-dd", "+0;-0;0", "yyyy-mm-dd", "+0;-0;0", "0.0%", "0.0%", "0.0%", "0.0%", None]
+                    None if x["ret26"] is None else x["ret26"] / 100, x["mdd26"] / 100,
+                    None if x["dip52"] is None else x["dip52"] / 100,
+                    x["w5"] if x["w5"] is not None else "未出現", x["w10"] if x["w10"] is not None else "未出現",
+                    "是" if x["complete"] else "否"]
+            fmts = [None, None, "yyyy-mm-dd", "+0;-0;0", "yyyy-mm-dd", "+0;-0;0", "yyyy-mm-dd", "0.0%", "0.0%", "0.0%", "0.0%", "0.0%", "0", "0", None]
             for c, (v, fm) in enumerate(zip(vals, fmts), 1):
                 put(dv, r, c, v, fm)
             r += 1

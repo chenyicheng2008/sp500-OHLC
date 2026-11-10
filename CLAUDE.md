@@ -244,6 +244,17 @@ net (2015-08 → 2026-11, 587 weeks): **no — it confirms, it doesn't warn.**
   as connectors between the two compared highs (amber A, orange B) on the spread and the
   index panels. The zig-zag pivots (R=60) are too coarse for this — 2026-10-02 is not a
   confirmed pivot — which is why divergence uses its own local-high rule.
+- **"Why does a fall always seem to follow a divergence?"** (asked 2026-11-10). Each row
+  now carries `dip13/26/52`, weeks to -5% / -10% (`w5`, `w10`) and its `confirm` week (h2 +
+  6 weeks — the high is only knowable then; stats still run from h2, the caption says so).
+  `horizons` compares B against **every week the index sat within 1% of its high** (B
+  requires an index high, so that is the fair base). As of 2026-11-06: within 26 weeks B
+  is not worse (tech ≥10% fall 0% vs 26%, semi 17% vs 27%); within 52 weeks it is (57% vs
+  39%, 60% vs 36%), and the falls came 27-42 weeks later, often after further highs. On a
+  10-year chart that gap looks like "right after". Read-out: a late-cycle reminder, not a
+  sell signal; single-digit sample. Asked the same day about monthly averages (chat only,
+  not in the report): monthly-averaged divergences cut zero-crosses 24→8 and B 8→5, looked
+  sharper (tech 3/4 vs 4/14) but flipped with K=3 and confirm ~2 months late.
 - Every read-out clause picks its connective from the numbers (「明顯高於/略高於/對照」,
   「相差不大」 only when the return gap < 3 points, 「各占一半」 only when hits = half).
   The first draft put 「明顯較高」 after the *lower* group's figures — read the sentence

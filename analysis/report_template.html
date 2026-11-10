@@ -485,6 +485,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     <div style="height:14px"></div>
   </div>
   <div class="tw"><table id="t-bt-div"><caption>背離清單<small id="bt-div-cap">—</small></caption></table></div>
+  <div class="tw"><table id="t-bt-div-h"><caption>背離之後多久、跌多少：13／26／52 週<small id="bt-div-h-cap">—</small></caption></table></div>
   <div class="tw"><table id="t-bt-div-sum"><caption>背離之後：與所有高點比較<small id="bt-div-sum-cap">—</small></caption></table></div>
   <div class="tw"><table id="t-bt-legs"><caption id="bt-legs-h">—<small id="bt-legs-cap">—</small></caption></table></div>
   <figure class="panel">
@@ -2370,6 +2371,10 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
 
   var DIV_TC = { A: "多空強、指數弱", B: "指數強、多空弱" }, DIV_COL = { A: "--warn", B: "--serious" };
 
+  function wkDown(w, left) {
+    return w === null ? (left > 52 ? "未出現" : "尚未出現") : w === 0 ? "當週" : w + " 週";
+  }
+
   function renderDivergenceStatic(B) {
     var V = B.divergence;
     if (!V) return [];
@@ -2383,20 +2388,40 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     var rows = [];
     BT_KEYS.forEach(function (k) {
       V.by_index[k].rows.forEach(function (r) {
-        rows.push([{ html: "<b style='color:" + css(DIV_COL[r.type]) + "'>" + r.type + "</b> " + DIV_TC[r.type] },
+        rows.push([{ html: "<b style='color:" + css(DIV_COL[r.type]) + "' title='" + DIV_TC[r.type] + "'>" + r.type + "</b>" },
           { html: nm(k) },
-          { html: r.h1 + " → " + r.h2, cls: "mono" },
+          { html: r.h2 + "<div class='sub'>前一個 " + r.h1 + "</div>", cls: "mono" },
+          { html: r.confirm_pending ? "待確認" : r.confirm, cls: "mono" },
           { html: "+" + r.h1_val.toFixed(0) + " → " + (r.h2_val >= 0 ? "+" : "") + r.h2_val.toFixed(0), cls: "n" },
           { html: pct(r.idx_chg, 1), cls: "n" },
-          { html: r.ret13 === null ? "—" : pct(r.ret13, 1), cls: "n" },
           { html: r.ret26 === null ? "尚無結果" : pct(r.ret26, 1), cls: "n" },
-          { html: pct(r.mdd26, 1) + (r.complete ? "" : "*"), cls: "n", color: r.mdd26 <= -BIG ? css("--neg") : null }]);
+          { html: pct(r.mdd26, 1) + (r.complete ? "" : "*"), cls: "n", color: r.mdd26 <= -BIG ? css("--neg") : null },
+          { html: r.dip52 === null ? "尚無結果" : pct(r.dip52, 1), cls: "n", color: r.dip52 !== null && r.dip52 <= -BIG ? css("--neg") : null },
+          { html: wkDown(r.w5, r.weeks_left) + " / " + wkDown(r.w10, r.weeks_left), cls: "n" }]);
       });
     });
     rows.sort(function (a, b) { return a[2].html < b[2].html ? 1 : -1; });
-    fillTable("t-bt-div", ["型態", "指數", "兩個高點", "多空排列差", "指數高點變化", H + " 週後", 2 * H + " 週後", 2 * H + " 週內最大跌幅"], rows);
-    document.getElementById("bt-div-cap").textContent = "新到舊。報酬與跌幅都從第二個高點那週起算。*尚未滿 " + 2 * H +
-      " 週，是到資料日為止的跌幅。紅字＝跌幅達 " + BIG + "%。";
+    fillTable("t-bt-div", ["型態", "指數", "第二個高點", "確認週", "多空排列差", "指數高點變化", 2 * H + " 週後報酬", 2 * H + " 週內最大跌幅",
+      V.horizons[V.horizons.length - 1] + " 週內最大跌幅", "回落 5%／10%"], rows);
+    document.getElementById("bt-div-cap").textContent = "型態 A＝" + DIV_TC.A + "，B＝" + DIV_TC.B + "。新到舊。報酬、跌幅與週數都從第二個高點那週起算；但那個高點要再過 " + V.k +
+      " 週沒有被超過才算成立，「確認週」是當時真正看得到背離的時間，在它之前發生的跌幅事前無法利用。*尚未滿 " + 2 * H +
+      " 週，是到資料日為止的跌幅。紅字＝跌幅達 " + BIG + "%。回落週數＝指數首次比第二個高點那週低 5%／10% 所經過的週數。";
+    // what came after, over 13 / 26 / 52 weeks, against every week the index sat at its high
+    var HZ = V.horizons, hRows = [];
+    BT_KEYS.forEach(function (k) {
+      ["B", "A", "at_high"].forEach(function (t) {
+        var Z = V.by_index[k].horizons[t];
+        hRows.push([{ html: nm(k) }, { html: t === "at_high" ? "指數在高點的任何一週（對照）" : t + " " + DIV_TC[t] }]
+          .concat(HZ.map(function (h) {
+            var z = Z[String(h)];
+            return { html: z.n ? pct(z.median, 1) + "<div class='sub'>跌 ≥10%：" + z.p10.toFixed(0) + "%（n=" + z.n + "）</div>" : "—", cls: "n" };
+          })));
+      });
+    });
+    fillTable("t-bt-div-h", ["指數", "起點"].concat(HZ.map(function (h) { return h + " 週內最大跌幅中位數"; })), hRows);
+    document.getElementById("bt-div-h-cap").textContent = "背離從第二個高點那週起算；對照組是指數離自己的歷史高點不到 " + V.at_high +
+      "% 的每一週（B 型的定義本來就要求指數創新高，所以要和同樣站在高點的時候比）。只計已滿該期間的次數。";
+
     var sumRows = [];
     BT_KEYS.forEach(function (k) {
       ["A", "B", "all_highs"].forEach(function (t) {
@@ -2425,6 +2450,20 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     lines.push("背離：" + txt.join("；") + "。" +
       (aRare ? "A 型（多空排列差守在高檔、指數卻過不了前高）在這段期間很少出現，樣本不足以下結論。" : "") +
       (bWeaker ? "B 型之後下跌的比例明顯偏高。" : "B 型（傳統頂背離）之後並沒有比一般高點更常大跌——這個指標的頂背離不是可靠的賣出訊號。"));
+    var hTxt = BT_KEYS.map(function (k) {
+      var Z = V.by_index[k].horizons, h1 = String(HZ[1]), hL = String(HZ[HZ.length - 1]);
+      var b = V.by_index[k].rows.filter(function (r) { return r.type === "B" && r.w10 !== null && r.weeks_left > 52; });
+      var ws = b.map(function (r) { return r.w10; }).sort(function (x, y) { return x - y; });
+      return { k: k, half: Z.B[h1].p10 <= Z.at_high[h1].p10, year: Z.B[hL].p10 > Z.at_high[hL].p10 + 10,
+        txt: nm(k) + "：B 型之後 " + h1 + " 週內跌 ≥10% 的比例 " + Z.B[h1].p10.toFixed(0) + "%（任何高點週 " + Z.at_high[h1].p10.toFixed(0) + "%），" +
+          hL + " 週內 " + Z.B[hL].p10.toFixed(0) + "%（" + Z.at_high[hL].p10.toFixed(0) + "%）" +
+          (ws.length ? "；有回落 10% 的，等了 " + ws.join("、") + " 週" : "") };
+    });
+    var allHalf = hTxt.every(function (x) { return x.half; }), allYear = hTxt.every(function (x) { return x.year; });
+    lines.push("背離之後多久才跌：" + hTxt.map(function (x) { return x.txt; }).join("；") + "。" +
+      (allHalf && allYear ? "半年內 B 型之後並沒有比較常大跌，拉長到一年才明顯偏高——在長期走勢圖上，背離後大半年才出現的下跌看起來像是緊接在後，" +
+        "期間指數往往還先創新高。B 型比較像「行情走到後段」的提醒，不是「接下來就跌」的訊號；樣本只有個位數。"
+        : allYear ? "一年內 B 型之後較常大跌，但樣本只有個位數。" : "不論半年或一年，B 型之後的大跌比例都沒有明顯高於指數在高點的任何一週。"));
     var latest = [];
     BT_KEYS.forEach(function (k) { var r = V.by_index[k].rows; if (r.length && !r[r.length - 1].complete) latest.push({ k: k, r: r[r.length - 1] }); });
     if (latest.length) {
