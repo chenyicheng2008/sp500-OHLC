@@ -176,7 +176,8 @@ def flatten_and_save_ohlc(ohlc_dict, output_filename):
 #   ^SP500-45  S&P 500 Information Technology (GICS sector index)
 #   ^GSPC      S&P 500
 #   ^SPXEW     S&P 500 Equal Weight
-INDEX_SYMBOLS = ["^SP500-45", "^GSPC", "^SPXEW"]
+#   ^SOX       PHLX Semiconductor (not an S&P index: its members include non-S&P 500 names)
+INDEX_SYMBOLS = ["^SP500-45", "^GSPC", "^SPXEW", "^SOX"]
 
 
 def fetch_indices(years=12):

@@ -205,7 +205,8 @@ every page label says 多空排列差 — don't reintroduce 淨值.
 ## Official index (`index_ohlc.csv`, asked 2026-11-13: 「加抓 ^SP500-45 官方指數並列比較」)
 
 - The fetch step's `fetch_indices()` saves `INDEX_SYMBOLS` (`^SP500-45` S&P 500 Information
-  Technology, `^GSPC` S&P 500, `^SPXEW` S&P 500 Equal Weight) as **daily** bars for 12 years to
+  Technology, `^GSPC` S&P 500, `^SPXEW` S&P 500 Equal Weight, `^SOX` PHLX Semiconductor) as
+  **daily** bars for 12 years to
   `data/weekly_reutin/index_ohlc.csv` (same columns as `sp500_ohlc.csv`). It runs last, in
   its own try, so a Yahoo failure cannot cost the constituent files.
 - `regime_backtest.py` (`OFFICIAL`, `official_weekly`, `compare_official`) resamples it to
@@ -219,8 +220,8 @@ every page label says 多空排列差 — don't reintroduce 淨值.
   gap with another series: Alpha Vantage has no ^SP500-45, and its `SIXT` is the capped
   Technology *Select Sector* index (XLK's), a different index.
 - The scheduled job runs **main's** fetch script, so the file only appears once the fetch
-  change is on main. Pushed to main on 2026-11-13 at the user's request (469a898, that file
-  only); the first scheduled run after that should commit `index_ohlc.csv` — bring it in
+  change is on main. Pushed to main on 2026-11-13 at the user's request (469a898 with the
+  first three symbols, then 9c0834e adding ^SOX — that file only each time); the first scheduled run after that should commit `index_ohlc.csv` — bring it in
   with the usual `git checkout origin/main -- data/weekly_reutin` and check the official
   lines/table replaced the "not in yet" note. Our 83-name "technology" uses Yahoo's sector, not GICS, so expect a
   gap; why exactly (which names differ) has not been checked against S&P's list.
@@ -252,16 +253,20 @@ the numbers. 2026-11-12: tech above 200/50/20-day 59/46/48% vs market 65/72/68%.
 
 Semiconductors alone (asked 2026-11-13: 「半導體也單獨加上站上均線比例與指數比較」): third
 panel (`f-ms`, `id: "ms"`), `breadth_long_weekly_semi.csv` / `breadth_daily_semi.csv`, the
-18 names of `SEMI_INDUSTRIES` (= regime_backtest's semi index, ×25.09 since 2015-08). No
-official overlay on purpose: ^SOX (PHLX) has non-S&P members and is not fetched — offer it,
-don't fake it. With 18 names one stock is ~6 points; the caption says so.
+18 names of `SEMI_INDUSTRIES` (= regime_backtest's semi index, ×25.09 since 2015-08).
+Official overlay: `^SOX` (added at the user's request the same day). It is the PHLX index,
+not S&P — different members (non-S&P 500 names) and weighting — so the caption says the gap
+is not all survivorship. With 18 names one stock is ~6 points; the caption says so.
 
 ## Simulated semiconductor sector (section 類股, asked 2026-11-13: 「11 個類股的報酬.. 加入半導體類股模擬」)
 
-`sector_semi_sim.csv` (payload `sector_sim`): the same group functions run on the 18
-semiconductor + equipment names as if they were a sector (`Sector = semiconductors-sim`,
-`parent = technology`, `weight_pct` = share of the whole index). It is a **subset of
-technology**, so it lives outside `D.sector`: the 11 real sectors, 「11 個類股」, 家數 total,
+`sector_semi_sim.csv` (payload `sector_sim`, one row per simulated sector): the same group
+functions run on a name list as if it were a sector, `weight_pct` = share of the whole index.
+Rows: `semiconductors-sim` (the 18 semiconductor + equipment names, `parent = technology`)
+and `ai-hardware-sim` (the 22-name `AIhardware_en.csv` list, asked the same day: 「類股模擬
+加入"ai硬體"」; `parent = technology|industrials` — it spans sectors, so the tag reads
+「跨科技、工業」, `simParent()`). 2026-11-12: AI hardware 3M -19.6%, 18% above the 50-day. These overlap the real
+sectors, so they live outside `D.sector`: the 11 real sectors, 「11 個類股」, 家數 total,
 weight sums, smallest-sector, best/worst and leadership read-outs are untouched. It is shown
 (purple, tagged 「科技子集」, weight in parentheses) only in the 3-month bar chart, the
 leadership map and both sector tables; the bar caption adds one data-derived sentence

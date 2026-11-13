@@ -205,6 +205,7 @@ def new_highs_lows(close: pd.DataFrame, window: int = 252) -> pd.DataFrame:
 
 SEMI_INDUSTRIES = ["semiconductors", "semiconductor-equipment-materials"]
 SEMI_KEY = "semiconductors-sim"
+AIHW_KEY = "ai-hardware-sim"
 LONG_MA_WEEKS = (4, 10, 40)      # ≈ 20 / 50 / 200 trading days
 LONG_MIN_SHARE = 0.6              # a week counts once 60% of today's names have a 40-week average
 
@@ -658,8 +659,9 @@ def main() -> None:
     td.index.name = "Date"
     td.round(3).to_csv(out_dir / "breadth_daily_tech.csv", encoding=ENC)
     semi_n = [t for t in fund.loc[fund["Industry"].isin(SEMI_INDUSTRIES), "Ticker"] if t in daily.columns and t in shares.index]
-    # no official overlay: ^SOX (PHLX) has a different membership, and nothing fetches it
-    sw = long_weekly(daily[semi_n], weekly[[t for t in semi_n if t in weekly.columns]], shares)
+    # official reference: PHLX Semiconductor (^SOX), a different membership -- see the caption
+    sw = add_official(long_weekly(daily[semi_n], weekly[[t for t in semi_n if t in weekly.columns]], shares),
+                      Path(args.data_dir), (("^SOX", "official_cw", "cap_weighted"),))
     sw.index.name = "Date"
     sw.round(3).to_csv(out_dir / "breadth_long_weekly_semi.csv", encoding=ENC)
     sd = daily_group(daily[semi_n], shares)
@@ -698,7 +700,26 @@ def main() -> None:
     semi["label"] = "Semiconductors (simulated)"
     semi["style"] = "cyclical"
     semi["parent"] = "technology"
-    semi.to_csv(out_dir / "sector_semi_sim.csv", index=False, encoding=ENC)
+    sims = [semi]
+    # The AI-hardware list (data/tableau/AIhardware_en.csv, asked 2026-11-13: 「類股模擬加入
+    # "ai硬體"」) as a second simulated row. It spans sectors, so `parent` names every sector
+    # it draws from, most names first.
+    aihw_p = REPO / "data" / "tableau" / "AIhardware_en.csv"
+    if aihw_p.exists():
+        lst = pd.read_csv(aihw_p, encoding=ENC)["stock"].dropna().tolist()
+        af = fund[fund["Ticker"].isin(lst)].assign(Sector=AIHW_KEY)
+        if len(af):
+            ai = (group_returns(daily, af, shares, "Sector")
+                  .merge(group_breadth(daily, af, "Sector").drop(columns="n"), on="Sector")
+                  .merge(group_fundamentals(af, "Sector").drop(columns="n"), on="Sector"))
+            ai["weight_pct"] = 100 * ai["market_cap"] / sector["market_cap"].sum()
+            ai["rs_3m"] = ai["cw_3M"] - bench_3m
+            ai["rs_12m"] = ai["cw_12M"] - bench_12m
+            ai["label"] = "AI hardware (simulated)"
+            ai["style"] = "cyclical"
+            ai["parent"] = "|".join(fund[fund["Ticker"].isin(lst)]["Sector"].value_counts().index)
+            sims.append(ai)
+    pd.concat(sims, ignore_index=True).to_csv(out_dir / "sector_semi_sim.csv", index=False, encoding=ENC)
 
     MIN_IND = 3
     ind_ret = group_returns(daily, fund, shares, "Industry", min_members=MIN_IND)
