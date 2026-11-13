@@ -219,8 +219,10 @@ every page label says 多空排列差 — don't reintroduce 淨值.
   gap with another series: Alpha Vantage has no ^SP500-45, and its `SIXT` is the capped
   Technology *Select Sector* index (XLK's), a different index.
 - The scheduled job runs **main's** fetch script, so the file only appears once the fetch
-  change is on main — as of 2026-11-13 it is only on the working branch (the user has not
-  approved a push to main; ask, don't push). Our 83-name "technology" uses Yahoo's sector, not GICS, so expect a
+  change is on main. Pushed to main on 2026-11-13 at the user's request (469a898, that file
+  only); the first scheduled run after that should commit `index_ohlc.csv` — bring it in
+  with the usual `git checkout origin/main -- data/weekly_reutin` and check the official
+  lines/table replaced the "not in yet" note. Our 83-name "technology" uses Yahoo's sector, not GICS, so expect a
   gap; why exactly (which names differ) has not been checked against S&P's list.
 
 ## Share above moving averages, long run (section 03 first chart, asked 2026-11-13)
