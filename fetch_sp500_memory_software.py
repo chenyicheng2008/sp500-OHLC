@@ -170,6 +170,36 @@ def flatten_and_save_ohlc(ohlc_dict, output_filename):
     return combined_df
 
 
+# Official indices saved next to the constituents, for comparison with the indices the
+# analysis rebuilds from member closes. Daily bars only (one row per session is small),
+# 12 years so the weekly comparison covers the whole long run.
+#   ^SP500-45  S&P 500 Information Technology (GICS sector index)
+INDEX_SYMBOLS = ["^SP500-45"]
+
+
+def fetch_indices(years=12):
+    start = pd.Timestamp.today().normalize() - pd.DateOffset(years=years)
+    out = {}
+    for sym in INDEX_SYMBOLS:
+        data = None
+        for attempt in range(1, MAX_RETRIES + 1):
+            try:
+                data = yf.download(sym, start=start, interval="1d", progress=False)
+                if data is not None and not data.empty:
+                    break
+            except Exception as e:
+                print(f"抓取 {sym} 錯誤（第 {attempt} 次）: {e}")
+            time.sleep(RETRY_DELAY_SEC * attempt)
+        if data is None or data.empty:
+            print(f"{sym} 沒有資料，略過")
+            continue
+        data = _flatten_columns(data, sym)
+        data["Interval"] = "1d"
+        out[sym] = data
+    if out:
+        flatten_and_save_ohlc(out, os.path.join(BASE, "index_ohlc.csv"))
+
+
 def fetch_sp500():
     sp500_df = pd.read_csv(os.path.join(BASE, "SP500.csv"))
     sp500_data = [get_stock_info(t) for t in sp500_df["A"]]
@@ -235,5 +265,12 @@ if __name__ == "__main__":
     print("== sp500 OHLC ==")
     sp500_ohlc = get_adjusted_ohlc_from_csv(os.path.join(BASE, "sp500_stocks.csv"), column_name="Ticker", total_years=12, daily_years=2)
     flatten_and_save_ohlc(sp500_ohlc, os.path.join(BASE, "sp500_ohlc.csv"))
+
+    # Last, and isolated: a failure here must not cost the constituent files above.
+    print("== official index OHLC ==")
+    try:
+        fetch_indices()
+    except Exception as e:
+        print(f"官方指數抓取失敗，略過: {e}")
 
     print("All done.")

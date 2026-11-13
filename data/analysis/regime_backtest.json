@@ -3372,6 +3372,13 @@
   "tech_ret_1y": 15.6,
   "semi_ret_1y": 18.0
  },
+ "official": {
+  "tech": {
+   "symbol": "^SP500-45",
+   "label": "S&P 500 資訊科技（官方）",
+   "available": false
+  }
+ },
  "net_now": -27.3,
  "d4_now": -4.5
 }

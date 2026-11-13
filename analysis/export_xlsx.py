@@ -105,7 +105,13 @@ def main() -> None:
             f"{labels['tech']}指數", f"{labels['semi']}指數",
             "科技 距高點", "半導體 距高點", "多空排列差 4 週變化", "科技 13 週報酬", "半導體 13 週報酬",
             f"{rb['ew']['label']}指數", "等權重 距高點"]
-    header(ws, 1, cols, [12, 11, 9, 10, 12, 13, 12, 13, 10, 11, 12, 11, 12, 14, 11])
+    widths = [12, 11, 9, 10, 12, 13, 12, 13, 10, 11, 12, 11, 12, 14, 11]
+    OFF = (rb.get("official") or {}).get("tech") or {}
+    has_off = bool(OFF.get("available")) and "tech_off" in bw
+    if has_off:               # official S&P 500 IT, rebased onto the rebuilt tech line
+        cols += [f"官方 {OFF['symbol']}", "官方 距高點"]
+        widths += [13, 11]
+    header(ws, 1, cols, widths)
     w = bw.join(tw[["sec_bull", "sec_neither", "sec_bear", "mkt_net"]], how="left")
     for i, (d, r) in enumerate(w.iterrows(), start=2):
         put(ws, i, 1, d.date(), "yyyy-mm-dd")
@@ -119,6 +125,9 @@ def main() -> None:
         put(ws, i, 13, f"=H{i}/H{i-13}-1" if i >= 15 else None, "0.0%")
         put(ws, i, 14, round(float(r["aihw"]), 2), "#,##0.0")
         put(ws, i, 15, f"=N{i}/MAX(N$2:N{i})-1", "0.0%")
+        if has_off and pd.notna(r["tech_off"]):
+            put(ws, i, 16, round(float(r["tech_off"]), 2), "#,##0.0")
+            put(ws, i, 17, f"=P{i}/MAX(P$2:P{i})-1", "0.0%")
     nW = len(w) + 1
     ws.cell(row=1, column=5).comment = Comment("多頭排列占比 − 空頭排列占比（百分點），-100～+100。週線用 10 週與 40 週均線。", "export")
     ws.cell(row=1, column=14).comment = Comment(f"多空排列差同一批 {rb['ew']['n']} 檔，每週取各檔報酬的簡單平均後連乘，"
@@ -257,6 +266,8 @@ def main() -> None:
     c2 = LineChart(); c2.title = f"科技／半導體／{rb['ew']['label']} 重建指數（週線，2015-08 = 100，對數刻度）"; c2.height, c2.width = 9, 26
     c2.add_data(Reference(ws, min_col=7, max_col=8, min_row=1, max_row=nW), titles_from_data=True)
     c2.add_data(Reference(ws, min_col=14, max_col=14, min_row=1, max_row=nW), titles_from_data=True)
+    if has_off:
+        c2.add_data(Reference(ws, min_col=16, max_col=16, min_row=1, max_row=nW), titles_from_data=True)
     c2.set_categories(Reference(ws, min_col=1, min_row=2, max_row=nW))
     c2.y_axis.scaling.logBase = 10
     c2.x_axis.number_format = "yyyy"; c2.x_axis.tickLblSkip = 52
@@ -277,6 +288,9 @@ def main() -> None:
         ("指數", f"{labels['tech']}（{rb['indices']['tech']['n']} 檔，Yahoo technology 類股）與 {labels['semi']}"
                f"（{rb['indices']['semi']['n']} 檔，Yahoo 半導體＋半導體設備產業）：S&P 500 成分股以市值加權、逐期連鎖重建，"
                "股數以最新市值÷最新收盤固定。不是官方指數。"),
+        ("官方指數", (f"{OFF['label']}（{OFF['symbol']}，週線 P 欄）：每日抓取的官方收盤，以第一個共同週對齊重建科技指數的水準。"
+                     f"共同期間週報酬相關 {OFF['corr_wk']:.2f}、年化追蹤誤差 {OFF['te_ann']:.1f}%。只供對照，統計仍用重建指數。")
+                    if has_off else f"{OFF.get('symbol', '^SP500-45')}：資料檔還沒有官方指數（index_ohlc.csv），有資料後才會出現在週線表。"),
         ("等權重指數", f"{rb['ew']['label']}指數（週線 N 欄）：{U}名單 {rb['ew']['n']} 檔，每週取各檔報酬的簡單平均後連乘，"
                    f"晚上市的成分（{rb['ew']['n'] - rb['ew']['n_start']} 檔）上市後才加入。和多空排列差是同一批股票，只供對照，"
                    "不用於任何統計。"),

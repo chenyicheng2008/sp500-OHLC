@@ -61,6 +61,50 @@ INDICES = {
 }
 
 
+# Official counterparts, fetched by the daily job into index_ohlc.csv (asked 2026-11-13:
+# 「加抓 ^SP500-45 官方指數並列比較」). Drawn beside the rebuilt index and compared in a
+# table; the rebuilt one still drives every statistic, so the long run stays comparable.
+OFFICIAL = {"tech": ("^SP500-45", "S&P 500 資訊科技（官方）")}
+
+
+def official_weekly(data_dir: Path, sym: str):
+    """Weekly (W-FRI) closes of an official index from index_ohlc.csv, or None if absent."""
+    p = data_dir / "index_ohlc.csv"
+    if not p.exists():
+        return None
+    io = pd.read_csv(p, encoding=ENC)
+    io["Date"] = pd.to_datetime(io["Date"])
+    s = io[io["Ticker"] == sym].set_index("Date")["Close"].dropna().sort_index()
+    if s.empty:
+        return None
+    return s, s.resample("W-FRI").last().dropna()
+
+
+def compare_official(df: pd.DataFrame, key: str, daily_last, off_daily: pd.Series) -> dict:
+    """Rebuilt vs official over their common weeks: returns, drawdown, tracking."""
+    a, b = df[key], df[key + "_off"]
+    both = a.notna() & b.notna()
+    a, b = a[both], b[both]
+    ra, rb_ = a.pct_change().dropna(), b.pct_change().dropna()
+    diff = ra - rb_
+
+    def ret(x, n):
+        return round(float(100 * (x.iloc[-1] / x.iloc[-1 - n] - 1)), 1) if len(x) > n else None
+
+    def side(x):
+        return {"total": round(float(100 * (x.iloc[-1] / x.iloc[0] - 1)), 1), "ret_1y": ret(x, 52), "ret_13w": ret(x, 13),
+                "dd_now": round(float(100 * (x.iloc[-1] / x.cummax().iloc[-1] - 1)), 1),
+                "peak": x.idxmax().date().isoformat(),
+                "max_dd": round(float(100 * (x / x.cummax() - 1).min()), 1)}
+    return {"start": a.index[0].date().isoformat(), "end": a.index[-1].date().isoformat(), "weeks": int(len(a)),
+            "official_last": off_daily.index[-1].date().isoformat(),
+            "lags": bool(off_daily.index[-1] < daily_last),
+            "rebuilt": side(a), "official": side(b),
+            "corr_wk": round(float(ra.corr(rb_)), 3),
+            "te_ann": round(float(100 * diff.std() * np.sqrt(52)), 1),
+            "beta": round(float(np.cov(ra, rb_)[0, 1] / rb_.var()), 2)}
+
+
 def weekly_closes(ohlc: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     daily, _ = drop_empty_sessions(pivot(ohlc, "1d", "Close"))
     wh, _ = drop_empty_sessions(pivot(ohlc, "1wk", "Close"))
@@ -341,12 +385,26 @@ def main() -> None:
     ew_cols = [t for t in reg["group_of"] if t in w.columns]
     ew_ret = w[ew_cols].pct_change(fill_method=None).mean(axis=1)
     df["aihw"] = 100 * (1 + ew_ret.fillna(0)).cumprod()
+    off_daily = {}
+    for key, (sym, _) in OFFICIAL.items():
+        got = official_weekly(Path(args.data_dir), sym)
+        if got is not None:
+            off_daily[key], df[key + "_off"] = got[0], got[1]
     df = df.dropna(subset=["net", "tech", "semi"])
+    for key in off_daily:
+        # start the official line on the rebuilt one, at the first week both exist
+        k0 = df[key + "_off"].first_valid_index()
+        df[key + "_off"] = df[key + "_off"] / df.loc[k0, key + "_off"] * 100
+        df[key + "_off_dd"] = 100 * (df[key + "_off"] / df[key + "_off"].cummax() - 1)
     for key in list(INDICES) + ["aihw"]:
         df[key] = 100 * df[key] / df[key].iloc[0]                  # rebase to the first net week
         df[key + "_dd"] = 100 * (df[key] / df[key].cummax() - 1)
 
-    out = df[["net", "tech", "semi", "aihw", "tech_dd", "semi_dd", "aihw_dd"]].round(2)
+    for key in off_daily:          # official line rebased onto the rebuilt level at its first week
+        k0 = df[key + "_off"].first_valid_index()
+        df[key + "_off"] = df[key + "_off"] * df.loc[k0, key] / 100
+    out = df[["net", "tech", "semi", "aihw", "tech_dd", "semi_dd", "aihw_dd"] +
+             [c for k in OFFICIAL for c in (k + "_off", k + "_off_dd") if c in df]].round(2)
     out.index.name = "Date"
     out.to_csv(out_dir / "regime_backtest_weekly.csv", encoding=ENC)
 
@@ -411,6 +469,9 @@ def main() -> None:
                  "ret_1y": round(float(100 * (df["aihw"].iloc[-1] / df["aihw"].iloc[-53] - 1)), 1),
                  "tech_ret_1y": round(float(100 * (df["tech"].iloc[-1] / df["tech"].iloc[-53] - 1)), 1),
                  "semi_ret_1y": round(float(100 * (df["semi"].iloc[-1] / df["semi"].iloc[-53] - 1)), 1)}
+    res["official"] = {key: {"symbol": sym, "label": label, "available": key in off_daily,
+                             **(compare_official(df, key, daily.index[-1], off_daily[key]) if key in off_daily else {})}
+                       for key, (sym, label) in OFFICIAL.items()}
     res["net_now"] = round(float(df["net"].iloc[-1]), 1)
     res["d4_now"] = round(float(d4.iloc[-1]), 1)
     with open(out_dir / "regime_backtest.json", "w", encoding="utf-8") as fh:
@@ -427,6 +488,10 @@ def main() -> None:
               f"median {row['pp_median']} ({row['min']}-{row['max']}), up {row['up_mean']} down {row['down_mean']}")
     print(f"  acf: {res['cycles']['acf']}")
     print(f"  ew {res['ew']}")
+    for k, o in res["official"].items():
+        print(f"  official {k} {o['symbol']}: " + (f"{o['weeks']}w, corr {o['corr_wk']}, TE {o['te_ann']}%, beta {o['beta']}, "
+              f"1y rebuilt {o['rebuilt']['ret_1y']}% vs official {o['official']['ret_1y']}%, dd {o['rebuilt']['dd_now']} vs "
+              f"{o['official']['dd_now']}" if o["available"] else "index_ohlc.csv missing -- not compared"))
     for k, v in res["divergence"]["by_index"].items():
         print(f"  divergence {k}: " + ", ".join(f"{t} {s['n']} ({s['hits']}/{s['n_done']} fell ≥{-round(100*BIG_DROP)}% in 26w, "
               f"median 26w {s['med_ret26']}%)" for t, s in v["summary"].items()))

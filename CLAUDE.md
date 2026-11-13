@@ -12,7 +12,7 @@ Taipei) and commits the refreshed CSVs back.
 ## Layout
 
 ```
-fetch_sp500_memory_software.py   fetch step (yfinance -> data/weekly_reutin/*.csv)
+fetch_sp500_memory_software.py   fetch step (yfinance -> data/weekly_reutin/*.csv, incl. index_ohlc.csv)
 data/weekly_reutin/              fetched CSVs (sp500_ohlc.csv, sp500_stocks.csv, ...)
 data/tableau/                    ticker lists (AIhardware_en.csv is hand-made, see below)
 analysis/breadth_sector.py       breadth + sector/industry analysis -> data/analysis/*.csv
@@ -201,6 +201,26 @@ every page label says 多空排列差 — don't reintroduce 淨值.
   effective 2026-11-19. If true it is a cliff the -60% rule catches (-87.5%) and drops
   SNDK's pre-split bars until Yahoo back-adjusts — check the printed exclusions and the
   AI-hardware member count (22) after the next refresh.
+
+## Official index (`index_ohlc.csv`, asked 2026-11-13: 「加抓 ^SP500-45 官方指數並列比較」)
+
+- The fetch step's `fetch_indices()` saves `INDEX_SYMBOLS` (now only `^SP500-45`, S&P 500
+  Information Technology, GICS) as **daily** bars for 12 years to
+  `data/weekly_reutin/index_ohlc.csv` (same columns as `sp500_ohlc.csv`). It runs last, in
+  its own try, so a Yahoo failure cannot cost the constituent files.
+- `regime_backtest.py` (`OFFICIAL`, `official_weekly`, `compare_official`) resamples it to
+  W-FRI, rebases it onto the rebuilt tech level at the first common week (`tech_off`,
+  `tech_off_dd`) and writes `official.tech` in the JSON: total / 52w / 13w return, distance
+  from high, max drawdown, peak, weekly-return correlation, annualised tracking error, beta,
+  and `lags` when the official series ends before our data. Every statistic still uses the
+  rebuilt index — the official one is drawn (dashed, same blue) and tabled (`t-bt-off`)
+  beside it, and is in the xlsx 週線 sheet as cols P/Q when present.
+- Missing file → `available: false`; the page says the data aren't in yet. Never fill the
+  gap with another series: Alpha Vantage has no ^SP500-45, and its `SIXT` is the capped
+  Technology *Select Sector* index (XLK's), a different index.
+- The scheduled job runs **main's** fetch script, so the file only appears once the fetch
+  change is on main. Our 83-name "technology" uses Yahoo's sector, not GICS, so expect a
+  gap; why exactly (which names differ) has not been checked against S&P's list.
 
 ## Regime as a warning? (`regime_backtest.py`, section 「預警檢驗」)
 

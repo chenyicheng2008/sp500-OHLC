@@ -473,6 +473,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     <div class="panel-body"><div id="c-bt-time"></div></div>
     <figcaption id="cap-bt-time"></figcaption>
   </figure>
+  <div class="tw" id="w-bt-off"><table id="t-bt-off"><caption id="bt-off-h">—<small id="bt-off-cap">—</small></caption></table></div>
   <figure class="panel">
     <div class="panel-head"><h3>多空排列差的週期，和指數自己的週期比較</h3><p id="bt-cyc-def">—</p></div>
     <div class="legend" id="lg-bt-cyc"></div>
@@ -1865,10 +1866,11 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
   /* ------------------------------------------------------------------ *
    * does the regime net warn of large falls? (regime_backtest.py)
    * ------------------------------------------------------------------ */
-  var BT_KEYS = ["tech", "semi"], BT_COL = { tech: "--s1", semi: "--s2", aihw: "--s4" };
+  var BT_KEYS = ["tech", "semi"], BT_COL = { tech: "--s1", semi: "--s2", aihw: "--s4", tech_off: "--s1" };
   function btShort(label) { return label.replace(/類股|（.*）/g, ""); }   // 科技類股 → 科技, 半導體（含設備） → 半導體
   // index name for chart labels; "aihw" is the regime universe as an equal-weight index (B.ew)
   function btName(B, k, short) {
+    if (/_off$/.test(k)) { var O = B.official[k.replace(/_off$/, "")]; return short ? "官方" + btShort(B.indices[k.replace(/_off$/, "")].label) : O.label + " " + O.symbol; }
     if (k !== "aihw") return short ? btShort(B.indices[k].label) : B.indices[k].label;
     return short ? B.ew.label.replace(/股|\s/g, "").replace("等權重", "等權") : B.ew.label + "（" + B.ew.n + " 檔）";
   }
@@ -1889,7 +1891,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     var mono = "IBM Plex Mono, monospace", ink3 = css("--ink-3"), rule = css("--rule");
 
     // top: index levels on a log scale
-    var LINES = BT_KEYS.concat(W.aihw ? ["aihw"] : []);
+    var LINES = BT_KEYS.concat(W.tech_off ? ["tech_off"] : [], W.aihw ? ["aihw"] : []);
     var vals = []; LINES.forEach(function (k) { W[k].forEach(function (v) { if (v) vals.push(v); }); });
     var lo = Math.min.apply(null, vals) * 0.92, hi = Math.max.apply(null, vals) * 1.08;
     var LY = function (v) { return top.y + top.h * (1 - (Math.log(v) - Math.log(lo)) / (Math.log(hi) - Math.log(lo))); };
@@ -1932,15 +1934,17 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
           fill: css(BT_COL[k]), opacity: 0.85 }));
       });
     });
-    var line = function (vals, Y, color) {
+    var line = function (vals, Y, color, dash) {
       var d = "", pen = false;
       vals.forEach(function (v, i) {
         if (v === null) { pen = false; return; }
         d += (pen ? "L" : "M") + X(i).toFixed(1) + " " + Y(v).toFixed(1); pen = true;
       });
-      svg.appendChild(el("path", { d: d, fill: "none", stroke: color, "stroke-width": 2, "stroke-linejoin": "round" }));
+      var at = { d: d, fill: "none", stroke: color, "stroke-width": dash ? 1.6 : 2, "stroke-linejoin": "round" };
+      if (dash) at["stroke-dasharray"] = "5 3";
+      svg.appendChild(el("path", at));
     };
-    LINES.forEach(function (k) { line(W[k], LY, css(BT_COL[k])); });
+    LINES.forEach(function (k) { line(W[k], LY, css(BT_COL[k]), /_off$/.test(k)); });
     line(W.net, NY, css("--s3"));
     // divergences: connect the two compared highs, on the spread and on that index
     if (B.divergence) {
@@ -1966,12 +1970,15 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     });
     // end labels: ink text beside a colored tick, spaced so they cannot collide
     var labs = LINES.map(function (k) {
-      return { y: LY(W[k][n - 1]), c: css(BT_COL[k]), t: (k === "aihw" && small ? "等權" : btName(B, k, true)) + " " + pct(W[k + "_dd"][n - 1], 0) };
-    }).sort(function (a, b) { return a.y - b.y; });
+      var j = n - 1; while (j > 0 && W[k][j] === null) j--;          // an official series can end early
+      return { y: LY(W[k][j]), c: css(BT_COL[k]), dash: /_off$/.test(k),
+        t: (k === "aihw" && small ? "等權" : k === "tech_off" && small ? "官方" : btName(B, k, true)) + " " + pct(W[k + "_dd"][j], 0) };
+    }).filter(function (lb) { return isFinite(lb.y); }).sort(function (a, b) { return a.y - b.y; });
     for (var li = 1; li < labs.length; li++) if (labs[li].y - labs[li - 1].y < 14) labs[li].y = labs[li - 1].y + 14;
     labs.push({ y: NY(W.net[n - 1]), c: css("--s3"), t: (small ? "" : "多空排列差 ") + (W.net[n - 1] >= 0 ? "+" : "") + W.net[n - 1].toFixed(0) });
     labs.forEach(function (lb) {
-      svg.appendChild(el("line", { x1: m.l + iw + 4, x2: m.l + iw + 12, y1: lb.y, y2: lb.y, stroke: lb.c, "stroke-width": 2 }));
+      svg.appendChild(el("line", { x1: m.l + iw + 4, x2: m.l + iw + 12, y1: lb.y, y2: lb.y, stroke: lb.c, "stroke-width": 2,
+        "stroke-dasharray": lb.dash ? "3 2" : null }));
       svg.appendChild(el("text", { x: m.l + iw + 15, y: lb.y + 4, fill: css("--ink-2"), "font-size": 11, "font-weight": 600 }, lb.t));
     });
     // years along the bottom
@@ -2362,8 +2369,10 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
       stat("與未來 " + H + " 週報酬的相關", sgn(R.tech.corr_fwd_ret, 2), "半導體 " + sgn(R.semi.corr_fwd_ret, 2)) +
       stat("目前多空排列差", sgn(B.net_now, 1), "科技距高點 " + pct(R.tech.dd_now, 1) + "；半導體 " + pct(R.semi.dd_now, 1));
 
-    var E = B.ew;
+    var E = B.ew, OT = B.official ? B.official.tech : null;
+    renderOfficial(B, OT);
     document.getElementById("bt-h-time").textContent = "時間序列：" + BT_KEYS.map(nm).join("、") + "指數" +
+      (OT && OT.available ? "（科技並列官方 " + OT.symbol + "）" : "") +
       (E ? "、" + U + " " + E.n + " 檔等權重指數" : "") + "與" + sU + "多空排列差（週線）";
     document.getElementById("bt-time-def").textContent =
       "上：" + (E ? "三" : "兩") + "個指數，" + B.start.slice(0, 7) + " = 100，對數刻度，方便比較不同年代的漲跌幅" +
@@ -2373,7 +2382,9 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
       (B.cycles ? "；實心圓與空心圓是門檻 " + B.cycles.main_swing + " 點認定的週期高點與低點（見下一張圖）。" : "。");
     document.getElementById("lg-bt-time").innerHTML = BT_KEYS.map(function (k) {
       return "<span><i class='swatch' style='background:" + css(BT_COL[k]) + "'></i>" + I[k].label + "指數</span>";
-    }).join("") + (E ? "<span><i class='swatch' style='background:" + css(BT_COL.aihw) + "'></i>" + btName(B, "aihw", false) + "</span>" : "") +
+    }).join("") + (OT && OT.available ? "<span><i class='swatch' style='background:repeating-linear-gradient(90deg," + css(BT_COL.tech) +
+        " 0 5px,transparent 5px 8px)'></i>" + btName(B, "tech_off", false) + "（虛線）</span>" : "") +
+      (E ? "<span><i class='swatch' style='background:" + css(BT_COL.aihw) + "'></i>" + btName(B, "aihw", false) + "</span>" : "") +
       "<span><i class='swatch' style='background:" + css("--s3") + "'></i>" + U + "多空排列差</span>" +
       "<span><i style='display:inline-block;width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid " +
       css("--ink-2") + "'></i>多空排列差跌破 0</span>" +
@@ -2599,6 +2610,38 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
   /* ------------------------------------------------------------------ *
    * tables
    * ------------------------------------------------------------------ */
+  // Rebuilt tech index beside the official S&P 500 IT sector index (index_ohlc.csv).
+  function renderOfficial(B, O) {
+    var wrap = document.getElementById("w-bt-off");
+    if (!O) { wrap.style.display = "none"; return; }
+    var rl = B.indices.tech.label;
+    document.getElementById("bt-off-h").firstChild.textContent = "重建" + btShort(rl) + "指數與官方 " + O.symbol + " 並列";
+    if (!O.available) {
+      fillTable("t-bt-off", ["項目", "說明"], [["官方指數", { html: "資料檔裡還沒有 " + O.symbol + "（index_ohlc.csv）。每日抓取程式抓到後，這裡和上圖會並列比較。" }]]);
+      document.getElementById("bt-off-cap").textContent = "";
+      return;
+    }
+    var R = O.rebuilt, F = O.official;
+    var dpt = function (a, b) { return a === null || b === null ? "—" : (a - b >= 0 ? "+" : "") + (a - b).toFixed(1) + " 點"; };
+    var row = function (lab, k, fmt) {
+      return [lab, fmt(R[k]), fmt(F[k]), dpt(R[k], F[k])];
+    };
+    var p1 = function (v) { return v === null ? "—" : pct(v, 1); };
+    fillTable("t-bt-off", ["項目", "重建<br>" + btShort(rl), "官方<br>" + O.symbol, "差<br>重建−官方"], [
+      row("期間報酬<br><small>" + O.start + " 起</small>", "total", p1),
+      row("近 52 週報酬", "ret_1y", p1),
+      row("近 13 週報酬", "ret_13w", p1),
+      row("目前距高點", "dd_now", p1),
+      row("期間最大跌幅", "max_dd", p1),
+      ["高點日期", R.peak, F.peak, R.peak === F.peak ? "同一週" : "不同週"]
+    ]);
+    var sync = O.corr_wk >= 0.97 ? "走勢幾乎一致" : O.corr_wk >= 0.9 ? "大致同步" : "差異明顯";
+    document.getElementById("bt-off-cap").textContent = "共同期間 " + O.weeks + " 週：週報酬相關 " + O.corr_wk.toFixed(2) +
+      "、年化追蹤誤差 " + O.te_ann.toFixed(1) + "%、β " + O.beta.toFixed(2) + "，" + sync + "。差異來自成分與權重：重建版用 Yahoo 的類股分類、" +
+      "今天的成分名單與固定股數；官方版用 GICS 分類並隨時調整成分與股數。上方所有統計仍用重建版，官方版只供對照。" +
+      (O.lags ? "官方資料只到 " + O.official_last + "，比成分股資料早結束，近期比較以共同週為準。" : "");
+  }
+
   function fillTable(id, head, rows) {
     var t = document.getElementById(id);
     var cap = t.querySelector("caption");

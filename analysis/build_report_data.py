@@ -169,7 +169,7 @@ def main() -> None:
         bw = pd.read_csv(d / "regime_backtest_weekly.csv", index_col=0, parse_dates=True)
         bt["weekly"] = {"dates": [x.strftime("%Y-%m-%d") for x in bw.index],
                         **{c: [None if pd.isna(v) else round(float(v), 1) for v in bw[c]]
-                           for c in ("net", "tech", "semi", "aihw", "tech_dd", "semi_dd", "aihw_dd")}}
+                           for c in ("net", "tech", "semi", "aihw", "tech_dd", "semi_dd", "aihw_dd", "tech_off", "tech_off_dd") if c in bw}}
         payload["backtest"] = bt
 
     txt = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
