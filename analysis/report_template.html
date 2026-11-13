@@ -9,7 +9,7 @@
   --ink:#101317; --ink-2:#565d66; --ink-3:#8a9099;
   --rule:#e2e3e7; --rule-strong:#c9ccd2;
   --accent:#2a78d6; --accent-soft:#e7f0fc;
-  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#8a5cd6;
   --good:#0ca30c; --warn:#fab219; --serious:#ec835a; --critical:#d03b3b;
   --pos:#2a78d6; --neg:#d03b3b; --mid:#f0efec;
   --grid:#e6e7eb; --axis:#c9ccd2;
@@ -22,7 +22,7 @@
     --ink:#f2f4f7; --ink-2:#b9bec6; --ink-3:#878d96;
     --rule:#2b2f36; --rule-strong:#3c414a;
     --accent:#3987e5; --accent-soft:#152438;
-    --s1:#3987e5; --s2:#d95926; --s3:#199e70;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#a07ef0;
     --good:#0ca30c; --warn:#fab219; --serious:#ec835a; --critical:#d03b3b;
     --pos:#3987e5; --neg:#e66767; --mid:#383835;
     --grid:#24282e; --axis:#3c414a;
@@ -35,7 +35,7 @@
   --ink:#f2f4f7; --ink-2:#b9bec6; --ink-3:#878d96;
   --rule:#2b2f36; --rule-strong:#3c414a;
   --accent:#3987e5; --accent-soft:#152438;
-  --s1:#3987e5; --s2:#d95926; --s3:#199e70;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#a07ef0;
   --good:#0ca30c; --warn:#fab219; --serious:#ec835a; --critical:#d03b3b;
   --pos:#3987e5; --neg:#e66767; --mid:#383835;
   --grid:#24282e; --axis:#3c414a;
@@ -497,17 +497,6 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
   <div class="tw"><table id="t-bt-buckets"><caption>依多空排列差區間分組<small id="bt-buckets-cap">—</small></caption></table></div>
   <div class="tw"><table id="t-bt-eps"><caption>歷次大跌與多空排列差跌破 0 的先後<small id="bt-eps-cap">—</small></caption></table></div>
   <div class="tw"><table id="t-bt-sig"><caption>把多空排列差當訊號用<small id="bt-sig-cap">—</small></caption></table></div>
-  <div class="panel" style="margin-top:22px">
-    <div class="panel-head"><h3 id="bt-h-slide">—</h3><p id="bt-slide-def">—</p></div>
-    <div class="legend" id="lg-bt-slide"></div>
-    <div class="grid2" style="margin-top:4px; padding:0 8px">
-      <div><div class="panel-body"><div id="c-bt-slide-tech"></div></div></div>
-      <div><div class="panel-body"><div id="c-bt-slide-semi"></div></div></div>
-    </div>
-    <p class="figcap" id="cap-bt-slide" style="padding:0 20px 16px; margin:0; font-size:12.5px; color:var(--ink-3); line-height:1.6"></p>
-  </div>
-  <div class="tw"><table id="t-bt-slide-sum"><caption>滑落之後多久出現修正：與任意一週比較<small id="bt-slide-sum-cap">—</small></caption></table></div>
-  <div class="tw"><table id="t-bt-slide-ev"><caption>每一次滑落<small id="bt-slide-ev-cap">—</small></caption></table></div>
   <div class="panel">
     <div class="panel-head"><h3>解讀</h3><p>以下每一句都由上方數據推導，資料改變時措辭會跟著改。</p></div>
     <ul class="take" id="bt-take" style="padding:0 20px 8px; margin-top:6px"></ul>
@@ -1876,8 +1865,13 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
   /* ------------------------------------------------------------------ *
    * does the regime net warn of large falls? (regime_backtest.py)
    * ------------------------------------------------------------------ */
-  var BT_KEYS = ["tech", "semi"], BT_COL = { tech: "--s1", semi: "--s2" };
+  var BT_KEYS = ["tech", "semi"], BT_COL = { tech: "--s1", semi: "--s2", aihw: "--s4" };
   function btShort(label) { return label.replace(/類股|（.*）/g, ""); }   // 科技類股 → 科技, 半導體（含設備） → 半導體
+  // index name for chart labels; "aihw" is the regime universe as an equal-weight index (B.ew)
+  function btName(B, k, short) {
+    if (k !== "aihw") return short ? btShort(B.indices[k].label) : B.indices[k].label;
+    return short ? B.ew.label.replace(/股|\s/g, "").replace("等權重", "等權") : B.ew.label + "（" + B.ew.n + " 檔）";
+  }
 
   // One shared time axis, three stacked bands: index levels (log), episode strips, net.
   // Two measures never share a y-scale; they share only the x-axis.
@@ -1895,7 +1889,8 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     var mono = "IBM Plex Mono, monospace", ink3 = css("--ink-3"), rule = css("--rule");
 
     // top: index levels on a log scale
-    var vals = []; BT_KEYS.forEach(function (k) { W[k].forEach(function (v) { if (v) vals.push(v); }); });
+    var LINES = BT_KEYS.concat(W.aihw ? ["aihw"] : []);
+    var vals = []; LINES.forEach(function (k) { W[k].forEach(function (v) { if (v) vals.push(v); }); });
     var lo = Math.min.apply(null, vals) * 0.92, hi = Math.max.apply(null, vals) * 1.08;
     var LY = function (v) { return top.y + top.h * (1 - (Math.log(v) - Math.log(lo)) / (Math.log(hi) - Math.log(lo))); };
     for (var e = Math.floor(Math.log10(lo)); e <= Math.ceil(Math.log10(hi)); e++) {
@@ -1945,7 +1940,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
       });
       svg.appendChild(el("path", { d: d, fill: "none", stroke: color, "stroke-width": 2, "stroke-linejoin": "round" }));
     };
-    BT_KEYS.forEach(function (k) { line(W[k], LY, css(BT_COL[k])); });
+    LINES.forEach(function (k) { line(W[k], LY, css(BT_COL[k])); });
     line(W.net, NY, css("--s3"));
     // divergences: connect the two compared highs, on the spread and on that index
     if (B.divergence) {
@@ -1970,10 +1965,10 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
         stroke: pv.kind === "P" ? css("--surface") : css("--s3"), "stroke-width": pv.kind === "P" ? 1.5 : 2 }));
     });
     // end labels: ink text beside a colored tick, spaced so they cannot collide
-    var labs = BT_KEYS.map(function (k) {
-      return { y: LY(W[k][n - 1]), c: css(BT_COL[k]), t: btShort(B.indices[k].label) + " " + pct(W[k + "_dd"][n - 1], 0) };
+    var labs = LINES.map(function (k) {
+      return { y: LY(W[k][n - 1]), c: css(BT_COL[k]), t: (k === "aihw" && small ? "等權" : btName(B, k, true)) + " " + pct(W[k + "_dd"][n - 1], 0) };
     }).sort(function (a, b) { return a.y - b.y; });
-    if (labs[1].y - labs[0].y < 14) labs[1].y = labs[0].y + 14;
+    for (var li = 1; li < labs.length; li++) if (labs[li].y - labs[li - 1].y < 14) labs[li].y = labs[li - 1].y + 14;
     labs.push({ y: NY(W.net[n - 1]), c: css("--s3"), t: (small ? "" : "多空排列差 ") + (W.net[n - 1] >= 0 ? "+" : "") + W.net[n - 1].toFixed(0) });
     labs.forEach(function (lb) {
       svg.appendChild(el("line", { x1: m.l + iw + 4, x2: m.l + iw + 12, y1: lb.y, y2: lb.y, stroke: lb.c, "stroke-width": 2 }));
@@ -2005,9 +2000,10 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
       var i = Math.max(0, Math.min(n - 1, Math.round((ev.clientX - bb.left - m.l) / (iw / Math.max(1, n - 1)))));
       cross.setAttribute("x1", X(i)); cross.setAttribute("x2", X(i)); cross.setAttribute("opacity", 0.35);
       var rows = "<div class='tt-h'>" + W.dates[i] + "</div>";
-      BT_KEYS.forEach(function (k) {
+      LINES.forEach(function (k) {
+        if (W[k][i] === null) return;
         rows += "<div class='tt-r'><span><i style='width:10px;height:2px;background:" + css(BT_COL[k]) + ";display:inline-block'></i>" +
-          B.indices[k].label + "</span><b>距高點 " + pct(W[k + "_dd"][i], 1) + "</b></div>";
+          btName(B, k, false) + "</span><b>距高點 " + pct(W[k + "_dd"][i], 1) + "</b></div>";
       });
       rows += "<div class='tt-r'><span><i style='width:10px;height:2px;background:" + css("--s3") + ";display:inline-block'></i>多空排列差</span><b>" +
         (W.net[i] >= 0 ? "+" : "") + W.net[i].toFixed(1) + "</b></div>";
@@ -2064,137 +2060,6 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
 
   function bucketName(b) {
     return b.lo <= -100 ? "≤ " + b.hi : b.hi >= 100 ? "> " + b.lo : b.lo + "~" + b.hi;
-  }
-
-  // Share of starting weeks that have seen the correction by week w: after a slide vs any week.
-  function btWaitCurve(host, B, k, key) {
-    var C = B.slide.curves[k][key], nW = B.slide.wait_max;
-    var w = Math.max(280, host.clientWidth), h = 236, small = w < 420;
-    var m = { t: 22, r: small ? 64 : 76, b: 38, l: 40 }, iw = w - m.l - m.r, ih = h - m.t - m.b;
-    var X = function (i) { return m.l + iw * i / nW; }, Y = function (v) { return m.t + ih * (1 - v / 100); };
-    var svg = mkSvg(w, h), mono = "IBM Plex Mono, monospace";
-    svg.appendChild(el("text", { x: m.l, y: 12, fill: css("--ink"), "font-size": 12.5, "font-weight": 600 },
-      B.indices[k].label + "：回落 " + key + "%"));
-    [0, 25, 50, 75, 100].forEach(function (v) {
-      svg.appendChild(el("line", { x1: m.l, x2: m.l + iw, y1: Y(v), y2: Y(v), stroke: css("--rule"), "stroke-width": 1 }));
-      svg.appendChild(el("text", { x: m.l - 6, y: Y(v) + 4, "text-anchor": "end", fill: css("--ink-3"), "font-size": 10.5, "font-family": mono }, v + "%"));
-    });
-    [0, 13, 26, 39, 52].forEach(function (v) {
-      if (v > nW) return;
-      svg.appendChild(el("text", { x: X(v), y: m.t + ih + 15, "text-anchor": "middle", fill: css("--ink-3"), "font-size": 10.5, "font-family": mono }, v));
-    });
-    svg.appendChild(el("text", { x: m.l + iw / 2, y: h - 3, "text-anchor": "middle", fill: css("--ink-3"), "font-size": 10.5 }, "滑落後經過的週數"));
-    var path = function (vals) { return vals.map(function (v, i) { return (i ? "L" : "M") + X(i).toFixed(1) + " " + Y(v).toFixed(1); }).join(""); };
-    var col = css(BT_COL[k]);
-    svg.appendChild(el("path", { d: path(C.base), fill: "none", stroke: css("--ink-3"), "stroke-width": 2, "stroke-dasharray": "5 4" }));
-    if (C.event) svg.appendChild(el("path", { d: path(C.event), fill: "none", stroke: col, "stroke-width": 2 }));
-    var labs = [{ y: Y(C.base[nW]), t: (small ? "對照 " : "任意一週 ") + C.base[nW].toFixed(0) + "%", c: css("--ink-3"), dash: true }];
-    if (C.event) labs.push({ y: Y(C.event[nW]), t: (small ? "滑落 " : "滑落後 ") + C.event[nW].toFixed(0) + "%", c: col });
-    labs.sort(function (a, b) { return a.y - b.y; });
-    if (labs.length > 1 && labs[1].y - labs[0].y < 14) labs[1].y = labs[0].y + 14;
-    labs.forEach(function (lb) {
-      svg.appendChild(el("line", { x1: m.l + iw + 4, x2: m.l + iw + 12, y1: lb.y, y2: lb.y, stroke: lb.c, "stroke-width": 2,
-        "stroke-dasharray": lb.dash ? "3 2" : null }));
-      svg.appendChild(el("text", { x: m.l + iw + 15, y: lb.y + 4, fill: css("--ink-2"), "font-size": 10.5, "font-weight": 600 }, lb.t));
-    });
-    var cross = el("line", { x1: 0, x2: 0, y1: m.t, y2: m.t + ih, stroke: css("--ink"), "stroke-width": 1, opacity: 0 });
-    svg.appendChild(cross);
-    var hit = el("rect", { x: m.l, y: m.t, width: iw, height: ih, fill: "transparent" });
-    hit.addEventListener("mousemove", function (ev) {
-      var bb = svg.getBoundingClientRect();
-      var i = Math.max(0, Math.min(nW, Math.round((ev.clientX - bb.left - m.l) / (iw / nW))));
-      cross.setAttribute("x1", X(i)); cross.setAttribute("x2", X(i)); cross.setAttribute("opacity", 0.35);
-      showTip("<div class='tt-h'>第 " + i + " 週內已回落 " + key + "%</div>" +
-        (C.event ? "<div class='tt-r'><span><i style='width:10px;height:2px;background:" + col + ";display:inline-block'></i>滑落後</span><b>" + C.event[i].toFixed(0) + "%</b></div>" : "") +
-        "<div class='tt-r'><span><i style='width:10px;height:2px;background:" + css("--ink-3") + ";display:inline-block'></i>任意一週</span><b>" + C.base[i].toFixed(0) + "%</b></div>", ev);
-    });
-    hit.addEventListener("mouseleave", function () { hideTip(); cross.setAttribute("opacity", 0); });
-    svg.appendChild(hit);
-    host.innerHTML = ""; host.appendChild(svg);
-  }
-
-  function renderSlideStatic(B) {
-    var SL = B.slide, D0 = SL.defs[0], D1 = SL.defs[1], K10 = String(SL.thresholds[0]), K15 = String(SL.thresholds[1]);
-    var U = B.universe_label, nm = function (k) { return btShort(B.indices[k].label); };
-    var defTxt = function (d) { return "先升到 +" + d.zone + " 以上，再從之後的最高點下降 " + d.drop + " 點以上"; };
-    document.getElementById("bt-h-slide").textContent = "多空排列差從高點滑落後，多久出現修正";
-    document.getElementById("bt-slide-def").textContent =
-      "「滑落」＝週線多空排列差" + defTxt(D0) + "，每次進入高檔區只算一次（" + B.start.slice(0, 4) + " 年以來 " + D0.n +
-      " 次）。「修正」＝指數從歷史高點回落達門檻。實線是滑落那週起算、到第幾週已出現修正的比例；虛線是任意一週起算的同一比例，作為對照。" +
-      "兩者都只計起算時尚未跌過門檻、且之後有滿 " + SL.wait_max + " 週資料的週。";
-    document.getElementById("lg-bt-slide").innerHTML = BT_KEYS.map(function (k) {
-      return "<span><i class='swatch' style='background:" + css(BT_COL[k]) + "'></i>" + B.indices[k].label + "：滑落後</span>";
-    }).join("") + "<span><i class='swatch' style='background:repeating-linear-gradient(90deg," + css("--ink-3") + " 0 4px,transparent 4px 7px)'></i>任意一週（對照）</span>";
-
-    // summary table: both definitions × indices × thresholds
-    var rows = [];
-    SL.defs.forEach(function (d) {
-      BT_KEYS.forEach(function (k) {
-        SL.thresholds.forEach(function (th) {
-          var st = d.stats[k][String(th)], b = SL.baseline[k][String(th)];
-          var cell = function (h) {
-            var p = st.n ? 100 * st["hit" + h] / st.n : null, bp = b["p" + h];
-            return { html: st["hit" + h] + "/" + st.n + "（" + (p === null ? "—" : p.toFixed(0) + "%") + "）<div class='sub'>對照 " + bp.toFixed(0) + "%</div>",
-              cls: "n", color: p !== null && p > bp + 5 ? css("--neg") : null };
-          };
-          rows.push([{ html: "≥+" + d.zone + " 後降 " + d.drop }, { html: nm(k) }, { html: "-" + th + "%", cls: "n" },
-            cell(13), cell(26), cell(52),
-            { html: (st.median === null ? "超過資料期間" : st.median.toFixed(0) + " 週") + "<div class='sub'>對照 " +
-              (b.median === null ? "—" : b.median.toFixed(0) + " 週") + "</div>", cls: "n" },
-            { html: String(st.already), cls: "n" }]);
-        });
-      });
-    });
-    fillTable("t-bt-slide-sum", ["滑落定義", "指數", "修正", "13 週內", "26 週內", "52 週內", "等待週數中位數", "滑落時已跌過"], rows);
-    document.getElementById("bt-slide-sum-cap").textContent = "分母是滑落時指數還沒跌到門檻、且之後有滿 " + SL.wait_max +
-      " 週資料的次數；「滑落時已跌過」的次數另列，不算進比例。對照＝任意一週起算的比例。紅字＝比對照高 5 個百分點以上。" +
-      "等待週數中位數把始終沒出現修正的次數也算進去。";
-
-    var w = function (v) { return v === null ? "未出現" : v === 0 ? "當週" : v + " 週"; };
-    fillTable("t-bt-slide-ev", ["滑落那週", "先前高點", "滑落時", "科技距高點", "科技 -" + K10 + "% / -" + K15 + "%", "半導體距高點", "半導體 -" + K10 + "% / -" + K15 + "%"],
-      D0.events.slice().reverse().map(function (e) {
-        return [{ html: e.date + (e.complete ? "" : "<div class='sub'>後續不足 " + SL.wait_max + " 週</div>"), cls: "mono" },
-          { html: "+" + e.hi.toFixed(0) + "<div class='sub'>" + e.hi_date + "</div>", cls: "n" },
-          { html: (e.now >= 0 ? "+" : "") + e.now.toFixed(0), cls: "n" },
-          { html: pct(e.tech_dd, 1), cls: "n" }, { html: w(e["tech_w" + K10]) + " / " + w(e["tech_w" + K15]), cls: "n" },
-          { html: pct(e.semi_dd, 1), cls: "n" }, { html: w(e["semi_w" + K10]) + " / " + w(e["semi_w" + K15]), cls: "n" }];
-      }));
-    document.getElementById("bt-slide-ev-cap").textContent = "依主要定義（" + defTxt(D0) + "），新到舊。週數是從滑落那週算到指數距歷史高點首次達門檻；" +
-      "「當週」表示滑落時已經跌過。";
-
-    // caption + read-out lines
-    var st0 = function (k, key) { return D0.stats[k][key]; }, bs = function (k, key) { return SL.baseline[k][key]; };
-    var share = function (st, h) { return st.n ? 100 * st["hit" + h] / st.n : 0; };
-    var cmp = function (a, b) { return a > b + 5 ? "高於" : a < b - 5 ? "低於" : "接近"; };
-    var lines = BT_KEYS.map(function (k) {
-      var a = share(st0(k, K10), 26), b = bs(k, K10).p26;
-      return nm(k) + "在滑落後 26 週內回落 " + K10 + "% 的比例是 " + a.toFixed(0) + "%，" + cmp(a, b) + "任意一週的 " + b.toFixed(0) + "%";
-    });
-    document.getElementById("cap-bt-slide").textContent = lines.join("；") + "。";
-    var allLower = BT_KEYS.every(function (k) { return SL.thresholds.every(function (th) {
-      return share(st0(k, String(th)), 26) <= bs(k, String(th)).p26 + 5; }); });
-    var strict = BT_KEYS.map(function (k) { var st = D1.stats[k][K15]; return nm(k) + " " + st.hit26 + "/" + st.n; }).join("、");
-    var strictLow = BT_KEYS.every(function (k) { var st = D1.stats[k][K15]; return share(st, 26) < bs(k, K15).p26; });
-    var doneStrict = D1.events.filter(function (e) { return e.complete; });
-    var nh = BT_KEYS.map(function (k) {
-      return nm(k) + " " + doneStrict.filter(function (e) { return e[k + "_newhigh"] !== null && e[k + "_newhigh"] <= SL.wait_max; }).length + "/" + doneStrict.length;
-    }).join("、");
-    var nhMost = BT_KEYS.every(function (k) {
-      return 2 * doneStrict.filter(function (e) { return e[k + "_newhigh"] !== null && e[k + "_newhigh"] <= SL.wait_max; }).length > doneStrict.length;
-    });
-    var medTxt = BT_KEYS.map(function (k) {
-      var st = st0(k, K10), b = bs(k, K10);
-      return nm(k) + " " + (st.median === null ? "超過資料期間" : st.median.toFixed(0) + " 週") + "（對照 " + (b.median === null ? "—" : b.median.toFixed(0) + " 週") + "）";
-    }).join("、");
-    return [
-      "從高點滑落後多久修正：" + B.start.slice(0, 4) + " 年以來 " + D0.n + " 次滑落，" + lines.join("；") + "。" +
-        (allLower ? "滑落並沒有讓修正來得更快或更常見。" : "部分組合的修正比對照更常見，見上表紅字。") +
-        "等待回落 " + K10 + "% 的週數中位數：" + medTxt + "。",
-      "更嚴格的定義（" + defTxt(D1) + "，" + D1.n + " 次）：之後 26 週內回落 " + K15 + "% 的" + (strictLow ? "只有" : "有") + strict +
-        " 次（任意一週為" + BT_KEYS.map(function (k) { return nm(k) + " " + bs(k, K15).p26.toFixed(0) + "%"; }).join("、") + "）；" +
-        SL.wait_max + " 週內指數再創新高的有" + nh + " 次。" +
-        (strictLow && nhMost ? "從很高的位置大幅滑落，之後多半是行情中的休息，而不是頭部。" : "")
-    ];
   }
 
   // Cycle lengths side by side: one row per series / swing size, a dot per completed cycle,
@@ -2497,14 +2362,19 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
       stat("與未來 " + H + " 週報酬的相關", sgn(R.tech.corr_fwd_ret, 2), "半導體 " + sgn(R.semi.corr_fwd_ret, 2)) +
       stat("目前多空排列差", sgn(B.net_now, 1), "科技距高點 " + pct(R.tech.dd_now, 1) + "；半導體 " + pct(R.semi.dd_now, 1));
 
-    document.getElementById("bt-h-time").textContent = "時間序列：" + BT_KEYS.map(nm).join("、") + "指數與" + sU + "多空排列差（週線）";
+    var E = B.ew;
+    document.getElementById("bt-h-time").textContent = "時間序列：" + BT_KEYS.map(nm).join("、") + "指數" +
+      (E ? "、" + U + " " + E.n + " 檔等權重指數" : "") + "與" + sU + "多空排列差（週線）";
     document.getElementById("bt-time-def").textContent =
-      "上：兩個指數，" + B.start.slice(0, 7) + " = 100，對數刻度，方便比較不同年代的漲跌幅。中：每段色條是一次跌幅達 " +
+      "上：" + (E ? "三" : "兩") + "個指數，" + B.start.slice(0, 7) + " = 100，對數刻度，方便比較不同年代的漲跌幅" +
+      (E ? "；等權重指數是多空排列差所數的同一批 " + E.n + " 檔，每週取各檔報酬的簡單平均後連乘（" + B.start.slice(0, 4) + " 年起有價格的 " +
+        E.n_start + " 檔，其餘上市後才加入）。它用今天挑出的名單回推，早年漲幅偏高（存活者偏差），只畫出來對照，不進入下方任何統計" : "") + "。中：每段色條是一次跌幅達 " +
       Math.abs(B.episode_dd) + "% 的下跌，從高點畫到低點。下：多空排列差。虛線與三角形標出多空排列差由正轉負的每一週" +
       (B.cycles ? "；實心圓與空心圓是門檻 " + B.cycles.main_swing + " 點認定的週期高點與低點（見下一張圖）。" : "。");
     document.getElementById("lg-bt-time").innerHTML = BT_KEYS.map(function (k) {
       return "<span><i class='swatch' style='background:" + css(BT_COL[k]) + "'></i>" + I[k].label + "指數</span>";
-    }).join("") + "<span><i class='swatch' style='background:" + css("--s3") + "'></i>" + U + "多空排列差</span>" +
+    }).join("") + (E ? "<span><i class='swatch' style='background:" + css(BT_COL.aihw) + "'></i>" + btName(B, "aihw", false) + "</span>" : "") +
+      "<span><i class='swatch' style='background:" + css("--s3") + "'></i>" + U + "多空排列差</span>" +
       "<span><i style='display:inline-block;width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid " +
       css("--ink-2") + "'></i>多空排列差跌破 0</span>" +
       (B.cycles ? "<span><i class='swatch dot' style='background:" + css("--s3") + "'></i>週期高點</span><span><i class='swatch dot' style='background:transparent;border:2px solid " +
@@ -2610,7 +2480,6 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
         " 跌破 -40，目前回升到 " + sgn(B.net_now, 1)) + "；歷史上" + dp.txt +
         (dp.t.hits * 2 === dp.t.n_done ? "——繼續大跌與見底各占一半，多空排列差本身分不出這次是哪一種。" : "。")
         : now.length ? "近 " + H + " 週有訊號出現，結果還要等。" : "近 " + H + " 週沒有訊號。"));
-    renderSlideStatic(B).forEach(function (t) { take.push(t); });
     renderCycleStatic(B).forEach(function (t) { take.push(t); });
     renderDivergenceStatic(B).forEach(function (t) { take.push(t); });
     var leads = [];
@@ -2619,7 +2488,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
       var ls = leads.slice().sort(function (a, b) { return a - b; }), med = ls[Math.floor((ls.length - 1) / 2)];
       take.push("反過來看大跌：" + leads.length + " 次大跌前一年內，多空排列差的高點比指數高點早 " + ls[0] + " 到 " + ls[ls.length - 1] +
         " 週（中位數 " + med + " 週）。" + (ls[ls.length - 1] - ls[0] >= 26 ? "前置時間差距太大，" : "") +
-        "而且同樣的高點與滑落之後多半並沒有大跌，這個「提前」只有事後回看才對得上，事前無法用來抓時點。");
+        "這個「提前」要等大跌發生後回看才對得上，事前無法用來抓時點。");
     }
     take.push("限制：相鄰週的 " + H + " 週窗口彼此重疊，真正獨立的只有約 " + B.independent_windows + " 段；指數與多空排列差都用今天的成分股回推，" +
       "早年有存活者偏差；半導體指數與" + sU + "名單重疊很高，兩者的同步有一部分是同一批股票。");
@@ -2633,6 +2502,8 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     document.getElementById("cap-bt-time").textContent = "期間多空排列差共 " + cr + " 週由正轉負（" + H + " 週內重複的只算一次則為 " +
       R.tech.signals[0].n + " 次），最近一次是 " + B.zero_crosses[cr - 1] + "。兩個指數合計 " + all.length + " 次大跌中，多空排列差在高點之後才跌破 0 的 " +
       nL + " 次、高點之前 " + nE + " 次、沒跌破 " + nN + " 次" + (nL > nE + nN ? "——多數時候它確認下跌，而不是預告。" : "。") +
+      (B.ew ? U + "等權重指數近一年 " + pct(B.ew.ret_1y, 1) + "（科技 " + pct(B.ew.tech_ret_1y, 1) +
+        "、半導體 " + pct(B.ew.semi_ret_1y, 1) + "），高點在 " + B.ew.peak + "，目前距高點 " + pct(B.ew.dd_now, 1) + "。" : "") +
       "指數為成分股重建，不是官方指數。";
     document.getElementById("cap-bt-bucket").textContent = "滑過長條可看週數與報酬中位數。";
   }
@@ -2650,7 +2521,6 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     drawBt();
     btBuckets(document.getElementById("c-bt-bucket"), B);
     btCycleDots(document.getElementById("c-bt-cyc"), B);
-    BT_KEYS.forEach(function (k) { btWaitCurve(document.getElementById("c-bt-slide-" + k), B, k, String(B.slide.thresholds[0])); });
   }
 
   function scatter(host, opt) {

@@ -103,8 +103,9 @@ def main() -> None:
     ws.title = "週線"
     cols = ["週（週五）", f"{U} 多頭排列 %", "整理 %", "空頭排列 %", f"{U} 多空排列差", "S&P 500 全體 多空排列差",
             f"{labels['tech']}指數", f"{labels['semi']}指數",
-            "科技 距高點", "半導體 距高點", "多空排列差 4 週變化", "科技 13 週報酬", "半導體 13 週報酬"]
-    header(ws, 1, cols, [12, 11, 9, 10, 12, 13, 12, 13, 10, 11, 12, 11, 12])
+            "科技 距高點", "半導體 距高點", "多空排列差 4 週變化", "科技 13 週報酬", "半導體 13 週報酬",
+            f"{rb['ew']['label']}指數", "等權重 距高點"]
+    header(ws, 1, cols, [12, 11, 9, 10, 12, 13, 12, 13, 10, 11, 12, 11, 12, 14, 11])
     w = bw.join(tw[["sec_bull", "sec_neither", "sec_bear", "mkt_net"]], how="left")
     for i, (d, r) in enumerate(w.iterrows(), start=2):
         put(ws, i, 1, d.date(), "yyyy-mm-dd")
@@ -116,8 +117,12 @@ def main() -> None:
         put(ws, i, 11, f"=E{i}-E{i-4}" if i >= 6 else None, "+0.0;-0.0;0")
         put(ws, i, 12, f"=G{i}/G{i-13}-1" if i >= 15 else None, "0.0%")
         put(ws, i, 13, f"=H{i}/H{i-13}-1" if i >= 15 else None, "0.0%")
+        put(ws, i, 14, round(float(r["aihw"]), 2), "#,##0.0")
+        put(ws, i, 15, f"=N{i}/MAX(N$2:N{i})-1", "0.0%")
     nW = len(w) + 1
     ws.cell(row=1, column=5).comment = Comment("多頭排列占比 − 空頭排列占比（百分點），-100～+100。週線用 10 週與 40 週均線。", "export")
+    ws.cell(row=1, column=14).comment = Comment(f"多空排列差同一批 {rb['ew']['n']} 檔，每週取各檔報酬的簡單平均後連乘，"
+                                                 "2015-08-14 = 100；用今天的名單回推，早年偏高（存活者偏差）。", "export")
     ws.cell(row=1, column=7).comment = Comment("成分股重建的市值加權指數，逐週連鎖，2015-08-14 = 100。股數以最新市值÷最新收盤固定，非官方指數。", "export")
 
     # ------------------------------------------------------------------ 日線
@@ -249,8 +254,9 @@ def main() -> None:
     c1.y_axis.title = "多空排列差"; c1.y_axis.scaling.min, c1.y_axis.scaling.max = -100, 100
     c1.x_axis.number_format = "yyyy"; c1.x_axis.tickLblSkip = 52
     ch.add_chart(c1, "A1")
-    c2 = LineChart(); c2.title = "科技／半導體 重建指數（週線，2015-08 = 100，對數刻度）"; c2.height, c2.width = 9, 26
+    c2 = LineChart(); c2.title = f"科技／半導體／{rb['ew']['label']} 重建指數（週線，2015-08 = 100，對數刻度）"; c2.height, c2.width = 9, 26
     c2.add_data(Reference(ws, min_col=7, max_col=8, min_row=1, max_row=nW), titles_from_data=True)
+    c2.add_data(Reference(ws, min_col=14, max_col=14, min_row=1, max_row=nW), titles_from_data=True)
     c2.set_categories(Reference(ws, min_col=1, min_row=2, max_row=nW))
     c2.y_axis.scaling.logBase = 10
     c2.x_axis.number_format = "yyyy"; c2.x_axis.tickLblSkip = 52
@@ -271,6 +277,9 @@ def main() -> None:
         ("指數", f"{labels['tech']}（{rb['indices']['tech']['n']} 檔，Yahoo technology 類股）與 {labels['semi']}"
                f"（{rb['indices']['semi']['n']} 檔，Yahoo 半導體＋半導體設備產業）：S&P 500 成分股以市值加權、逐期連鎖重建，"
                "股數以最新市值÷最新收盤固定。不是官方指數。"),
+        ("等權重指數", f"{rb['ew']['label']}指數（週線 N 欄）：{U}名單 {rb['ew']['n']} 檔，每週取各檔報酬的簡單平均後連乘，"
+                   f"晚上市的成分（{rb['ew']['n'] - rb['ew']['n_start']} 檔）上市後才加入。和多空排列差是同一批股票，只供對照，"
+                   "不用於任何統計。"),
         ("限制", "名單與指數成分都用今天的名單回推（存活者偏差，早年偏樂觀）；固定股數忽略增資、買回與成分變動；"
                f"半導體指數與{U}名單重疊 {rb['indices']['semi']['overlap_n']} 檔（市值 {rb['indices']['semi']['overlap_cap']:.0f}%）。"),
         ("工作表", "摘要（公式）、週線、日線、背離、週期段落、成分股_AI硬體／半導體／科技、圖表。"

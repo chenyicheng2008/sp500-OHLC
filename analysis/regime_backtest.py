@@ -36,11 +36,6 @@ REPO = Path(__file__).resolve().parent.parent
 H = 13                      # forward / backward horizon, weeks
 BIG_DROP = -0.10            # "large fall": max drawdown within the next H weeks
 EPISODE_DD = -0.15          # peak-to-trough drawdown that counts as an episode
-# "Spread slides from a high": it reaches `zone`, then falls `drop` points below the highest
-# reading since it got there. One trigger per visit to the zone.
-SLIDES = [{"id": "base", "zone": 60, "drop": 30}, {"id": "strict", "zone": 80, "drop": 40}]
-CORRECTIONS = (-0.10, -0.15, -0.20)  # drawdown from the index's running high
-WAIT_MAX = 52                         # weeks of follow-up for the waiting-time view
 # Cycles: a turning point is confirmed once the series reverses by at least R from it
 # (zig-zag). The answer depends on R, so several are reported; MAIN_SWING drives the chart.
 SPREAD_SWINGS = (40, 60, 80)          # points of 多空排列差
@@ -147,76 +142,6 @@ def episodes(level: pd.Series, net: pd.Series) -> list:
             "cross_to_trough": round(100 * (level[tr] / level[c] - 1), 1) if c is not None else None,
         })
     return rows
-
-
-def weeks_to(dd: np.ndarray, i: int, thr: float):
-    """Weeks from week i until the drawdown first reaches thr (None if it never does)."""
-    hit = np.nonzero(dd[i:] <= thr)[0]
-    return int(hit[0]) if len(hit) else None
-
-
-def slide_triggers(net: pd.Series, zone: float, drop: float) -> list:
-    out, armed, hi, hi_i = [], False, None, None
-    for i, v in enumerate(net.values):
-        if v >= zone and (not armed or v > hi):
-            armed, hi, hi_i = True, v, i
-        if armed and v <= hi - drop:
-            out.append((i, hi_i))
-            armed = False
-    return out
-
-
-def slide_study(df: pd.DataFrame) -> dict:
-    """After the spread slides from a high, how long until each index corrects -- vs any week."""
-    n, last_ok = len(df), len(df) - 1 - WAIT_MAX       # need a full year of follow-up
-    dd = {k: (df[k] / df[k].cummax() - 1).values for k in INDICES}
-    base = {}
-    curves = {}
-    for k in INDICES:
-        base[k] = {}
-        curves[k] = {}
-        for thr in CORRECTIONS:
-            waits = [weeks_to(dd[k], i, thr) for i in range(last_ok + 1) if dd[k][i] > thr]
-            w = np.array([x if x is not None else 10 ** 6 for x in waits])
-            key = str(round(-100 * thr))
-            base[k][key] = {"n": len(w), **{f"p{h}": round(100 * float((w <= h).mean()), 1) for h in (13, 26, 52)},
-                            "median": float(np.median(w)) if np.median(w) < 10 ** 6 else None}
-            curves[k][key] = {"base": [round(100 * float((w <= h).mean()), 1) for h in range(WAIT_MAX + 1)]}
-    defs = []
-    for d in SLIDES:
-        trig = slide_triggers(df["net"], d["zone"], d["drop"])
-        events = []
-        for i, hi_i in trig:
-            ev = {"date": df.index[i].date().isoformat(), "hi_date": df.index[hi_i].date().isoformat(),
-                  "hi": round(float(df["net"].iloc[hi_i]), 1), "now": round(float(df["net"].iloc[i]), 1),
-                  "complete": i <= last_ok}
-            for k in INDICES:
-                ev[k + "_dd"] = round(100 * float(dd[k][i]), 1)
-                for thr in CORRECTIONS:
-                    ev[f"{k}_w{round(-100 * thr)}"] = weeks_to(dd[k], i, thr)
-                nh = np.nonzero(dd[k][i + 1:] >= 0)[0]                  # next new high, if any
-                ev[k + "_newhigh"] = int(nh[0]) + 1 if len(nh) else None
-            events.append(ev)
-        stats = {}
-        for k in INDICES:
-            stats[k] = {}
-            for thr in CORRECTIONS:
-                key = str(round(-100 * thr))
-                done = [e for e in events if e["complete"]]
-                elig = [e for e in done if e[k + "_dd"] > 100 * thr]      # not already past the line
-                w = np.array([e[f"{k}_w{key}"] if e[f"{k}_w{key}"] is not None else 10 ** 6 for e in elig])
-                # median over every eligible trigger, "never" included -- same basis as the baseline
-                med = float(np.median(w)) if len(w) else None
-                stats[k][key] = {"n": len(elig), "already": len(done) - len(elig),
-                                 **{f"hit{h}": int((w <= h).sum()) for h in (13, 26, 52)},
-                                 "median": med if med is not None and med < 10 ** 6 else None}
-                if d["id"] == SLIDES[0]["id"]:
-                    curves[k][key]["event"] = [round(100 * float((w <= h).mean()), 1) if len(w) else None
-                                               for h in range(WAIT_MAX + 1)]
-        defs.append({**d, "n": len(events), "n_complete": sum(e["complete"] for e in events),
-                     "events": events, "stats": stats})
-    return {"defs": defs, "baseline": base, "curves": curves, "wait_max": WAIT_MAX,
-            "thresholds": [round(-100 * t) for t in CORRECTIONS]}
 
 
 def zigzag(v: np.ndarray, r: float) -> list:
@@ -409,12 +334,19 @@ def main() -> None:
         overlap = [t for t in cols if t in members]
         info[key] = {"label": label, "n": len(cols), "overlap_n": len(overlap),
                      "overlap_cap": round(100 * float(meta.loc[overlap, "Market Cap"].sum() / meta.loc[cols, "Market Cap"].sum()), 0)}
+    # The regime universe itself as an equal-weight index (asked 2026-11-13): each week the
+    # mean return of the members priced both weeks, chain-linked, so a name that lists later
+    # (SNDK, 2025-02) joins without a jump. Drawn on the timeline only -- it is built from
+    # the same names the spread counts, so it is kept out of every warning statistic.
+    ew_cols = [t for t in reg["group_of"] if t in w.columns]
+    ew_ret = w[ew_cols].pct_change(fill_method=None).mean(axis=1)
+    df["aihw"] = 100 * (1 + ew_ret.fillna(0)).cumprod()
     df = df.dropna(subset=["net", "tech", "semi"])
-    for key in INDICES:
+    for key in list(INDICES) + ["aihw"]:
         df[key] = 100 * df[key] / df[key].iloc[0]                  # rebase to the first net week
         df[key + "_dd"] = 100 * (df[key] / df[key].cummax() - 1)
 
-    out = df[["net", "tech", "semi", "tech_dd", "semi_dd"]].round(2)
+    out = df[["net", "tech", "semi", "aihw", "tech_dd", "semi_dd", "aihw_dd"]].round(2)
     out.index.name = "Date"
     out.to_csv(out_dir / "regime_backtest_weekly.csv", encoding=ENC)
 
@@ -464,7 +396,6 @@ def main() -> None:
         }
     crosses = df.index[(df["net"] < 0) & (df["net"].shift(1) >= 0)]
     res["zero_crosses"] = [t.date().isoformat() for t in crosses]
-    res["slide"] = slide_study(df)
     res["cycles"] = cycle_study(df)
     res["divergence"] = divergence_study(df)
     # constituent lists: the regime universe (every name counts once in the spread) and each
@@ -473,6 +404,13 @@ def main() -> None:
     for key, (label, sel) in INDICES.items():
         cols = [t for t in meta.index[sel(meta)] if t in w.columns and t in shares.index]
         res["constituents"][key] = constituents(daily, meta, [t for t in cols if t in daily.columns], reg["group_of"])
+    res["ew"] = {"label": reg["universe"]["label"] + "等權重", "n": len(ew_cols),
+                 "n_start": int(w[ew_cols].loc[df.index[0]].notna().sum()),
+                 "dd_now": round(float(df["aihw_dd"].iloc[-1]), 1),
+                 "peak": df["aihw"].idxmax().date().isoformat(),
+                 "ret_1y": round(float(100 * (df["aihw"].iloc[-1] / df["aihw"].iloc[-53] - 1)), 1),
+                 "tech_ret_1y": round(float(100 * (df["tech"].iloc[-1] / df["tech"].iloc[-53] - 1)), 1),
+                 "semi_ret_1y": round(float(100 * (df["semi"].iloc[-1] / df["semi"].iloc[-53] - 1)), 1)}
     res["net_now"] = round(float(df["net"].iloc[-1]), 1)
     res["d4_now"] = round(float(d4.iloc[-1]), 1)
     with open(out_dir / "regime_backtest.json", "w", encoding="utf-8") as fh:
@@ -488,18 +426,10 @@ def main() -> None:
         print(f"  cycle {row['series']} swing {row['swing']}: {row['n_cycles']} cycles, peak-peak mean {row['pp_mean']} "
               f"median {row['pp_median']} ({row['min']}-{row['max']}), up {row['up_mean']} down {row['down_mean']}")
     print(f"  acf: {res['cycles']['acf']}")
+    print(f"  ew {res['ew']}")
     for k, v in res["divergence"]["by_index"].items():
         print(f"  divergence {k}: " + ", ".join(f"{t} {s['n']} ({s['hits']}/{s['n_done']} fell ≥{-round(100*BIG_DROP)}% in 26w, "
               f"median 26w {s['med_ret26']}%)" for t, s in v["summary"].items()))
-    sl = res["slide"]
-    for d in sl["defs"]:
-        print(f"  slide ≥{d['zone']} then -{d['drop']}: {d['n']} triggers ({d['n_complete']} with {WAIT_MAX}w follow-up)")
-        for k in INDICES:
-            for key, st in d["stats"][k].items():
-                b = sl["baseline"][k][key]
-                print(f"    {k} -{key}%: 13/26/52w {st['hit13']}/{st['hit26']}/{st['hit52']} of {st['n']} "
-                      f"(baseline {b['p13']}/{b['p26']}/{b['p52']}%), median wait {st['median']} vs {b['median']}")
-
 
 if __name__ == "__main__":
     main()

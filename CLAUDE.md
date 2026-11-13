@@ -219,26 +219,28 @@ net (2015-08 → 2026-11, 587 weeks): **no — it confirms, it doesn't warn.**
 - Of 15 episodes (≥15% falls, both indices) the net crossed below 0 after the peak 8×,
   before it 5× (index then rose another 7-28% first), never 2× (tech 2025-10, semi 2024-03).
 - Signals are declustered (13w); signals inside the last 13w are "尚無結果", never counted.
+  Only 45 non-overlapping 13w windows exist — say so whenever quoting these rates.
   A pending signal is described with its own date, not as happening now: on 2026-11-12 the
   read-out said 「多空排列差剛跌破 -40」 for the 11-06 deep40 signal while net was back at
   -27.3. It now says 「剛跌破」 only when net ≤ -40, else 「在 <date> 跌破 -40，目前回升到 …」.
 - `asof` in `regime_backtest.json` is the last **trading day**; `last_week` is the W-FRI
   label of the final weekly bar, which runs ahead of it mid-week (`week_partial`). asof
   once equalled that Friday (2026-11-13 on data ending 11-12) and dated the xlsx wrong.
-  Only 45 non-overlapping 13w windows exist — say so whenever quoting these rates.
-- **Slide from a high → how long to a correction?** (asked 2026-11-09, `slide_study()`).
-  A slide = net reaches `zone`, then falls `drop` below the highest reading since; one
-  trigger per visit (base 60/30 → 33 triggers, strict 80/40 → 11). Correction = index
-  drawdown from its running high reaching -10/-15/-20%. Compared against **any week**,
-  and both sides count only start weeks not already past the line and with 52 weeks of
-  follow-up. That eligibility rule matters: the first chat answer counted already-down
-  triggers as "0 weeks" and showed tech -10% within 26w as 9/29 (31%); on the fair basis
-  it is 5/25 (20%) vs 40% for any week; semi 12/25 (48%) vs 63%. Median wait for -10%:
-  tech 47 w vs 36, semi 30 vs 17 — slides are followed by corrections *later*, not sooner.
-  Strict slides: tech -15% within 26w 0/9, and every one saw a new high within 52 weeks.
-  The spread's own high led the index peak by 0-52 weeks (median 45) across 13 episodes —
-  only matchable in hindsight; the read-out says so. "只有" and 「多半是行情中的休息」 are
-  conditional on those comparisons, not fixed text.
+- **Slide from a high → how long to a correction?** Asked 2026-11-09, then **removed from
+  the report on 2026-11-13 at the user's request** (「刪除多空排列差從高點滑落後相關章節」):
+  `slide_study()`, its charts, tables and read-out lines are gone from code and page. Finding
+  at removal, for the record: on a fair basis (start weeks not already past the line, 52 w
+  follow-up) slides were followed by corrections *later*, not sooner (tech -10% within 26 w
+  5/25 vs 40% for any week). Don't reintroduce it unasked. The episodes' spread-high lead
+  (0-52 weeks, median 45, only matchable in hindsight) is separate and stays.
+- **AI-hardware equal-weight index** (asked 2026-11-13, 「時間序列…加 AI 硬體 22 檔之等權重
+  指數」): `aihw` / `aihw_dd` in `regime_backtest_weekly.csv`, `ew` in the JSON. Weekly mean
+  return of the members priced both weeks, chain-linked, rebased with tech/semi at the first
+  net week (18 of 22 priced then; SNDK joins 2025-02). Drawn on the 預警檢驗 timeline (purple,
+  `--s4`) and in the xlsx 週線 sheet (cols N/O) **only** — it is built from the same names the
+  spread counts, so it stays out of every warning statistic; the page says so, and says the
+  hand-picked list makes early years read high. 2026-11-12: +88.3% over 52 w (tech +15.6%,
+  semi +18.0%), peak 2026-10-02, -24.7% from it.
 - **Average cycle** (asked 2026-11-09, `cycle_study()`): turning points by zig-zag — a
   high/low is confirmed once the series reverses by ≥R. The answer depends on R, so the
   page lists R = 40/60/80 points (mean peak-to-peak 18 / 34 / 57 weeks as of 2026-11-06);
