@@ -105,6 +105,8 @@ def main() -> None:
         "drawdown": read("breadth_drawdown_buckets.csv").round(1).to_dict("records"),
         "concentration": json.load(open(d / "analysis_bundle.json", encoding="utf-8"))["concentration"],
         "sector": read("sector_summary.csv").round(2).to_dict("records"),
+        # simulated semiconductor "sector" (a subset of technology), shown beside the 11
+        "sector_sim": read("sector_semi_sim.csv").round(2).to_dict("records") if (d / "sector_semi_sim.csv").exists() else [],
         "rotation": read("sector_rotation.csv").round(1).to_dict("records"),
         "industry": read("industry_summary.csv").round(1).to_dict("records"),
         "leaders": read("leaders_3m.csv").round(1).to_dict("records"),
@@ -191,6 +193,10 @@ def main() -> None:
         payload["ma_long_tech"] = ma_payload(d / "breadth_long_weekly_tech.csv",
                                              pd.read_csv(d / "breadth_daily_tech.csv", index_col=0, parse_dates=True))
         payload["ma_long_tech"]["n"] = payload["ma_long_tech"]["n_max"]
+    if (d / "breadth_long_weekly_semi.csv").exists():
+        payload["ma_long_semi"] = ma_payload(d / "breadth_long_weekly_semi.csv",
+                                             pd.read_csv(d / "breadth_daily_semi.csv", index_col=0, parse_dates=True))
+        payload["ma_long_semi"]["n"] = payload["ma_long_semi"]["n_max"]
 
     # --- does the regime net warn of large falls? (regime_backtest.py) -------------
     bt_json = d / "regime_backtest.json"

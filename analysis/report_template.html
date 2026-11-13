@@ -365,6 +365,18 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     <figcaption id="cap-mt"></figcaption>
   </figure>
 
+  <figure class="panel" id="f-ms">
+    <div class="panel-head">
+      <h3>半導體：站上均線的比例與指數</h3>
+      <p id="sub-ms">—</p>
+    </div>
+    <div class="rb-row" id="ms-basis" style="padding:0 20px"></div>
+    <div id="rb-ms"></div>
+    <div class="legend" id="lg-ms"></div>
+    <div class="panel-body"><div id="c-ms"></div></div>
+    <figcaption id="cap-ms"></figcaption>
+  </figure>
+
   <div class="grid2">
     <figure class="panel">
       <div class="panel-head"><h3>市值加權 vs 等權指數</h3><p>兩者皆以一年前 = 100。差距擴大＝漲勢集中在大型股。</p></div>
@@ -600,7 +612,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
    * labels
    * ------------------------------------------------------------------ */
   var SEC_TC = {
-    "technology": "科技", "industrials": "工業", "financial-services": "金融",
+    "technology": "科技", "semiconductors-sim": "半導體（模擬）", "industrials": "工業", "financial-services": "金融",
     "healthcare": "醫療保健", "consumer-cyclical": "非必需消費", "consumer-defensive": "必需消費",
     "utilities": "公用事業", "real-estate": "不動產", "communication-services": "通訊服務",
     "energy": "能源", "basic-materials": "原物料", "unknown": "未分類"
@@ -2893,16 +2905,18 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
       }));
 
     // sector table
-    var sec = D.sector.slice().sort(function (a, b) { return b.cw_3M - a.cw_3M; });
+    var SIM = D.sector_sim || [];
+    var simTag = function (s) { return s.parent ? " <span class='tag cyc'>" + secName(s.parent) + "子集</span>" : ""; };
+    var sec = D.sector.concat(SIM).sort(function (a, b) { return b.cw_3M - a.cw_3M; });
     fillTable("t-sector",
       ["類股", "權重", "家數", "1 個月", "3 個月", "12 個月<br><span class='sub'>市值加權</span>",
        "12 個月<br><span class='sub'>等權</span>", "12 個月<br><span class='sub'>中位數</span>",
        "&gt;50日均", "&gt;200日均", "距 52 週高<br><span class='sub'>中位數</span>"],
       sec.map(function (s) {
         return [
-          { html: secName(s.Sector) + " <span class='tag " + (s.style === "defensive" ? "def" : "cyc") + "'>" +
-              (s.style === "defensive" ? "防禦" : "景氣") + "</span>" },
-          { html: s.weight_pct.toFixed(1) + "%", cls: "n" },
+          { html: secName(s.Sector) + (s.parent ? simTag(s) : " <span class='tag " + (s.style === "defensive" ? "def" : "cyc") + "'>" +
+              (s.style === "defensive" ? "防禦" : "景氣") + "</span>") },
+          { html: s.parent ? "（" + s.weight_pct.toFixed(1) + "%）" : s.weight_pct.toFixed(1) + "%", cls: "n" },
           { html: String(s.n), cls: "n" },
           signed(s.cw_1M), signed(s.cw_3M), signed(s.cw_12M), signed(s.ew_12M), signed(s.med_12M),
           heat(s.pct_above_50dma), heat(s.pct_above_200dma),
@@ -2912,10 +2926,10 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
 
     fillTable("t-secval",
       ["類股", "本益比", "預估本益比", "殖利率", "今年成長", "明年成長", "下季成長", "預估PE ÷ 明年成長"],
-      D.sector.slice().sort(function (a, b) { return a.median_fwd_pe - b.median_fwd_pe; }).map(function (s) {
+      D.sector.concat(SIM).sort(function (a, b) { return a.median_fwd_pe - b.median_fwd_pe; }).map(function (s) {
         var peg = s.fwd_pe_over_ny_growth;
         return [
-          { html: secName(s.Sector) },
+          { html: secName(s.Sector) + simTag(s) },
           { html: num(s.median_pe), cls: "n" },
           { html: num(s.median_fwd_pe), cls: "n" },
           { html: num(s.median_div_yield, 2) + "%", cls: "n" },
@@ -3080,7 +3094,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
         "同期重建" + cfg.pre + "指數：市值加權 " + chg(ML.cw) + "、等權重 " + chg(ML.ew) +
         (ML.off_cw ? "；" + cfg.offCW + " " + chg(ML.off_cw) + (ML.off_ew ? "、" + cfg.offEW + " " + chg(ML.off_ew) : "") : "") + "。" +
         "成分股與指數都用今天的成分名單回推，早年的強勢與漲幅都偏高（存活者偏差）" +
-        (ML.off_cw ? "，重建線與官方虛線拉開的距離就是這個偏差。" : "；官方 " + cfg.offSyms + " 由每日抓取程式加抓，資料進來後會以虛線並列，直接看出偏差有多大。") + (cfg.note || "") +
+        (ML.off_cw ? "，重建線與官方虛線拉開的距離就是這個偏差。" : cfg.offSyms ? "；官方 " + cfg.offSyms + " 由每日抓取程式加抓，資料進來後會以虛線並列，直接看出偏差有多大。" : "。") + (cfg.note || "") +
         (ML.partial ? "最後一週尚未收完（資料到 " + D.asof + "）。" : "");
     } else {
       var DL = ML ? ML.daily : null;
@@ -3203,17 +3217,27 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
       offSyms: "^SP500-45",
       note: "官方只有市值加權版，等權重線沒有官方對照。科技類股依 Yahoo 的類股分類，官方資訊科技類股依 GICS，兩者成分不完全相同，所以即使沒有存活者偏差，兩條線也不會完全重合。" });
     else document.getElementById("f-mt").style.display = "none";
-    if (D.ma_long_tech && D.ma_long) {
-      var TD = D.ma_long_tech.daily, MD = D.ma_long.daily, lastv = function (a) { return a[a.length - 1]; };
+    if (D.ma_long_semi) drawMaPanel({ id: "ms", ML: D.ma_long_semi, pre: "半導體", offSyms: null,
+      note: "半導體只有 " + D.ma_long_semi.n + " 檔，一檔就占約 " + (100 / D.ma_long_semi.n).toFixed(0) +
+        " 個百分點，比例跳動比全市場與科技類股大得多。沒有官方對照：費城半導體指數（^SOX）成分包含非 S&P 500 的公司，和這 " +
+        D.ma_long_semi.n + " 檔不是同一批。" });
+    else document.getElementById("f-ms").style.display = "none";
+    // subtitles: each group's shares against the whole market, wording chosen from the gap
+    var subVsMarket = function (G, lead) {
+      if (!G || !D.ma_long) return;
+      var GD = G.daily, MD = D.ma_long.daily, lastv = function (a) { return a[a.length - 1]; };
       var cmpTxt = function (k, nm) {
-        var t = lastv(TD[k]), m = lastv(MD[k]);
+        var t = lastv(GD[k]), m = lastv(MD[k]);
         return nm + " " + t.toFixed(0) + "%，" + (Math.abs(t - m) < 3 ? "和全市場的 " + m.toFixed(0) + "% 差不多" :
           (t > m ? "高於" : "低於") + "全市場的 " + m.toFixed(0) + "%");
       };
-      document.getElementById("sub-mt").textContent = "Yahoo 類股分類為科技（technology）的 S&P 500 成分股 " + D.ma_long_tech.n +
-        " 檔，和預警檢驗的重建科技指數是同一批。目前（" + lastv(TD.dates) + "）" + cmpTxt("p200", "站上 200 日均線") + "；" +
+      return lead + "目前（" + lastv(GD.dates) + "）" + cmpTxt("p200", "站上 200 日均線") + "；" +
         cmpTxt("p50", "站上 50 日均線") + "；" + cmpTxt("p20", "站上 20 日均線") + "。";
-    }
+    };
+    if (D.ma_long_tech) document.getElementById("sub-mt").textContent = subVsMarket(D.ma_long_tech,
+      "Yahoo 類股分類為科技（technology）的 S&P 500 成分股 " + D.ma_long_tech.n + " 檔，和預警檢驗的重建科技指數是同一批。");
+    if (D.ma_long_semi) document.getElementById("sub-ms").textContent = subVsMarket(D.ma_long_semi,
+      "Yahoo 產業為半導體與半導體設備的 S&P 500 成分股 " + D.ma_long_semi.n + " 檔（科技類股的子集），和預警檢驗的重建半導體指數、類股表的「半導體（模擬）」是同一批。");
 
     lineChart(document.getElementById("c-idx"), {
       dates: D.dates, height: 250, right: 50,
@@ -3300,10 +3324,12 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     // sector 3M bars
     var ref3 = D.participation.filter(function (r) { return r.horizon === "3M"; })[0].index_ret;
     var secSorted = D.sector.slice().sort(function (a, b) { return b.cw_3M - a.cw_3M; });
+    var SIMS = D.sector_sim || [];
     hbarChart(document.getElementById("c-sec"), {
       diverging: true, rowH: 32, ref: ref3, refLabel: "指數 " + pct(ref3),
-      rows: secSorted.map(function (s) {
+      rows: secSorted.concat(SIMS).sort(function (a, b) { return b.cw_3M - a.cw_3M; }).map(function (s) {
         return { label: secName(s.Sector), value: s.cw_3M, display: pct(s.cw_3M),
+          color: s.parent ? css("--s4") : null,
           note: s.pct_above_50dma.toFixed(0) + "%↑50日",
           tip: "<div class='tt-h'>" + secName(s.Sector) + " · " + s.n + " 檔</div>" +
             "<div class='tt-r'><span>3 個月（市值加權）</span><b>" + pct(s.cw_3M) + "</b></div>" +
@@ -3321,16 +3347,23 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
       (mismatch.length
         ? "但有 " + mismatch.length + " 個類股報酬為正、站上 50 日均線的比例卻不到一半（" +
           mismatch.map(function (x) { return secName(x.Sector); }).join("、") + "），漲的是權值股而不是整群。"
-        : "");
+        : "") +
+      SIMS.map(function (x) {
+        var par = D.sector.filter(function (y) { return y.Sector === x.parent; })[0];
+        return secName(x.Sector) + "是" + secName(x.parent) + "類股中產業為半導體與半導體設備的 " + x.n + " 檔（紫色），屬" + secName(x.parent) +
+          "的子集，不計入類股家數、權重加總與上面的最強／最弱比較；近三個月市值加權 " + pct(x.cw_3M) +
+          (par ? "，" + (x.cw_3M > par.cw_3M ? "強於" : "弱於") + "整個" + secName(x.parent) + "類股的 " + pct(par.cw_3M) : "") +
+          "，" + x.pct_above_50dma.toFixed(0) + "% 站上 50 日均線。";
+      }).join("");
 
     // leadership quadrant
     var maxCap = Math.max.apply(null, D.sector.map(function (s) { return s.weight_pct; }));
     scatter(document.getElementById("c-quad"), {
       height: 360,
-      points: D.sector.filter(function (s) { return s.Sector !== "unknown"; }).map(function (s) {
+      points: D.sector.filter(function (s) { return s.Sector !== "unknown"; }).concat(SIMS).map(function (s) {
         return {
           x: s.rs_3m, y: s.pct_above_200dma, r: 6 + 16 * Math.sqrt(s.weight_pct / maxCap),
-          color: s.style === "defensive" ? s2 : s1,
+          color: s.parent ? css("--s4") : s.style === "defensive" ? s2 : s1,
           label: secName(s.Sector),
           tip: "<div class='tt-h'>" + secName(s.Sector) + "</div>" +
             "<div class='tt-r'><span>3 個月超額報酬</span><b>" + pct(s.rs_3m) + "</b></div>" +
@@ -3343,6 +3376,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     document.getElementById("lg-quad").innerHTML =
       "<span><i class='swatch dot' style='background:" + s1 + "'></i>景氣循環</span>" +
       "<span><i class='swatch dot' style='background:" + s2 + "'></i>防禦型</span>" +
+      (SIMS.length ? "<span><i class='swatch dot' style='background:" + css("--s4") + "'></i>模擬（" + SIMS.map(function (x) { return secName(x.parent); }).join("、") + "的子集）</span>" : "") +
       "<span class='sub' style='color:var(--ink-3)'>圓面積 ∝ 指數權重</span>";
     var known = D.sector.filter(function (x) { return x.Sector !== "unknown"; });
     var lead = known.slice().sort(function (a, b) { return b.rs_3m - a.rs_3m; })[0];

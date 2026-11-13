@@ -250,6 +250,23 @@ indices). Its cap-weighted line equals regime_backtest's rebuilt tech exactly (�
 compares each tech share with the whole market, choosing 高於/低於/差不多 (<3 points) from
 the numbers. 2026-11-12: tech above 200/50/20-day 59/46/48% vs market 65/72/68%.
 
+Semiconductors alone (asked 2026-11-13: 「半導體也單獨加上站上均線比例與指數比較」): third
+panel (`f-ms`, `id: "ms"`), `breadth_long_weekly_semi.csv` / `breadth_daily_semi.csv`, the
+18 names of `SEMI_INDUSTRIES` (= regime_backtest's semi index, ×25.09 since 2015-08). No
+official overlay on purpose: ^SOX (PHLX) has non-S&P members and is not fetched — offer it,
+don't fake it. With 18 names one stock is ~6 points; the caption says so.
+
+## Simulated semiconductor sector (section 類股, asked 2026-11-13: 「11 個類股的報酬.. 加入半導體類股模擬」)
+
+`sector_semi_sim.csv` (payload `sector_sim`): the same group functions run on the 18
+semiconductor + equipment names as if they were a sector (`Sector = semiconductors-sim`,
+`parent = technology`, `weight_pct` = share of the whole index). It is a **subset of
+technology**, so it lives outside `D.sector`: the 11 real sectors, 「11 個類股」, 家數 total,
+weight sums, smallest-sector, best/worst and leadership read-outs are untouched. It is shown
+(purple, tagged 「科技子集」, weight in parentheses) only in the 3-month bar chart, the
+leadership map and both sector tables; the bar caption adds one data-derived sentence
+(2026-11-12: 3M -17.8% vs technology -7.0%, 44% above the 50-day).
+
 ## Regime as a warning? (`regime_backtest.py`, section 「預警檢驗」)
 
 Asked 2026-11-09: "can this indicator predict a large tech fall?" Answer, from the weekly

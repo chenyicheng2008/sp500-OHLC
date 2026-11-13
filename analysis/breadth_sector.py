@@ -203,6 +203,8 @@ def new_highs_lows(close: pd.DataFrame, window: int = 252) -> pd.DataFrame:
     return df
 
 
+SEMI_INDUSTRIES = ["semiconductors", "semiconductor-equipment-materials"]
+SEMI_KEY = "semiconductors-sim"
 LONG_MA_WEEKS = (4, 10, 40)      # ≈ 20 / 50 / 200 trading days
 LONG_MIN_SHARE = 0.6              # a week counts once 60% of today's names have a 40-week average
 
@@ -655,6 +657,15 @@ def main() -> None:
     td = daily_group(daily[tech], shares)
     td.index.name = "Date"
     td.round(3).to_csv(out_dir / "breadth_daily_tech.csv", encoding=ENC)
+    semi_n = [t for t in fund.loc[fund["Industry"].isin(SEMI_INDUSTRIES), "Ticker"] if t in daily.columns and t in shares.index]
+    # no official overlay: ^SOX (PHLX) has a different membership, and nothing fetches it
+    sw = long_weekly(daily[semi_n], weekly[[t for t in semi_n if t in weekly.columns]], shares)
+    sw.index.name = "Date"
+    sw.round(3).to_csv(out_dir / "breadth_long_weekly_semi.csv", encoding=ENC)
+    sd = daily_group(daily[semi_n], shares)
+    sd.index.name = "Date"
+    sd.round(3).to_csv(out_dir / "breadth_daily_semi.csv", encoding=ENC)
+    print(f"semi breadth: {len(semi_n)} names, weekly {sw.index[0].date()} -> {sw.index[-1].date()}")
     print(f"tech breadth: {len(tech)} names, weekly {tw.index[0].date()} -> {tw.index[-1].date()}, "
           f"daily {td.index[0].date()} -> {td.index[-1].date()}")
 
@@ -672,6 +683,22 @@ def main() -> None:
     sector["style"] = np.where(sector["Sector"].isin(DEFENSIVE), "defensive", "cyclical")
     sector = sector.sort_values("cw_3M", ascending=False)
     sector.to_csv(out_dir / "sector_summary.csv", index=False, encoding=ENC)
+
+    # Simulated "semiconductor sector" (asked 2026-11-13: 「11 個類股的報酬.. 加入半導體類股模擬」):
+    # the semiconductor + equipment industries, a subset of technology -- the same 18 names as
+    # regime_backtest's rebuilt semi index. Kept in its own file so the 11 real sectors, their
+    # weights and every count stay as they are; weight_pct is its share of the whole index.
+    sf = fund[fund["Industry"].isin(SEMI_INDUSTRIES)].assign(Sector=SEMI_KEY)
+    semi = (group_returns(daily, sf, shares, "Sector")
+            .merge(group_breadth(daily, sf, "Sector").drop(columns="n"), on="Sector")
+            .merge(group_fundamentals(sf, "Sector").drop(columns="n"), on="Sector"))
+    semi["weight_pct"] = 100 * semi["market_cap"] / sector["market_cap"].sum()
+    semi["rs_3m"] = semi["cw_3M"] - bench_3m
+    semi["rs_12m"] = semi["cw_12M"] - bench_12m
+    semi["label"] = "Semiconductors (simulated)"
+    semi["style"] = "cyclical"
+    semi["parent"] = "technology"
+    semi.to_csv(out_dir / "sector_semi_sim.csv", index=False, encoding=ENC)
 
     MIN_IND = 3
     ind_ret = group_returns(daily, fund, shares, "Industry", min_members=MIN_IND)
