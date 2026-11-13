@@ -419,7 +419,10 @@ def main() -> None:
     out.to_csv(out_dir / "regime_backtest_weekly.csv", encoding=ENC)
 
     d4 = df["net"] - df["net"].shift(4)
-    res = {"asof": df.index[-1].date().isoformat(), "start": df.index[0].date().isoformat(),
+    # The weekly bars are labelled with their Friday, so mid-week the last one is partial and
+    # dated after the data. asof is the last *trading day*; the week label is kept separately.
+    res = {"asof": daily.index[-1].date().isoformat(), "last_week": df.index[-1].date().isoformat(),
+           "week_partial": bool(df.index[-1] > daily.index[-1]), "start": df.index[0].date().isoformat(),
            "weeks": len(df), "horizon": H, "big_drop": round(100 * BIG_DROP), "episode_dd": round(100 * EPISODE_DD),
            "universe_label": reg["universe"]["label"], "n_members": reg["n_members"],
            "indices": info, "independent_windows": len(df) // H, "by_index": {}}

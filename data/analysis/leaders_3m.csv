@@ -1,16 +1,16 @@
 ﻿Ticker,ret_3m,ret_12m,Short Name,Sector,Industry,Market Cap
-MRNA,324.99581442062686,978.9049584184227,"Moderna, Inc.",healthcare,biotechnology,102850600960
-EPAM,63.61301536903363,-0.994348435213166,"EPAM Systems, Inc.",technology,information-technology-services,8128527360
-ACN,47.31543534396283,8.143337496786817,Accenture plc,technology,information-technology-services,153887113216
-RVTY,33.75197234143113,67.97256597693016,"Revvity, Inc.",healthcare,diagnostics-research,17308166144
-TYL,31.990079751989974,-8.734619520680443,"Tyler Technologies, Inc.",technology,software-application,16721265664
-VEEV,29.41753284192781,2.86865845036941,Veeva Systems Inc.,healthcare,health-information-services,49176576000
-PTC,29.168323272118002,2.684637611593499,PTC Inc.,technology,software-application,21190889472
-HAS,26.788274882237538,59.68014326958739,"Hasbro, Inc.",consumer-cyclical,leisure,16631061504
-EL,26.658835464056718,22.54434271339121,"Estee Lauder Companies, Inc. (T",consumer-defensive,household-personal-products,39878090752
-GILD,26.13103956567011,39.512519489054185,"Gilead Sciences, Inc.",healthcare,drug-manufacturers-general,207000109056
-KDP,25.923567375970702,41.45574568788264,Keurig Dr Pepper Inc.,consumer-defensive,beverages-non-alcoholic,49851240448
-GDDY,25.01912769058332,-14.064619077131068,GoDaddy Inc.,technology,software-infrastructure,13871399936
-CBOE,24.289992025693863,41.55545846199147,"Cboe Global Markets, Inc.",financial-services,financial-data-stock-exchanges,36856741888
-VTRS,23.21452052498445,91.77542161449932,Viatris Inc.,healthcare,drug-manufacturers-specialty-generic,22825914368
-BBY,22.13442406028987,29.742948326775643,"Best Buy Co., Inc.",consumer-cyclical,specialty-retail,20895170560
+MRNA,265.3664043248979,775.9939698605692,"Moderna, Inc.",healthcare,biotechnology,93609058304
+EPAM,63.01492719507928,-9.064166018602904,"EPAM Systems, Inc.",technology,information-technology-services,8359153152
+ACN,42.4360533389911,6.013790762865634,Accenture plc,technology,information-technology-services,147654836224
+RVTY,34.44871972426839,66.90375990165931,"Revvity, Inc.",healthcare,diagnostics-research,17529518080
+PTC,31.0517529215359,10.25280898876404,PTC Inc.,technology,software-application,21319073792
+SWKS,29.31628156782409,35.001728648219974,"Skyworks Solutions, Inc.",technology,semiconductors,21143961600
+TYL,28.891789635241416,-9.874468864278585,"Tyler Technologies, Inc.",technology,software-application,16841736192
+EL,28.786740042651026,23.384020264437044,"Estee Lauder Companies, Inc. (T",consumer-defensive,household-personal-products,40041140224
+VTRS,28.311928343505976,91.09643560473542,Viatris Inc.,healthcare,drug-manufacturers-specialty-generic,23697219584
+ULTA,27.453738757342137,24.508912920977433,"Ulta Beauty, Inc.",consumer-cyclical,specialty-retail,27833829376
+IDXX,26.691591348508446,-2.0281488015017057,"IDEXX Laboratories, Inc.",healthcare,diagnostics-research,54994391040
+HAS,26.568285599048515,59.886569554948025,"Hasbro, Inc.",consumer-cyclical,leisure,16990508032
+CBOE,24.91211666715236,43.33864419755275,"Cboe Global Markets, Inc.",financial-services,financial-data-stock-exchanges,38486380544
+APP,24.803445862548234,-33.82528274069829,Applovin Corporation,communication-services,advertising-agencies,130434834432
+CDW,24.526919407389023,23.57779783334406,CDW Corporation,technology,information-technology-services,21565802496

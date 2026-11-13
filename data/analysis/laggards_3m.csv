@@ -1,16 +1,16 @@
 ﻿Ticker,ret_3m,ret_12m,Short Name,Sector,Industry,Market Cap
-AXON,-47.51228497141994,-51.05781031984928,"Axon Enterprise, Inc.",industrials,aerospace-defense,25488439296
-STX,-42.40133901638454,68.14998196689923,Seagate Technology Holdings PLC,technology,computer-hardware,105825370112
-INTC,-42.28876054488836,46.638867152227206,Intel Corporation,technology,semiconductors,299128193024
-COHR,-40.7012144616625,43.21472967814528,Coherent Corp.,technology,scientific-technical-instruments,37975601152
-TER,-40.207114255260244,16.553490749202272,"Teradyne, Inc.",technology,semiconductor-equipment-materials,34068762624
-WDC,-39.803652309129745,65.0668776772388,Western Digital Corporation,technology,computer-hardware,98738987008
-FIX,-39.21646368564799,3.219696266097438,"Comfort Systems USA, Inc.",industrials,engineering-construction,35810230272
-CIEN,-37.22208106104509,24.29906665864545,Ciena Corporation,technology,communication-equipment,34514776064
-AMAT,-36.20704000666567,38.88508814163247,"Applied Materials, Inc.",technology,semiconductor-equipment-materials,264041775104
-LRCX,-34.51274545189871,22.002919108738418,Lam Research Corporation,technology,semiconductor-equipment-materials,250383826944
-LITE,-33.79429627293236,131.4028042343582,Lumentum Holdings Inc.,technology,communication-equipment,48841990144
-CAT,-33.145663457009725,-1.0137108526901195,"Caterpillar, Inc.",industrials,farm-heavy-construction-machinery,255625838592
-FICO,-32.88338118511955,-56.75484845882855,Fair Isaac Corporation,technology,software-application,15063932928
-GLW,-32.60024902304147,22.911063335286606,Corning Incorporated,technology,electronic-components,91420491776
-SNDK,-32.543301027971395,285.7090058007361,Sandisk Corporation,technology,computer-hardware,118820151296
+AXON,-49.88659550164647,-46.32633274795705,"Axon Enterprise, Inc.",industrials,aerospace-defense,25008799744
+STX,-43.95371204199881,90.40045585731565,Seagate Technology Holdings PLC,technology,computer-hardware,125142941696
+SNDK,-42.87646590780865,245.1874469119632,Sandisk Corporation,technology,computer-hardware,133390589952
+INTC,-40.2926821824981,61.562827447894094,Intel Corporation,technology,semiconductors,325278007296
+WDC,-38.81487907127662,83.4170105002644,Western Digital Corporation,technology,computer-hardware,116493139968
+TER,-36.9967520656976,49.106175713226776,"Teradyne, Inc.",technology,semiconductor-equipment-materials,41177903104
+FIX,-36.35717531843922,18.526808230927692,"Comfort Systems USA, Inc.",industrials,engineering-construction,39467245568
+FICO,-33.929526651234276,-60.09434172382145,Fair Isaac Corporation,technology,software-application,15338250240
+FIS,-33.16008404793045,-55.64400286287666,Fidelity National Information S,technology,information-technology-services,14618736640
+LITE,-32.55339208605738,147.41554299277269,Lumentum Holdings Inc.,technology,communication-equipment,56646332416
+SMCI,-32.254016898227924,-30.47398252628869,"Super Micro Computer, Inc.",technology,computer-hardware,17792546816
+CIEN,-31.434102720048173,41.72974044977642,Ciena Corporation,technology,communication-equipment,41690288128
+AKAM,-30.746460486431737,-4.469708668443739,"Akamai Technologies, Inc.",technology,software-infrastructure,12484476928
+ALB,-30.099489843824767,-7.645802683997783,Albemarle Corporation,basic-materials,specialty-chemicals,11193233408
+LRCX,-29.58588464333134,47.543546804490774,Lam Research Corporation,technology,semiconductor-equipment-materials,292031168512

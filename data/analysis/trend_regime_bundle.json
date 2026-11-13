@@ -8,7 +8,7 @@
   "missing": {},
   "n_priced": 22
  },
- "asof": "2026-11-06",
+ "asof": "2026-11-12",
  "ma_daily": [
   50,
   200
@@ -18,78 +18,73 @@
   40
  ],
  "n_members": 22,
- "daily_start": "2025-08-22",
+ "daily_start": "2025-08-29",
  "weekly_start": "2015-08-14",
- "then_date": "2026-10-08",
+ "then_date": "2026-10-14",
  "transitions": {
   "bull": {
-   "bull": 0,
-   "neither": 13,
-   "bear": 1
+   "bull": 1,
+   "neither": 2,
+   "bear": 0
   },
   "neither": {
-   "bull": 0,
-   "neither": 2,
-   "bear": 5
+   "bull": 1,
+   "neither": 8,
+   "bear": 7
   },
   "bear": {
-   "bull": 0,
+   "bull": 1,
    "neither": 0,
-   "bear": 1
+   "bear": 2
   }
  },
  "moved": {
-  "bull->neither": [
-   "AMAT",
-   "AMD",
-   "ANET",
-   "APH",
-   "DELL",
-   "HPE",
-   "LITE",
-   "LRCX",
-   "MU",
-   "NVDA",
-   "SMCI",
-   "SNDK",
-   "TER"
-  ],
   "neither->bear": [
-   "AVGO",
-   "CIEN",
+   "AMAT",
    "COHR",
    "GLW",
+   "KLAC",
+   "LRCX",
+   "TER",
    "WDC"
   ],
-  "bull->bear": [
-   "KLAC"
+  "neither->bull": [
+   "ANET"
+  ],
+  "bull->neither": [
+   "APH",
+   "HPE"
+  ],
+  "bear->bull": [
+   "TEL"
   ]
  },
  "names_now": {
-  "bull": [],
-  "neither": [
-   "AMAT",
+  "bull": [
    "AMD",
    "ANET",
+   "TEL"
+  ],
+  "neither": [
    "APH",
+   "AVGO",
    "DELL",
    "HPE",
    "LITE",
-   "LRCX",
    "MU",
    "NVDA",
    "SMCI",
    "SNDK",
-   "STX",
-   "TEL",
-   "TER"
+   "STX"
   ],
   "bear": [
-   "AVGO",
+   "AMAT",
    "CIEN",
    "COHR",
    "GLW",
    "KLAC",
+   "LRCX",
+   "TER",
    "VRT",
    "WDC"
   ]
@@ -120,26 +115,26 @@
  },
  "lookback": {
   "1M": {
-   "date": "2026-10-08",
-   "sec_bull": 63.6,
-   "sec_bear": 4.5,
-   "sec_net": 59.1,
-   "mkt_bull": 24.7,
-   "mkt_bear": 29.8,
-   "mkt_net": -5.1
+   "date": "2026-10-14",
+   "sec_bull": 13.6,
+   "sec_bear": 13.6,
+   "sec_net": 0.0,
+   "mkt_bull": 25.4,
+   "mkt_bear": 29.0,
+   "mkt_net": -3.7
   },
   "3M": {
-   "date": "2026-08-10",
-   "sec_bull": 27.3,
-   "sec_bear": 4.5,
-   "sec_net": 22.7,
-   "mkt_bull": 42.9,
-   "mkt_bear": 9.8,
-   "mkt_net": 33.1
+   "date": "2026-08-14",
+   "sec_bull": 54.5,
+   "sec_bear": 0.0,
+   "sec_net": 54.5,
+   "mkt_bull": 46.9,
+   "mkt_bear": 8.3,
+   "mkt_net": 38.5
   }
  },
- "pctile_daily": 0.0,
- "pctile_weekly": 7.7,
+ "pctile_daily": 3.3,
+ "pctile_weekly": 11.9,
  "weekly_extremes": {
   "max": {
    "date": "2016-12-23",

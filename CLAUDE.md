@@ -190,6 +190,17 @@ every page label says 多空排列差 — don't reintroduce 淨值.
   daily year) vs market +18.9; a month earlier +59.1 vs -5.1. All 14 bulls left (13 to
   neither, KLAC to bear); the largest one-day fall was 10-14 (E03 CPI, E04 Barclays AI
   hardware downgrade). The software list on the same date: net -6.7.
+- As of 2026-11-12: AI hardware bull 14%, neither 46%, bear 41%, net -27.3 vs market +26.4;
+  tech -11.1% / semi -21.5% from their highs. Events that week: E22 hot October CPI, E23
+  Nvidia probe worries, E24 CoreWeave lifting memory, E25 Jensen Huang stepping down as
+  Nvidia CEO (Kress interim; the release gives no reason — do not supply one), E26
+  Corteva -24.3% on earnings (real, under the -60% cliff threshold), E27 Nvidia Q3 on
+  11-18 (previewed, rewrite with the outcome next refresh). SMCI -11.3% and GPN -12% on
+  11-12 found no source — data moves only.
+- **Heads-up, unverified:** a search summary reported a Sandisk (SNDK) 8-for-1 split
+  effective 2026-11-19. If true it is a cliff the -60% rule catches (-87.5%) and drops
+  SNDK's pre-split bars until Yahoo back-adjusts — check the printed exclusions and the
+  AI-hardware member count (22) after the next refresh.
 
 ## Regime as a warning? (`regime_backtest.py`, section 「預警檢驗」)
 
@@ -208,6 +219,12 @@ net (2015-08 → 2026-11, 587 weeks): **no — it confirms, it doesn't warn.**
 - Of 15 episodes (≥15% falls, both indices) the net crossed below 0 after the peak 8×,
   before it 5× (index then rose another 7-28% first), never 2× (tech 2025-10, semi 2024-03).
 - Signals are declustered (13w); signals inside the last 13w are "尚無結果", never counted.
+  A pending signal is described with its own date, not as happening now: on 2026-11-12 the
+  read-out said 「多空排列差剛跌破 -40」 for the 11-06 deep40 signal while net was back at
+  -27.3. It now says 「剛跌破」 only when net ≤ -40, else 「在 <date> 跌破 -40，目前回升到 …」.
+- `asof` in `regime_backtest.json` is the last **trading day**; `last_week` is the W-FRI
+  label of the final weekly bar, which runs ahead of it mid-week (`week_partial`). asof
+  once equalled that Friday (2026-11-13 on data ending 11-12) and dated the xlsx wrong.
   Only 45 non-overlapping 13w windows exist — say so whenever quoting these rates.
 - **Slide from a high → how long to a correction?** (asked 2026-11-09, `slide_study()`).
   A slide = net reaches `zone`, then falls `drop` below the highest reading since; one

@@ -18,3 +18,10 @@ E18,2026-11-04,macro,期中選舉結果衝擊 AI 電力股,民主黨贏得國會
 E19,2026-11-04,stock,FIS 財報後重挫,Fidelity National Information Services 公布第三季財報，疲弱的展望蓋過季度結果，股價大跌；公司 8 月已下修過全年財測。,FIS,FinChannel,https://finchannel.com/?p=140597
 E20,2026-11-05,industry,記憶體與 AI 晶片股全面重挫,記憶體、半導體與 AI 硬體股同步大跌，那斯達克跌逾 4%；Trefis 指出記憶體股自 11-03 起已轉弱。FXStreet 的盤勢評論將部分恐慌歸因於市場擔心民主黨推動 AI 監管（屬評論觀點）。,MU|SNDK|AMD|NVDA,Trefis；FXStreet,https://www.trefis.com/stock/mu/articles/623345/what-sent-micron-stock-lower/2026-11-06
 E17,2026-11-06,macro,10 月非農就業遠優於預期,10 月非農新增 16.5 萬人，遠高於約 6 萬人的預期；民間部門新增 15.9 萬人。是聯準會 12 月會議前的關鍵數據。,,First Trust,"https://www.ftportfolios.com/Commentary/EconomicResearch/2026/11/6/nonfarm-payrolls-increased-165,000-in-october"
+E21,2026-11-09,industry,晶片股自前週 AI 賣壓反彈,科技股與晶片股從前一週的 AI 賣壓反彈，Nasdaq 100 大漲；同日 Nvidia 下跌。,AMD|NVDA,StockAnalysis,https://stockanalysis.com/news/nasdaq-100-rallies-after-ai-selloff-nvidia-falls/
+E22,2026-11-10,macro,10 月 CPI 高於預期,10 月消費者物價月增 0.4%（預期 0.3%），核心月增 0.3%（預期 0.2%），升息疑慮升溫。,,CNBC,https://www.cnbc.com/2026/11/10/cpi-inflation-report-october-2026.html
+E23,2026-11-10,stock,Nvidia 受調查疑慮拖累,熱 CPI 與市場對 Nvidia 的審查疑慮同日衝擊美股。,NVDA,Finimize,https://finimize.com/content/hotter-cpi-and-nvidia-scrutiny-rattle-us-stocks
+E24,2026-11-11,industry,CoreWeave 財報帶動記憶體股反彈,CoreWeave 財報重新點燃 AI 交易，Seagate、Sandisk、Micron 等記憶體與儲存股大漲。,STX|SNDK|MU,24/7 Wall St.,https://247wallst.com/investing/2026/11/11/seagate-spikes-9-sandisk-surges-8-as-coreweaves-results-revive-ai-trade-micron-climbs-7/
+E25,2026-11-12,stock,黃仁勳辭任 Nvidia 執行長,Nvidia 宣布執行長交接：黃仁勳辭去總裁、執行長與董事職務，財務長 Colette Kress 暫代執行長，Harvey Jones 出任董事長。公司未說明原因。,NVDA,NVIDIA Newsroom,https://nvidianews.nvidia.com/news/nvidia-announces-ceo-transition
+E26,2026-11-12,stock,Corteva 財報疲弱、更新全年財測,11-11 盤後公布第三季：淨銷售年減 9%，調整後每股盈餘 0.06 美元、年減 57%；因巴西市況弱於預期更新全年財測。,CTVA,Corteva Form 8-K (SEC),https://www.sec.gov/Archives/edgar/data/0001755672/000175567226000031/a3q_2026xearningsxnewsxr.htm
+E27,2026-11-18,stock,Nvidia 第三季財報,Nvidia 訂於 11-17 美東下午 5 點（盤後）召開第三季（FY2027）財報電話會議，市場於 11-18 反應。,NVDA,NVIDIA Investor Relations,https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Sets-Conference-Call-for-Third-Quarter-Financial-Results/

@@ -2606,7 +2606,8 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     var now = T.signals.filter(function (s) { return s.pending.length; }).map(function (s) { return s.id; });
     var dp = sigTxt("deep40");
     take.push("現在：多空排列差 " + sgn(B.net_now, 1) + "（4 週變化 " + sgn(B.d4_now, 0) + "），科技距高點 " + pct(T.dd_now, 1) + "、半導體 " +
-      pct(S.dd_now, 1) + "。" + (now.indexOf("deep40") >= 0 ? "多空排列差剛跌破 -40；歷史上" + dp.txt +
+      pct(S.dd_now, 1) + "。" + (now.indexOf("deep40") >= 0 ? (B.net_now <= -40 ? "多空排列差剛跌破 -40" : "多空排列差在 " + dp.t.pending[dp.t.pending.length - 1] +
+        " 跌破 -40，目前回升到 " + sgn(B.net_now, 1)) + "；歷史上" + dp.txt +
         (dp.t.hits * 2 === dp.t.n_done ? "——繼續大跌與見底各占一半，多空排列差本身分不出這次是哪一種。" : "。")
         : now.length ? "近 " + H + " 週有訊號出現，結果還要等。" : "近 " + H + " 週沒有訊號。"));
     renderSlideStatic(B).forEach(function (t) { take.push(t); });
