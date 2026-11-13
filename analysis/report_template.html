@@ -346,6 +346,8 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
       <h3>站上均線的成分股比例</h3>
       <p id="sub-ma">—</p>
     </div>
+    <div class="rb-row" id="ma-basis" style="padding:0 20px"></div>
+    <div id="rb-ma"></div>
     <div class="legend" id="lg-ma"></div>
     <div class="panel-body"><div id="c-ma"></div></div>
     <figcaption id="cap-ma"></figcaption>
@@ -3011,6 +3013,170 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     }).join("");
   }
 
+  /* 站上均線比例 + 指數：週線長期（2015 起）或日線（近兩年），可調時間範圍 ---------- */
+  var MA_BASIS = null;
+  function drawMaPanel() {
+    var ML = D.ma_long, s1 = css("--s1"), s2 = css("--s2"), s3 = css("--s3"), cI = css("--ink-2"), cE = css("--s4");
+    if (!MA_BASIS) MA_BASIS = ML ? "w" : "d";
+    var bh = document.getElementById("ma-basis");
+    bh.innerHTML = "";
+    if (ML) [["w", "週線・" + ML.dates[0].slice(0, 4) + " 起"], ["d", "日線・" + ML.daily.dates[0].slice(0, 7) + " 起"]].forEach(function (o) {
+      var bt = document.createElement("button"); bt.type = "button"; bt.textContent = o[1];
+      if (MA_BASIS === o[0]) bt.className = "on";
+      bt.setAttribute("aria-pressed", MA_BASIS === o[0] ? "true" : "false");
+      bt.addEventListener("click", function () { MA_BASIS = o[0]; drawMaPanel(); });
+      bh.appendChild(bt);
+    });
+    var wk = MA_BASIS === "w", P = wk ? {
+      dates: ML.dates, key: "ma-w", unit: "週",
+      presets: { list: [{ label: "1 年", len: 52 }, { label: "3 年", len: 156 }, { label: "5 年", len: 260 }, { label: "全部", len: Infinity }], min: 13 },
+      top: [{ k: "cw", name: "市值加權（重建）", color: cI, values: ML.cw }, { k: "ew", name: "等權重（重建）", color: cE, values: ML.ew }]
+        .concat(ML.off_cw ? [{ k: "off_cw", name: "S&P 500 官方 ^GSPC", color: cI, values: ML.off_cw, dash: true }] : [])
+        .concat(ML.off_ew ? [{ k: "off_ew", name: "S&P 500 等權重官方 ^SPXEW", color: cE, values: ML.off_ew, dash: true }] : []),
+      bot: [{ name: "% > 40 週均線", color: s1, values: ML.p40 }, { name: "% > 10 週均線", color: s2, values: ML.p10 }, { name: "% > 4 週均線", color: s3, values: ML.p4, thin: true }]
+    } : ML ? {
+      dates: ML.daily.dates, key: "ma-d", unit: "日",
+      presets: { list: [{ label: "3 個月", len: 63 }, { label: "6 個月", len: 126 }, { label: "1 年", len: 252 }, { label: "全部", len: Infinity }], min: 20 },
+      top: [{ k: "cw", name: "市值加權（重建）", color: cI, values: ML.daily.cw }, { k: "ew", name: "等權重（重建）", color: cE, values: ML.daily.ew }],
+      bot: [{ name: "% > 200 日均線", color: s1, values: ML.daily.p200 }, { name: "% > 50 日均線", color: s2, values: ML.daily.p50 },
+        { name: "% > 20 日均線", color: s3, values: ML.daily.p20, thin: true }]
+    } : {
+      dates: D.dates, key: "ma-d", unit: "點",
+      presets: { list: [{ label: "全部", len: Infinity }], min: 10 },
+      top: [{ k: "cw", name: "市值加權（重建）", color: cI, values: D.capw }, { k: "ew", name: "等權重（重建）", color: cE, values: D.eqw }],
+      bot: [{ name: "% > 200 日均線", color: s1, values: D.ma200 }, { name: "% > 50 日均線", color: s2, values: D.ma50 }, { name: "% > 20 日均線", color: s3, values: D.ma20, thin: true }]
+    };
+    var draw = function () {
+      var r = rangeOf(P.key, P.dates.length);
+      var cut = function (x) { return Object.assign({}, x, { values: sliceIdx(x.values, r) }); };
+      twoPanel(document.getElementById("c-ma"), { dates: sliceIdx(P.dates, r), top: P.top.map(cut), bot: P.bot.map(cut) });
+    };
+    rangeBar(document.getElementById("rb-ma"), P.key, P.dates, P.bot[0].values, P.presets, P.unit, draw);
+    draw();
+    var sw = function (x) {
+      return "<span><i class='swatch' style='background:" + (x.dash ? "repeating-linear-gradient(90deg," + x.color + " 0 5px,transparent 5px 8px)" : x.color) +
+        "'></i>" + x.name + (x.dash ? "（虛線）" : "") + "</span>";
+    };
+    document.getElementById("lg-ma").innerHTML = P.top.map(sw).join("") + P.bot.map(sw).join("");
+    var chg = function (v) { var a = v.filter(function (x) { return x !== null; }); return pct(100 * (a[a.length - 1] / a[0] - 1), 0); };
+    var cap;
+    if (wk) {
+      var lastOf = function (v) { return v[v.length - 1]; }, pr = ML.pctile, md = ML.median;
+      var lvl = function (k, nm) { return nm + " " + lastOf(ML[k]).toFixed(0) + "%（" + pctTxt(pr[k], "全期") + "，全期中位 " + md[k].toFixed(0) + "%）"; };
+      cap = "週線（" + ML.dates[0] + " 起，" + ML.n_min + "–" + ML.n_max + " 檔有 40 週均線；4／10／40 週約當 20／50／200 日）：" +
+        lvl("p40", "%>40 週均線") + "；" + lvl("p10", "%>10 週") + "；" + lvl("p4", "%>4 週") + "。" +
+        "同期重建指數：市值加權 " + chg(ML.cw) + "、等權重 " + chg(ML.ew) +
+        (ML.off_cw ? "；官方 S&P 500 " + chg(ML.off_cw) + (ML.off_ew ? "、官方等權重 " + chg(ML.off_ew) : "") : "") + "。" +
+        "成分股與指數都用今天的成分名單回推，早年的強勢與漲幅都偏高（存活者偏差）" +
+        (ML.off_cw ? "，重建線與官方虛線拉開的距離就是這個偏差。" : "；官方 ^GSPC／^SPXEW 由每日抓取程式加抓，資料進來後會以虛線並列，直接看出偏差有多大。") +
+        (ML.partial ? "最後一週尚未收完（資料到 " + D.asof + "）。" : "");
+    } else {
+      cap = "近一年區間：%>200日均線 " + D.range1y.pct_above_200dma.min + "–" + D.range1y.pct_above_200dma.max +
+        "（中位 " + D.range1y.pct_above_200dma.med + "），目前 " + D.latest.pct_above_200dma.toFixed(1) +
+        "；%>50日均線 " + D.range1y.pct_above_50dma.min + "–" + D.range1y.pct_above_50dma.max +
+        "（中位 " + D.range1y.pct_above_50dma.med + "），目前 " + D.latest.pct_above_50dma.toFixed(1) +
+        "；%>20日均線 " + D.range1y.pct_above_20dma.min + "–" + D.range1y.pct_above_20dma.max +
+        "（中位 " + D.range1y.pct_above_20dma.med + "），目前 " + D.latest.pct_above_20dma.toFixed(1) + "。" +
+        "上圖兩條重建指數以 " + P.dates[0] + " = 100：市值加權 " + chg(P.top[0].values) + "、等權重 " + chg(P.top[1].values) + "。";
+    }
+    document.getElementById("cap-ma").textContent = cap + "時間範圍只改變圖的顯示，文字數字是全期。";
+  }
+
+  // Two stacked panels on one time axis: index levels (log) on top, shares (0-100%) below.
+  function twoPanel(host, o) {
+    var dates = o.dates, n = dates.length;
+    var w = Math.max(320, host.clientWidth), small = w < 520;
+    var m = { l: small ? 40 : 48, r: small ? 62 : 78 };
+    var top = { y: 10, h: small ? 170 : 210 }, bot = { y: top.y + (small ? 170 : 210) + 22, h: small ? 150 : 180 };
+    var h = bot.y + bot.h + 26, iw = w - m.l - m.r;
+    var X = function (i) { return m.l + iw * i / Math.max(1, n - 1); };
+    var svg = mkSvg(w, h), mono = "IBM Plex Mono, monospace", ink3 = css("--ink-3"), rule = css("--rule");
+    var vals = []; o.top.forEach(function (sr) { sr.values.forEach(function (v) { if (v) vals.push(v); }); });
+    var lo = Math.min.apply(null, vals) * 0.97, hi = Math.max.apply(null, vals) * 1.03;
+    var LY = function (v) { return top.y + top.h * (1 - (Math.log(v) - Math.log(lo)) / (Math.log(hi) - Math.log(lo))); };
+    var ticks = [];
+    if (hi / lo > 3) {                                   // wide range: 1-2-5 steps per decade
+      for (var e = Math.floor(Math.log10(lo)); e <= Math.ceil(Math.log10(hi)); e++)
+        [1, 1.5, 2, 3, 5, 7].forEach(function (f) { var v = f * Math.pow(10, e); if (v >= lo && v <= hi) ticks.push(v); });
+      if (ticks.length > 6) ticks = ticks.filter(function (v, i) { return i % Math.ceil(ticks.length / 6) === 0; });
+    } else {                                             // narrow range: even steps, still drawn on the log axis
+      var raw = (hi - lo) / 4, mag = Math.pow(10, Math.floor(Math.log10(raw))), stp = [1, 2, 2.5, 5, 10].map(function (f) { return f * mag; })
+        .filter(function (x) { return x >= raw; })[0];
+      for (var v0 = Math.ceil(lo / stp) * stp; v0 <= hi; v0 += stp) ticks.push(v0);
+    }
+    ticks.forEach(function (v) {
+      svg.appendChild(el("line", { x1: m.l, x2: m.l + iw, y1: LY(v), y2: LY(v), stroke: rule, "stroke-width": 1 }));
+      svg.appendChild(el("text", { x: m.l - 6, y: LY(v) + 4, "text-anchor": "end", fill: ink3, "font-size": 10.5, "font-family": mono }, v >= 100 ? v.toFixed(0) : v.toFixed(0)));
+    });
+    var PY = function (v) { return bot.y + bot.h * (1 - v / 100); };
+    [0, 25, 50, 75, 100].forEach(function (v) {
+      svg.appendChild(el("line", { x1: m.l, x2: m.l + iw, y1: PY(v), y2: PY(v), stroke: v === 50 ? css("--ink-3") : rule, "stroke-width": 1, opacity: v === 50 ? 0.6 : 1 }));
+      svg.appendChild(el("text", { x: m.l - 6, y: PY(v) + 4, "text-anchor": "end", fill: ink3, "font-size": 10.5, "font-family": mono }, v + "%"));
+    });
+    var path = function (sr, Y) {
+      var d = "", pen = false;
+      sr.values.forEach(function (v, i) {
+        if (v === null || v === undefined) { pen = false; return; }
+        d += (pen ? "L" : "M") + X(i).toFixed(1) + " " + Y(v).toFixed(1); pen = true;
+      });
+      var at = { d: d, fill: "none", stroke: sr.color, "stroke-width": sr.dash ? 1.6 : sr.thin ? 1.2 : 1.9, "stroke-linejoin": "round" };
+      if (sr.dash) at["stroke-dasharray"] = "5 3";
+      if (sr.thin) at.opacity = 0.75;
+      svg.appendChild(el("path", at));
+    };
+    o.top.forEach(function (sr) { path(sr, LY); });
+    o.bot.forEach(function (sr) { path(sr, PY); });
+    var lastIdx = function (v) { var j = v.length - 1; while (j > 0 && (v[j] === null || v[j] === undefined)) j--; return j; };
+    var endLabels = function (list, Y, fmt) {
+      var labs = list.map(function (sr) { var j = lastIdx(sr.values); return { y: Y(sr.values[j]), c: sr.color, dash: sr.dash, t: fmt(sr, j) }; })
+        .filter(function (lb) { return isFinite(lb.y); }).sort(function (a, b) { return a.y - b.y; });
+      for (var i = 1; i < labs.length; i++) if (labs[i].y - labs[i - 1].y < 13) labs[i].y = labs[i - 1].y + 13;
+      labs.forEach(function (lb) {
+        svg.appendChild(el("line", { x1: m.l + iw + 4, x2: m.l + iw + 11, y1: lb.y, y2: lb.y, stroke: lb.c, "stroke-width": 2, "stroke-dasharray": lb.dash ? "3 2" : null }));
+        svg.appendChild(el("text", { x: m.l + iw + 14, y: lb.y + 4, fill: css("--ink-2"), "font-size": 10.5, "font-weight": 600, "font-family": mono }, lb.t));
+      });
+    };
+    endLabels(o.top, LY, function (sr, j) {             // change over the window shown
+      var f = sr.values.filter(function (v) { return v !== null && v !== undefined; })[0];
+      return pct(100 * (sr.values[j] / f - 1), 0);
+    });
+    endLabels(o.bot, PY, function (sr, j) { return sr.values[j].toFixed(0) + "%"; });
+    // x ticks
+    if (n > 120 && dates[n - 1].slice(0, 4) - dates[0].slice(0, 4) >= 3) {
+      var lastY = null, span = dates[n - 1].slice(0, 4) - dates[0].slice(0, 4), every = Math.max(1, Math.ceil(span / (small ? 5 : 11)));
+      dates.forEach(function (d, i) {
+        var y = d.slice(0, 4); if (y === lastY) return; lastY = y;
+        if (i === 0 || +y % every) return;
+        svg.appendChild(el("text", { x: X(i), y: h - 8, "text-anchor": "middle", fill: ink3, "font-size": 10.5, "font-family": mono }, y));
+      });
+    } else {
+      var st = Math.max(1, Math.round(n / (small ? 4 : 7)));
+      for (var q = 0; q < n; q += st) {
+        if (n - 1 - q < st * 0.55 && q !== 0) continue;
+        svg.appendChild(el("text", { x: X(q), y: h - 8, "text-anchor": q === 0 ? "start" : "middle", fill: ink3, "font-size": 10.5, "font-family": mono }, fmtTick(dates, q)));
+      }
+      svg.appendChild(el("text", { x: X(n - 1), y: h - 8, "text-anchor": "end", fill: ink3, "font-size": 10.5, "font-family": mono }, fmtTick(dates, n - 1)));
+    }
+    var cross = el("line", { x1: 0, x2: 0, y1: top.y, y2: bot.y + bot.h, stroke: css("--ink"), "stroke-width": 1, opacity: 0 });
+    svg.appendChild(cross);
+    var hit = el("rect", { x: m.l, y: top.y, width: iw, height: bot.y + bot.h - top.y, fill: "transparent" });
+    hit.addEventListener("mousemove", function (ev) {
+      var bb = svg.getBoundingClientRect();
+      var i = Math.max(0, Math.min(n - 1, Math.round((ev.clientX - bb.left - m.l) / (iw / Math.max(1, n - 1)))));
+      cross.setAttribute("x1", X(i)); cross.setAttribute("x2", X(i)); cross.setAttribute("opacity", 0.35);
+      var row = function (sr, txt) {
+        return "<div class='tt-r'><span><i style='width:10px;height:2px;background:" + sr.color + ";display:inline-block'></i>" + sr.name + "</span><b>" + txt + "</b></div>";
+      };
+      var rows = "<div class='tt-h'>" + dates[i] + "</div>";
+      o.top.forEach(function (sr) { var v = sr.values[i]; if (v !== null && v !== undefined) rows += row(sr, v.toFixed(1)); });
+      o.bot.forEach(function (sr) { var v = sr.values[i]; if (v !== null && v !== undefined) rows += row(sr, v.toFixed(1) + "%"); });
+      showTip(rows, ev);
+    });
+    hit.addEventListener("mouseleave", function () { hideTip(); cross.setAttribute("opacity", 0); });
+    svg.appendChild(hit);
+    host.innerHTML = ""; host.appendChild(svg);
+  }
+
   /* charts (re-rendered on resize / theme change) --------------------- */
   function renderCharts() {
     candleChart(document.getElementById("c-candle"));
@@ -3019,28 +3185,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     renderBacktestCharts();
     var s1 = css("--s1"), s2 = css("--s2"), s3 = css("--s3");
 
-    lineChart(document.getElementById("c-ma"), {
-      dates: D.dates, height: 280, right: 58,
-      min: 0, max: 100, yTicks: 4,
-      yFmt: function (v) { return v.toFixed(0) + "%"; },
-      tipFmt: function (v) { return v.toFixed(1) + "%"; },
-      series: [
-        { name: "% > 200 日均線", color: s1, values: D.ma200, label: D.latest.pct_above_200dma.toFixed(0) + "%" },
-        { name: "% > 50 日均線", color: s2, values: D.ma50, label: D.latest.pct_above_50dma.toFixed(0) + "%" },
-        { name: "% > 20 日均線", color: s3, values: D.ma20, label: D.latest.pct_above_20dma.toFixed(0) + "%" }
-      ]
-    });
-    document.getElementById("lg-ma").innerHTML =
-      "<span><i class='swatch' style='background:" + s1 + "'></i>% &gt; 200 日均線（長期趨勢）</span>" +
-      "<span><i class='swatch' style='background:" + s2 + "'></i>% &gt; 50 日均線（中期趨勢）</span>" +
-      "<span><i class='swatch' style='background:" + s3 + "'></i>% &gt; 20 日均線（短期趨勢）</span>";
-    document.getElementById("cap-ma").textContent =
-      "近一年區間：%>200日均線 " + D.range1y.pct_above_200dma.min + "–" + D.range1y.pct_above_200dma.max +
-      "（中位 " + D.range1y.pct_above_200dma.med + "），目前 " + D.latest.pct_above_200dma.toFixed(1) +
-      "；%>50日均線 " + D.range1y.pct_above_50dma.min + "–" + D.range1y.pct_above_50dma.max +
-      "（中位 " + D.range1y.pct_above_50dma.med + "），目前 " + D.latest.pct_above_50dma.toFixed(1) +
-      "；%>20日均線 " + D.range1y.pct_above_20dma.min + "–" + D.range1y.pct_above_20dma.max +
-      "（中位 " + D.range1y.pct_above_20dma.med + "），目前 " + D.latest.pct_above_20dma.toFixed(1) + "。";
+    drawMaPanel();
 
     lineChart(document.getElementById("c-idx"), {
       dates: D.dates, height: 250, right: 50,

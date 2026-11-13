@@ -174,7 +174,9 @@ def flatten_and_save_ohlc(ohlc_dict, output_filename):
 # analysis rebuilds from member closes. Daily bars only (one row per session is small),
 # 12 years so the weekly comparison covers the whole long run.
 #   ^SP500-45  S&P 500 Information Technology (GICS sector index)
-INDEX_SYMBOLS = ["^SP500-45"]
+#   ^GSPC      S&P 500
+#   ^SPXEW     S&P 500 Equal Weight
+INDEX_SYMBOLS = ["^SP500-45", "^GSPC", "^SPXEW"]
 
 
 def fetch_indices(years=12):

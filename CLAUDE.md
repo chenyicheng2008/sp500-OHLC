@@ -204,8 +204,8 @@ every page label says 多空排列差 — don't reintroduce 淨值.
 
 ## Official index (`index_ohlc.csv`, asked 2026-11-13: 「加抓 ^SP500-45 官方指數並列比較」)
 
-- The fetch step's `fetch_indices()` saves `INDEX_SYMBOLS` (now only `^SP500-45`, S&P 500
-  Information Technology, GICS) as **daily** bars for 12 years to
+- The fetch step's `fetch_indices()` saves `INDEX_SYMBOLS` (`^SP500-45` S&P 500 Information
+  Technology, `^GSPC` S&P 500, `^SPXEW` S&P 500 Equal Weight) as **daily** bars for 12 years to
   `data/weekly_reutin/index_ohlc.csv` (same columns as `sp500_ohlc.csv`). It runs last, in
   its own try, so a Yahoo failure cannot cost the constituent files.
 - `regime_backtest.py` (`OFFICIAL`, `official_weekly`, `compare_official`) resamples it to
@@ -219,8 +219,25 @@ every page label says 多空排列差 — don't reintroduce 淨值.
   gap with another series: Alpha Vantage has no ^SP500-45, and its `SIXT` is the capped
   Technology *Select Sector* index (XLK's), a different index.
 - The scheduled job runs **main's** fetch script, so the file only appears once the fetch
-  change is on main. Our 83-name "technology" uses Yahoo's sector, not GICS, so expect a
+  change is on main — as of 2026-11-13 it is only on the working branch (the user has not
+  approved a push to main; ask, don't push). Our 83-name "technology" uses Yahoo's sector, not GICS, so expect a
   gap; why exactly (which names differ) has not been checked against S&P's list.
+
+## Share above moving averages, long run (section 03 first chart, asked 2026-11-13)
+
+「站上均線的成分股比例 模倣加SP500指數/等權重指數之比較, 拉長時間序列, 加Slide bar」.
+`breadth_sector.long_weekly()` → `breadth_long_weekly.csv`: spliced weekly closes (1wk bars
+before the daily slice + daily resampled W-FRI), % above the 4/10/40-week MA (≈20/50/200
+days), and S&P 500 cap-weighted (chain-linked, constant shares) and equal-weight indices,
+from the first week 60% of today's names have a 40-week MA (2015-08). If `index_ohlc.csv`
+holds `^GSPC` / `^SPXEW` they are added (`official_cw`/`official_ew`), started on the
+rebuilt lines at the first common week. Payload `ma_long` (+ `ma_long.daily`, the full
+daily breadth since MA20 exists — the old 1-year chart arrays are thinned to ~55 points).
+`drawMaPanel()` / `twoPanel()`: indices (log) over shares (0-100%), a 週線/日線 toggle, a
+`rangeBar` per basis, end labels give the change over the window shown. **Survivorship is
+large here**: rebuilt 2015-08 → 2026-11 cap-weighted +442%, equal-weight +481% — equal
+weight beating cap weight is the opposite of what the real indices did, so it is bias, and
+the caption says so; the dashed official lines will show its size once fetched.
 
 ## Regime as a warning? (`regime_backtest.py`, section 「預警檢驗」)
 

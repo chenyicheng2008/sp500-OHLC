@@ -203,6 +203,43 @@ def new_highs_lows(close: pd.DataFrame, window: int = 252) -> pd.DataFrame:
     return df
 
 
+LONG_MA_WEEKS = (4, 10, 40)      # ≈ 20 / 50 / 200 trading days
+LONG_MIN_SHARE = 0.6              # a week counts once 60% of today's names have a 40-week average
+
+
+def long_weekly(daily: pd.DataFrame, weekly: pd.DataFrame, shares: pd.Series) -> pd.DataFrame:
+    """Weekly breadth and indices from the spliced history (asked 2026-11-13).
+
+    Closes: the 1wk bars before the daily slice, then the daily slice resampled to
+    Fridays (W-FRI, so the last bar is partial mid-week). Indices are chain-linked week
+    to week so a name entering the data does not jump the level: cap weight by last
+    week's cap (constant shares), equal weight = mean weekly return. Today's members
+    only -- survivorship bias, early years read strong.
+    """
+    w = pd.concat([weekly[weekly.index < daily.index[0]].resample("W-FRI").last(),
+                   daily.resample("W-FRI").last()])
+    w = w[~w.index.duplicated(keep="last")].dropna(how="all").sort_index()
+    r = w.pct_change(fill_method=None)
+    cols = [c for c in w.columns if c in shares.index]
+    cap = w[cols].mul(shares[cols], axis=1).shift(1)
+    ok = r[cols].notna() & cap.notna()
+    cw_ret = (r[cols].where(ok) * cap.where(ok)).sum(axis=1) / cap.where(ok).sum(axis=1)
+    out = pd.DataFrame(index=w.index)
+    out["cap_weighted"] = (1 + cw_ret.fillna(0)).cumprod()
+    out["equal_weighted"] = (1 + r.mean(axis=1).fillna(0)).cumprod()
+    for n in LONG_MA_WEEKS:
+        ma = w.rolling(n, min_periods=n).mean()
+        valid = ma.notna() & w.notna()
+        above = ((w > ma) & valid).sum(axis=1).astype(float)
+        out[f"pct_above_{n}w"] = 100 * above / valid.sum(axis=1).replace(0, np.nan)
+        if n == LONG_MA_WEEKS[-1]:
+            out["n_valid"] = valid.sum(axis=1)
+    out = out[out["n_valid"] >= LONG_MIN_SHARE * w.shape[1]]
+    for c in ("cap_weighted", "equal_weighted"):
+        out[c] = 100 * out[c] / out[c].iloc[0]
+    return out
+
+
 def index_series(close: pd.DataFrame, shares: pd.Series) -> pd.DataFrame:
     """Cap-weighted and equal-weighted index levels rebased to 100."""
     cols = [c for c in close.columns if c in shares.index]
@@ -569,6 +606,25 @@ def main() -> None:
     )
     long_ratio = long_ratio[~long_ratio.index.duplicated(keep="last")].sort_index()
     long_ratio.rename("ew_cw_ratio").to_frame().to_csv(out_dir / "breadth_ew_cw_long.csv", encoding=ENC)
+    lw = long_weekly(daily, weekly, shares)
+    # official S&P 500 / S&P 500 Equal Weight from the fetch step, if present: started on the
+    # rebuilt line at the first common week, so the gap that opens is the reconstruction's bias
+    off_p = Path(args.data_dir) / "index_ohlc.csv"
+    if off_p.exists():
+        io = pd.read_csv(off_p, encoding=ENC)
+        io["Date"] = pd.to_datetime(io["Date"])
+        for sym, col, base in (("^GSPC", "official_cw", "cap_weighted"), ("^SPXEW", "official_ew", "equal_weighted")):
+            s = io[io["Ticker"] == sym].set_index("Date")["Close"].dropna().sort_index()
+            if s.empty:
+                continue
+            s = s.resample("W-FRI").last().reindex(lw.index)
+            k0 = s.first_valid_index()
+            if k0 is not None:
+                lw[col] = s / s[k0] * lw.loc[k0, base]
+    lw.index.name = "Date"
+    lw.round(3).to_csv(out_dir / "breadth_long_weekly.csv", encoding=ENC)
+    print(f"long weekly breadth {lw.index[0].date()} -> {lw.index[-1].date()} ({len(lw)} weeks, "
+          f"{int(lw['n_valid'].iloc[0])}-{int(lw['n_valid'].max())} names with a 40-week average)")
 
     # ---- sector / industry ------------------------------------------------ #
     sec_ret = group_returns(daily, fund, shares, "Sector")

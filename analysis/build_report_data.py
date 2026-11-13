@@ -162,6 +162,31 @@ def main() -> None:
         tr["groups"] = read("trend_regime_groups.csv").to_dict("records")
         payload["trend"] = tr
 
+    # --- long weekly breadth + rebuilt / official S&P 500 (breadth_sector.long_weekly) ---
+    lw_p = d / "breadth_long_weekly.csv"
+    if lw_p.exists():
+        lw = pd.read_csv(lw_p, index_col=0, parse_dates=True)
+        r1 = lambda v: None if pd.isna(v) else round(float(v), 1)
+        ml = {"dates": [x.strftime("%Y-%m-%d") for x in lw.index],
+              **{k: [r1(v) for v in lw[c]] for k, c in (("cw", "cap_weighted"), ("ew", "equal_weighted"),
+                 ("p4", "pct_above_4w"), ("p10", "pct_above_10w"), ("p40", "pct_above_40w"),
+                 ("off_cw", "official_cw"), ("off_ew", "official_ew")) if c in lw},
+              "n_min": int(lw["n_valid"].min()), "n_max": int(lw["n_valid"].max()),
+              "partial": bool(lw.index[-1] > pd.Timestamp(payload["asof"])),
+              "pctile": {k: round(float(100 * (lw[c] < lw[c].iloc[-1]).mean()), 0)
+                         for k, c in (("p4", "pct_above_4w"), ("p10", "pct_above_10w"), ("p40", "pct_above_40w"))},
+              "median": {k: round(float(lw[c].median()), 1)
+                         for k, c in (("p4", "pct_above_4w"), ("p10", "pct_above_10w"), ("p40", "pct_above_40w"))}}
+        # the daily view at full resolution (the 1-year chart series above are thinned)
+        bd = b.copy()
+        bd = bd[bd["pct_above_20dma"].notna()]
+        ml["daily"] = {"dates": [x.strftime("%Y-%m-%d") for x in bd.index],
+                       "cw": [r1(100 * v / bd["cap_weighted"].iloc[0]) for v in bd["cap_weighted"]],
+                       "ew": [r1(100 * v / bd["equal_weighted"].iloc[0]) for v in bd["equal_weighted"]],
+                       **{k: [r1(v) for v in bd[c]] for k, c in (("p20", "pct_above_20dma"), ("p50", "pct_above_50dma"),
+                                                                 ("p200", "pct_above_200dma"))}}
+        payload["ma_long"] = ml
+
     # --- does the regime net warn of large falls? (regime_backtest.py) -------------
     bt_json = d / "regime_backtest.json"
     if bt_json.exists():
