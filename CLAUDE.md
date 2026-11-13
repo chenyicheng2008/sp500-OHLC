@@ -241,6 +241,15 @@ large here**: rebuilt 2015-08 → 2026-11 cap-weighted +442%, equal-weight +481%
 weight beating cap weight is the opposite of what the real indices did, so it is bias, and
 the caption says so; the dashed official lines will show its size once fetched.
 
+Tech alone (asked 2026-11-13: 「單獨加上科技股站上均線比例與指數/等權重比較」): the second
+panel in section 03 (`f-mt`), same `drawMaPanel(cfg)` with `id: "mt"`. Data:
+`breadth_long_weekly_tech.csv` (long_weekly on the 83 Yahoo-technology names) and
+`breadth_daily_tech.csv` (`daily_group()`: 20/50/200-day shares + chain-linked daily
+indices). Its cap-weighted line equals regime_backtest's rebuilt tech exactly (×12.01 since
+2015-08). Official overlay: `^SP500-45` only (no official tech equal weight). The subtitle
+compares each tech share with the whole market, choosing 高於/低於/差不多 (<3 points) from
+the numbers. 2026-11-12: tech above 200/50/20-day 59/46/48% vs market 65/72/68%.
+
 ## Regime as a warning? (`regime_backtest.py`, section 「預警檢驗」)
 
 Asked 2026-11-09: "can this indicator predict a large tech fall?" Answer, from the weekly

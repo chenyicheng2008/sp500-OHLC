@@ -353,6 +353,18 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     <figcaption id="cap-ma"></figcaption>
   </figure>
 
+  <figure class="panel" id="f-mt">
+    <div class="panel-head">
+      <h3>科技類股：站上均線的比例與指數</h3>
+      <p id="sub-mt">—</p>
+    </div>
+    <div class="rb-row" id="mt-basis" style="padding:0 20px"></div>
+    <div id="rb-mt"></div>
+    <div class="legend" id="lg-mt"></div>
+    <div class="panel-body"><div id="c-mt"></div></div>
+    <figcaption id="cap-mt"></figcaption>
+  </figure>
+
   <div class="grid2">
     <figure class="panel">
       <div class="panel-head"><h3>市值加權 vs 等權指數</h3><p>兩者皆以一年前 = 100。差距擴大＝漲勢集中在大型股。</p></div>
@@ -3014,50 +3026,50 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
   }
 
   /* 站上均線比例 + 指數：週線長期（2015 起）或日線（近兩年），可調時間範圍 ---------- */
-  var MA_BASIS = null;
-  function drawMaPanel() {
-    var ML = D.ma_long, s1 = css("--s1"), s2 = css("--s2"), s3 = css("--s3"), cI = css("--ink-2"), cE = css("--s4");
-    if (!MA_BASIS) MA_BASIS = ML ? "w" : "d";
-    var bh = document.getElementById("ma-basis");
+  var MA_BASIS = {};
+  function drawMaPanel(cfg) {
+    var ML = cfg.ML, id = cfg.id, s1 = css("--s1"), s2 = css("--s2"), s3 = css("--s3"), cI = css("--ink-2"), cE = css("--s4");
+    if (!MA_BASIS[id]) MA_BASIS[id] = ML ? "w" : "d";
+    var basis = MA_BASIS[id], bh = document.getElementById(id + "-basis");
     bh.innerHTML = "";
     if (ML) [["w", "週線・" + ML.dates[0].slice(0, 4) + " 起"], ["d", "日線・" + ML.daily.dates[0].slice(0, 7) + " 起"]].forEach(function (o) {
       var bt = document.createElement("button"); bt.type = "button"; bt.textContent = o[1];
-      if (MA_BASIS === o[0]) bt.className = "on";
-      bt.setAttribute("aria-pressed", MA_BASIS === o[0] ? "true" : "false");
-      bt.addEventListener("click", function () { MA_BASIS = o[0]; drawMaPanel(); });
+      if (basis === o[0]) bt.className = "on";
+      bt.setAttribute("aria-pressed", basis === o[0] ? "true" : "false");
+      bt.addEventListener("click", function () { MA_BASIS[id] = o[0]; drawMaPanel(cfg); });
       bh.appendChild(bt);
     });
-    var wk = MA_BASIS === "w", P = wk ? {
-      dates: ML.dates, key: "ma-w", unit: "週",
+    var wk = basis === "w", P = wk ? {
+      dates: ML.dates, key: id + "-w", unit: "週",
       presets: { list: [{ label: "1 年", len: 52 }, { label: "3 年", len: 156 }, { label: "5 年", len: 260 }, { label: "全部", len: Infinity }], min: 13 },
-      top: [{ k: "cw", name: "市值加權（重建）", color: cI, values: ML.cw }, { k: "ew", name: "等權重（重建）", color: cE, values: ML.ew }]
-        .concat(ML.off_cw ? [{ k: "off_cw", name: "S&P 500 官方 ^GSPC", color: cI, values: ML.off_cw, dash: true }] : [])
-        .concat(ML.off_ew ? [{ k: "off_ew", name: "S&P 500 等權重官方 ^SPXEW", color: cE, values: ML.off_ew, dash: true }] : []),
+      top: [{ k: "cw", name: cfg.pre + "市值加權（重建）", color: cI, values: ML.cw }, { k: "ew", name: cfg.pre + "等權重（重建）", color: cE, values: ML.ew }]
+        .concat(ML.off_cw ? [{ k: "off_cw", name: cfg.offCW, color: cI, values: ML.off_cw, dash: true }] : [])
+        .concat(ML.off_ew ? [{ k: "off_ew", name: cfg.offEW, color: cE, values: ML.off_ew, dash: true }] : []),
       bot: [{ name: "% > 40 週均線", color: s1, values: ML.p40 }, { name: "% > 10 週均線", color: s2, values: ML.p10 }, { name: "% > 4 週均線", color: s3, values: ML.p4, thin: true }]
     } : ML ? {
-      dates: ML.daily.dates, key: "ma-d", unit: "日",
+      dates: ML.daily.dates, key: id + "-d", unit: "日",
       presets: { list: [{ label: "3 個月", len: 63 }, { label: "6 個月", len: 126 }, { label: "1 年", len: 252 }, { label: "全部", len: Infinity }], min: 20 },
-      top: [{ k: "cw", name: "市值加權（重建）", color: cI, values: ML.daily.cw }, { k: "ew", name: "等權重（重建）", color: cE, values: ML.daily.ew }],
+      top: [{ k: "cw", name: cfg.pre + "市值加權（重建）", color: cI, values: ML.daily.cw }, { k: "ew", name: cfg.pre + "等權重（重建）", color: cE, values: ML.daily.ew }],
       bot: [{ name: "% > 200 日均線", color: s1, values: ML.daily.p200 }, { name: "% > 50 日均線", color: s2, values: ML.daily.p50 },
         { name: "% > 20 日均線", color: s3, values: ML.daily.p20, thin: true }]
     } : {
-      dates: D.dates, key: "ma-d", unit: "點",
+      dates: D.dates, key: id + "-d", unit: "點",
       presets: { list: [{ label: "全部", len: Infinity }], min: 10 },
-      top: [{ k: "cw", name: "市值加權（重建）", color: cI, values: D.capw }, { k: "ew", name: "等權重（重建）", color: cE, values: D.eqw }],
+      top: [{ k: "cw", name: cfg.pre + "市值加權（重建）", color: cI, values: D.capw }, { k: "ew", name: cfg.pre + "等權重（重建）", color: cE, values: D.eqw }],
       bot: [{ name: "% > 200 日均線", color: s1, values: D.ma200 }, { name: "% > 50 日均線", color: s2, values: D.ma50 }, { name: "% > 20 日均線", color: s3, values: D.ma20, thin: true }]
     };
     var draw = function () {
       var r = rangeOf(P.key, P.dates.length);
       var cut = function (x) { return Object.assign({}, x, { values: sliceIdx(x.values, r) }); };
-      twoPanel(document.getElementById("c-ma"), { dates: sliceIdx(P.dates, r), top: P.top.map(cut), bot: P.bot.map(cut) });
+      twoPanel(document.getElementById("c-" + id), { dates: sliceIdx(P.dates, r), top: P.top.map(cut), bot: P.bot.map(cut) });
     };
-    rangeBar(document.getElementById("rb-ma"), P.key, P.dates, P.bot[0].values, P.presets, P.unit, draw);
+    rangeBar(document.getElementById("rb-" + id), P.key, P.dates, P.bot[0].values, P.presets, P.unit, draw);
     draw();
     var sw = function (x) {
       return "<span><i class='swatch' style='background:" + (x.dash ? "repeating-linear-gradient(90deg," + x.color + " 0 5px,transparent 5px 8px)" : x.color) +
         "'></i>" + x.name + (x.dash ? "（虛線）" : "") + "</span>";
     };
-    document.getElementById("lg-ma").innerHTML = P.top.map(sw).join("") + P.bot.map(sw).join("");
+    document.getElementById("lg-" + id).innerHTML = P.top.map(sw).join("") + P.bot.map(sw).join("");
     var chg = function (v) { var a = v.filter(function (x) { return x !== null; }); return pct(100 * (a[a.length - 1] / a[0] - 1), 0); };
     var cap;
     if (wk) {
@@ -3065,21 +3077,22 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
       var lvl = function (k, nm) { return nm + " " + lastOf(ML[k]).toFixed(0) + "%（" + pctTxt(pr[k], "全期") + "，全期中位 " + md[k].toFixed(0) + "%）"; };
       cap = "週線（" + ML.dates[0] + " 起，" + ML.n_min + "–" + ML.n_max + " 檔有 40 週均線；4／10／40 週約當 20／50／200 日）：" +
         lvl("p40", "%>40 週均線") + "；" + lvl("p10", "%>10 週") + "；" + lvl("p4", "%>4 週") + "。" +
-        "同期重建指數：市值加權 " + chg(ML.cw) + "、等權重 " + chg(ML.ew) +
-        (ML.off_cw ? "；官方 S&P 500 " + chg(ML.off_cw) + (ML.off_ew ? "、官方等權重 " + chg(ML.off_ew) : "") : "") + "。" +
+        "同期重建" + cfg.pre + "指數：市值加權 " + chg(ML.cw) + "、等權重 " + chg(ML.ew) +
+        (ML.off_cw ? "；" + cfg.offCW + " " + chg(ML.off_cw) + (ML.off_ew ? "、" + cfg.offEW + " " + chg(ML.off_ew) : "") : "") + "。" +
         "成分股與指數都用今天的成分名單回推，早年的強勢與漲幅都偏高（存活者偏差）" +
-        (ML.off_cw ? "，重建線與官方虛線拉開的距離就是這個偏差。" : "；官方 ^GSPC／^SPXEW 由每日抓取程式加抓，資料進來後會以虛線並列，直接看出偏差有多大。") +
+        (ML.off_cw ? "，重建線與官方虛線拉開的距離就是這個偏差。" : "；官方 " + cfg.offSyms + " 由每日抓取程式加抓，資料進來後會以虛線並列，直接看出偏差有多大。") + (cfg.note || "") +
         (ML.partial ? "最後一週尚未收完（資料到 " + D.asof + "）。" : "");
     } else {
-      cap = "近一年區間：%>200日均線 " + D.range1y.pct_above_200dma.min + "–" + D.range1y.pct_above_200dma.max +
-        "（中位 " + D.range1y.pct_above_200dma.med + "），目前 " + D.latest.pct_above_200dma.toFixed(1) +
-        "；%>50日均線 " + D.range1y.pct_above_50dma.min + "–" + D.range1y.pct_above_50dma.max +
-        "（中位 " + D.range1y.pct_above_50dma.med + "），目前 " + D.latest.pct_above_50dma.toFixed(1) +
-        "；%>20日均線 " + D.range1y.pct_above_20dma.min + "–" + D.range1y.pct_above_20dma.max +
-        "（中位 " + D.range1y.pct_above_20dma.med + "），目前 " + D.latest.pct_above_20dma.toFixed(1) + "。" +
-        "上圖兩條重建指數以 " + P.dates[0] + " = 100：市值加權 " + chg(P.top[0].values) + "、等權重 " + chg(P.top[1].values) + "。";
+      var DL = ML ? ML.daily : null;
+      var rng = function (k, nm) {
+        var a = DL[k].slice(-252).filter(function (v) { return v !== null; }), so = a.slice().sort(function (x, y) { return x - y; });
+        return nm + " " + so[0].toFixed(1) + "–" + so[so.length - 1].toFixed(1) + "（中位 " + so[Math.floor((so.length - 1) / 2)].toFixed(1) +
+          "），目前 " + a[a.length - 1].toFixed(1);
+      };
+      cap = (DL ? "近一年區間：" + rng("p200", "%>200日均線") + "；" + rng("p50", "%>50日均線") + "；" + rng("p20", "%>20日均線") + "。" : "") +
+        "上圖兩條重建" + cfg.pre + "指數以 " + P.dates[0] + " = 100：市值加權 " + chg(P.top[0].values) + "、等權重 " + chg(P.top[1].values) + "。";
     }
-    document.getElementById("cap-ma").textContent = cap + "時間範圍只改變圖的顯示，文字數字是全期。";
+    document.getElementById("cap-" + id).textContent = cap + "時間範圍只改變圖的顯示，文字數字是全期。";
   }
 
   // Two stacked panels on one time axis: index levels (log) on top, shares (0-100%) below.
@@ -3185,7 +3198,22 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     renderBacktestCharts();
     var s1 = css("--s1"), s2 = css("--s2"), s3 = css("--s3");
 
-    drawMaPanel();
+    drawMaPanel({ id: "ma", ML: D.ma_long, pre: "", offCW: "S&P 500 官方 ^GSPC", offEW: "S&P 500 等權重官方 ^SPXEW", offSyms: "^GSPC／^SPXEW" });
+    if (D.ma_long_tech) drawMaPanel({ id: "mt", ML: D.ma_long_tech, pre: "科技類股", offCW: "S&P 500 資訊科技官方 ^SP500-45",
+      offSyms: "^SP500-45",
+      note: "官方只有市值加權版，等權重線沒有官方對照。科技類股依 Yahoo 的類股分類，官方資訊科技類股依 GICS，兩者成分不完全相同，所以即使沒有存活者偏差，兩條線也不會完全重合。" });
+    else document.getElementById("f-mt").style.display = "none";
+    if (D.ma_long_tech && D.ma_long) {
+      var TD = D.ma_long_tech.daily, MD = D.ma_long.daily, lastv = function (a) { return a[a.length - 1]; };
+      var cmpTxt = function (k, nm) {
+        var t = lastv(TD[k]), m = lastv(MD[k]);
+        return nm + " " + t.toFixed(0) + "%，" + (Math.abs(t - m) < 3 ? "和全市場的 " + m.toFixed(0) + "% 差不多" :
+          (t > m ? "高於" : "低於") + "全市場的 " + m.toFixed(0) + "%");
+      };
+      document.getElementById("sub-mt").textContent = "Yahoo 類股分類為科技（technology）的 S&P 500 成分股 " + D.ma_long_tech.n +
+        " 檔，和預警檢驗的重建科技指數是同一批。目前（" + lastv(TD.dates) + "）" + cmpTxt("p200", "站上 200 日均線") + "；" +
+        cmpTxt("p50", "站上 50 日均線") + "；" + cmpTxt("p20", "站上 20 日均線") + "。";
+    }
 
     lineChart(document.getElementById("c-idx"), {
       dates: D.dates, height: 250, right: 50,

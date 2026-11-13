@@ -240,6 +240,39 @@ def long_weekly(daily: pd.DataFrame, weekly: pd.DataFrame, shares: pd.Series) ->
     return out
 
 
+def daily_group(daily: pd.DataFrame, shares: pd.Series) -> pd.DataFrame:
+    """Daily % above 20/50/200-day MAs plus chain-linked cap / equal-weight indices for a
+    group of names (the weekly long_weekly() at daily resolution)."""
+    r = daily.pct_change(fill_method=None)
+    cols = [c for c in daily.columns if c in shares.index]
+    cap = daily[cols].mul(shares[cols], axis=1).shift(1)
+    ok = r[cols].notna() & cap.notna()
+    cw_ret = (r[cols].where(ok) * cap.where(ok)).sum(axis=1) / cap.where(ok).sum(axis=1)
+    out = moving_average_breadth(daily)[["pct_above_20dma", "pct_above_50dma", "pct_above_200dma"]]
+    out["cap_weighted"] = 100 * (1 + cw_ret.fillna(0)).cumprod()
+    out["equal_weighted"] = 100 * (1 + r.mean(axis=1).fillna(0)).cumprod()
+    return out
+
+
+def add_official(lw: pd.DataFrame, data_dir: Path, pairs) -> pd.DataFrame:
+    """Official index closes from index_ohlc.csv (if present), weekly, started on the rebuilt
+    line at the first common week -- the gap that opens is the reconstruction's bias."""
+    off_p = data_dir / "index_ohlc.csv"
+    if not off_p.exists():
+        return lw
+    io = pd.read_csv(off_p, encoding=ENC)
+    io["Date"] = pd.to_datetime(io["Date"])
+    for sym, col, base in pairs:
+        s = io[io["Ticker"] == sym].set_index("Date")["Close"].dropna().sort_index()
+        if s.empty:
+            continue
+        s = s.resample("W-FRI").last().reindex(lw.index)
+        k0 = s.first_valid_index()
+        if k0 is not None:
+            lw[col] = s / s[k0] * lw.loc[k0, base]
+    return lw
+
+
 def index_series(close: pd.DataFrame, shares: pd.Series) -> pd.DataFrame:
     """Cap-weighted and equal-weighted index levels rebased to 100."""
     cols = [c for c in close.columns if c in shares.index]
@@ -606,25 +639,24 @@ def main() -> None:
     )
     long_ratio = long_ratio[~long_ratio.index.duplicated(keep="last")].sort_index()
     long_ratio.rename("ew_cw_ratio").to_frame().to_csv(out_dir / "breadth_ew_cw_long.csv", encoding=ENC)
-    lw = long_weekly(daily, weekly, shares)
-    # official S&P 500 / S&P 500 Equal Weight from the fetch step, if present: started on the
-    # rebuilt line at the first common week, so the gap that opens is the reconstruction's bias
-    off_p = Path(args.data_dir) / "index_ohlc.csv"
-    if off_p.exists():
-        io = pd.read_csv(off_p, encoding=ENC)
-        io["Date"] = pd.to_datetime(io["Date"])
-        for sym, col, base in (("^GSPC", "official_cw", "cap_weighted"), ("^SPXEW", "official_ew", "equal_weighted")):
-            s = io[io["Ticker"] == sym].set_index("Date")["Close"].dropna().sort_index()
-            if s.empty:
-                continue
-            s = s.resample("W-FRI").last().reindex(lw.index)
-            k0 = s.first_valid_index()
-            if k0 is not None:
-                lw[col] = s / s[k0] * lw.loc[k0, base]
+    lw = add_official(long_weekly(daily, weekly, shares), Path(args.data_dir),
+                      (("^GSPC", "official_cw", "cap_weighted"), ("^SPXEW", "official_ew", "equal_weighted")))
     lw.index.name = "Date"
     lw.round(3).to_csv(out_dir / "breadth_long_weekly.csv", encoding=ENC)
     print(f"long weekly breadth {lw.index[0].date()} -> {lw.index[-1].date()} ({len(lw)} weeks, "
           f"{int(lw['n_valid'].iloc[0])}-{int(lw['n_valid'].max())} names with a 40-week average)")
+    # the same two views for the technology sector alone (asked 2026-11-13: 「單獨加上科技股
+    # 站上均線比例與指數/等權重比較」) -- the same names as regime_backtest's rebuilt tech index
+    tech = [t for t in fund.loc[fund["Sector"] == "technology", "Ticker"] if t in daily.columns and t in shares.index]
+    tw = add_official(long_weekly(daily[tech], weekly[[t for t in tech if t in weekly.columns]], shares), Path(args.data_dir),
+                      (("^SP500-45", "official_cw", "cap_weighted"),))
+    tw.index.name = "Date"
+    tw.round(3).to_csv(out_dir / "breadth_long_weekly_tech.csv", encoding=ENC)
+    td = daily_group(daily[tech], shares)
+    td.index.name = "Date"
+    td.round(3).to_csv(out_dir / "breadth_daily_tech.csv", encoding=ENC)
+    print(f"tech breadth: {len(tech)} names, weekly {tw.index[0].date()} -> {tw.index[-1].date()}, "
+          f"daily {td.index[0].date()} -> {td.index[-1].date()}")
 
     # ---- sector / industry ------------------------------------------------ #
     sec_ret = group_returns(daily, fund, shares, "Sector")

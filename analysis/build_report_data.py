@@ -162,30 +162,35 @@ def main() -> None:
         tr["groups"] = read("trend_regime_groups.csv").to_dict("records")
         payload["trend"] = tr
 
-    # --- long weekly breadth + rebuilt / official S&P 500 (breadth_sector.long_weekly) ---
-    lw_p = d / "breadth_long_weekly.csv"
-    if lw_p.exists():
-        lw = pd.read_csv(lw_p, index_col=0, parse_dates=True)
+    # --- long weekly breadth + rebuilt / official indices (breadth_sector.long_weekly) ---
+    # S&P 500 as a whole, and the technology sector alone (the same 83 names as the rebuilt
+    # tech index in 預警檢驗)
+    def ma_payload(weekly_csv, daily_df):
+        lw = pd.read_csv(weekly_csv, index_col=0, parse_dates=True)
         r1 = lambda v: None if pd.isna(v) else round(float(v), 1)
+        trio = (("p4", "pct_above_4w"), ("p10", "pct_above_10w"), ("p40", "pct_above_40w"))
         ml = {"dates": [x.strftime("%Y-%m-%d") for x in lw.index],
-              **{k: [r1(v) for v in lw[c]] for k, c in (("cw", "cap_weighted"), ("ew", "equal_weighted"),
-                 ("p4", "pct_above_4w"), ("p10", "pct_above_10w"), ("p40", "pct_above_40w"),
+              **{k: [r1(v) for v in lw[c]] for k, c in (("cw", "cap_weighted"), ("ew", "equal_weighted"), *trio,
                  ("off_cw", "official_cw"), ("off_ew", "official_ew")) if c in lw},
               "n_min": int(lw["n_valid"].min()), "n_max": int(lw["n_valid"].max()),
               "partial": bool(lw.index[-1] > pd.Timestamp(payload["asof"])),
-              "pctile": {k: round(float(100 * (lw[c] < lw[c].iloc[-1]).mean()), 0)
-                         for k, c in (("p4", "pct_above_4w"), ("p10", "pct_above_10w"), ("p40", "pct_above_40w"))},
-              "median": {k: round(float(lw[c].median()), 1)
-                         for k, c in (("p4", "pct_above_4w"), ("p10", "pct_above_10w"), ("p40", "pct_above_40w"))}}
+              "pctile": {k: round(float(100 * (lw[c] < lw[c].iloc[-1]).mean()), 0) for k, c in trio},
+              "median": {k: round(float(lw[c].median()), 1) for k, c in trio}}
         # the daily view at full resolution (the 1-year chart series above are thinned)
-        bd = b.copy()
-        bd = bd[bd["pct_above_20dma"].notna()]
+        bd = daily_df[daily_df["pct_above_20dma"].notna()]
         ml["daily"] = {"dates": [x.strftime("%Y-%m-%d") for x in bd.index],
                        "cw": [r1(100 * v / bd["cap_weighted"].iloc[0]) for v in bd["cap_weighted"]],
                        "ew": [r1(100 * v / bd["equal_weighted"].iloc[0]) for v in bd["equal_weighted"]],
                        **{k: [r1(v) for v in bd[c]] for k, c in (("p20", "pct_above_20dma"), ("p50", "pct_above_50dma"),
                                                                  ("p200", "pct_above_200dma"))}}
-        payload["ma_long"] = ml
+        return ml
+
+    if (d / "breadth_long_weekly.csv").exists():
+        payload["ma_long"] = ma_payload(d / "breadth_long_weekly.csv", b)
+    if (d / "breadth_long_weekly_tech.csv").exists():
+        payload["ma_long_tech"] = ma_payload(d / "breadth_long_weekly_tech.csv",
+                                             pd.read_csv(d / "breadth_daily_tech.csv", index_col=0, parse_dates=True))
+        payload["ma_long_tech"]["n"] = payload["ma_long_tech"]["n_max"]
 
     # --- does the regime net warn of large falls? (regime_backtest.py) -------------
     bt_json = d / "regime_backtest.json"
