@@ -197,6 +197,10 @@ def main() -> None:
         payload["ma_long_semi"] = ma_payload(d / "breadth_long_weekly_semi.csv",
                                              pd.read_csv(d / "breadth_daily_semi.csv", index_col=0, parse_dates=True))
         payload["ma_long_semi"]["n"] = payload["ma_long_semi"]["n_max"]
+    if (d / "breadth_long_weekly_aihw.csv").exists():
+        payload["ma_long_aihw"] = ma_payload(d / "breadth_long_weekly_aihw.csv",
+                                             pd.read_csv(d / "breadth_daily_aihw.csv", index_col=0, parse_dates=True))
+        payload["ma_long_aihw"]["n"] = payload["ma_long_aihw"]["n_max"]
 
     # --- does the regime net warn of large falls? (regime_backtest.py) -------------
     bt_json = d / "regime_backtest.json"

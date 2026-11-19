@@ -668,6 +668,20 @@ def main() -> None:
     sd.index.name = "Date"
     sd.round(3).to_csv(out_dir / "breadth_daily_semi.csv", encoding=ENC)
     print(f"semi breadth: {len(semi_n)} names, weekly {sw.index[0].date()} -> {sw.index[-1].date()}")
+    # AI-hardware list alone (asked 2026-11-19: 「AI 硬體也單獨加上站上均線比例與指數比較」) --
+    # the same 22 names the 多空排列差 counts. No official index exists for a hand-picked list.
+    aihw_p = REPO / "data" / "tableau" / "AIhardware_en.csv"
+    if aihw_p.exists():
+        ai_n = [t for t in pd.read_csv(aihw_p, encoding=ENC)["stock"].dropna()
+                if t in daily.columns and t in shares.index]
+        aw = long_weekly(daily[ai_n], weekly[[t for t in ai_n if t in weekly.columns]], shares)
+        aw.index.name = "Date"
+        aw.round(3).to_csv(out_dir / "breadth_long_weekly_aihw.csv", encoding=ENC)
+        ad = daily_group(daily[ai_n], shares)
+        ad.index.name = "Date"
+        ad.round(3).to_csv(out_dir / "breadth_daily_aihw.csv", encoding=ENC)
+        print(f"AI-hardware breadth: {len(ai_n)} names, weekly {aw.index[0].date()} -> {aw.index[-1].date()} "
+              f"({int(aw['n_valid'].iloc[0])}-{int(aw['n_valid'].max())} with a 40-week average)")
     print(f"tech breadth: {len(tech)} names, weekly {tw.index[0].date()} -> {tw.index[-1].date()}, "
           f"daily {td.index[0].date()} -> {td.index[-1].date()}")
 

@@ -258,6 +258,17 @@ Official overlay: `^SOX` (added at the user's request the same day). It is the P
 not S&P — different members (non-S&P 500 names) and weighting — so the caption says the gap
 is not all survivorship. With 18 names one stock is ~6 points; the caption says so.
 
+AI hardware alone (asked 2026-11-19: 「AI 硬體也單獨加上站上均線比例與指數比較」): fourth
+panel (`f-mh`, `id: "mh"`), `breadth_long_weekly_aihw.csv` / `breadth_daily_aihw.csv`, the
+22 names of `AIhardware_en.csv` (17 with a 40-week MA in 2015-08). Its equal-weight line
+ends where regime_backtest's `aihw` does (5255.07 on 2026-11-12). No official line — it is
+a hand-picked list; the caption says so, and that its survivorship is the worst of the four.
+The caption also separates this measure (close above one MA) from the 多空排列差 (close >
+MA50 > MA200). It names that section by its live h2, never by a typed 「第 07 節」. 2026-11-12:
+above 200/50/20-day 32/18/36% vs market 65/72/68%; 40-week 32% (14th percentile).
+Rebuilt on pandas 3.1.1 (new container): outputs matched the pandas-2 files to 1e-13 except
+two weeks of %>4-week (one name each, a close sitting exactly on its average).
+
 ## Simulated semiconductor sector (section 類股, asked 2026-11-13: 「11 個類股的報酬.. 加入半導體類股模擬」)
 
 `sector_semi_sim.csv` (payload `sector_sim`, one row per simulated sector): the same group

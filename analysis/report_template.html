@@ -377,6 +377,18 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     <figcaption id="cap-ms"></figcaption>
   </figure>
 
+  <figure class="panel" id="f-mh">
+    <div class="panel-head">
+      <h3 id="h-mh">—</h3>
+      <p id="sub-mh">—</p>
+    </div>
+    <div class="rb-row" id="mh-basis" style="padding:0 20px"></div>
+    <div id="rb-mh"></div>
+    <div class="legend" id="lg-mh"></div>
+    <div class="panel-body"><div id="c-mh"></div></div>
+    <figcaption id="cap-mh"></figcaption>
+  </figure>
+
   <div class="grid2">
     <figure class="panel">
       <div class="panel-head"><h3>市值加權 vs 等權指數</h3><p>兩者皆以一年前 = 100。差距擴大＝漲勢集中在大型股。</p></div>
@@ -3097,7 +3109,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
       var lvl = function (k, nm) { return nm + " " + lastOf(ML[k]).toFixed(0) + "%（" + pctTxt(pr[k], "全期") + "，全期中位 " + md[k].toFixed(0) + "%）"; };
       cap = "週線（" + ML.dates[0] + " 起，" + ML.n_min + "–" + ML.n_max + " 檔有 40 週均線；4／10／40 週約當 20／50／200 日）：" +
         lvl("p40", "%>40 週均線") + "；" + lvl("p10", "%>10 週") + "；" + lvl("p4", "%>4 週") + "。" +
-        "同期重建" + cfg.pre + "指數：市值加權 " + chg(ML.cw) + "、等權重 " + chg(ML.ew) +
+        "同期重建" + (/^[A-Za-z]/.test(cfg.pre) ? " " : "") + cfg.pre + "指數：市值加權 " + chg(ML.cw) + "、等權重 " + chg(ML.ew) +
         (ML.off_cw ? "；" + cfg.offCW + " " + chg(ML.off_cw) + (ML.off_ew ? "、" + cfg.offEW + " " + chg(ML.off_ew) : "") : "") + "。" +
         "成分股與指數都用今天的成分名單回推，早年的強勢與漲幅都偏高（存活者偏差）" +
         (ML.off_cw ? "，重建線與官方虛線拉開的距離就是這個偏差。" : cfg.offSyms ? "；官方 " + cfg.offSyms + " 由每日抓取程式加抓，資料進來後會以虛線並列，直接看出偏差有多大。" : "。") + (cfg.note || "") +
@@ -3110,7 +3122,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
           "），目前 " + a[a.length - 1].toFixed(1);
       };
       cap = (DL ? "近一年區間：" + rng("p200", "%>200日均線") + "；" + rng("p50", "%>50日均線") + "；" + rng("p20", "%>20日均線") + "。" : "") +
-        "上圖兩條重建" + cfg.pre + "指數以 " + P.dates[0] + " = 100：市值加權 " + chg(P.top[0].values) + "、等權重 " + chg(P.top[1].values) + "。";
+        "上圖兩條重建" + (/^[A-Za-z]/.test(cfg.pre) ? " " : "") + cfg.pre + "指數以 " + P.dates[0] + " = 100：市值加權 " + chg(P.top[0].values) + "、等權重 " + chg(P.top[1].values) + "。";
     }
     document.getElementById("cap-" + id).textContent = cap + "時間範圍只改變圖的顯示，文字數字是全期。";
   }
@@ -3228,6 +3240,14 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
         " 個百分點，比例跳動比全市場與科技類股大得多。^SOX 不是 S&P 指數，成分包含非 S&P 500 的公司，加權方式也不同，和這 " +
         D.ma_long_semi.n + " 檔不是同一批，虛線只當參考，兩條線的差距不全是存活者偏差。" });
     else document.getElementById("f-ms").style.display = "none";
+    if (D.ma_long_aihw) {
+      var UL = D.trend && D.trend.universe ? D.trend.universe.label : "AI 硬體股", NH = D.ma_long_aihw.n;
+      var aiSec = "「" + ((document.querySelector("#ai .sec-head h2") || {}).textContent || "AI 多空") + "」一節";
+      document.getElementById("h-mh").textContent = UL + "：站上均線的比例與指數";
+      drawMaPanel({ id: "mh", ML: D.ma_long_aihw, pre: UL, offSyms: null,
+        note: "這 " + NH + " 檔是自選名單，不是官方指數，沒有官方線可以對照；名單是今天挑的，早年漲幅偏高的程度比全市場、科技與半導體都更嚴重。" +
+          "一檔約占 " + (100 / NH).toFixed(0) + " 個百分點。這裡看的是收盤價在某條均線之上的比例；" + aiSec + "的多空排列差要求收盤、50 日、200 日依序排列，條件不同，數字不能互換。" });
+    } else document.getElementById("f-mh").style.display = "none";
     // subtitles: each group's shares against the whole market, wording chosen from the gap
     var subVsMarket = function (G, lead) {
       if (!G || !D.ma_long) return;
@@ -3242,6 +3262,8 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     };
     if (D.ma_long_tech) document.getElementById("sub-mt").textContent = subVsMarket(D.ma_long_tech,
       "Yahoo 類股分類為科技（technology）的 S&P 500 成分股 " + D.ma_long_tech.n + " 檔，和預警檢驗的重建科技指數是同一批。");
+    if (D.ma_long_aihw) document.getElementById("sub-mh").textContent = subVsMarket(D.ma_long_aihw,
+      "AI 硬體股名單的 " + D.ma_long_aihw.n + " 檔（data/tableau/AIhardware_en.csv），和" + "「" + ((document.querySelector("#ai .sec-head h2") || {}).textContent || "AI 多空") + "」一節的多空排列差、預警檢驗的 AI 硬體等權重指數、類股表的「AI 硬體（模擬）」是同一批。");
     if (D.ma_long_semi) document.getElementById("sub-ms").textContent = subVsMarket(D.ma_long_semi,
       "Yahoo 產業為半導體與半導體設備的 S&P 500 成分股 " + D.ma_long_semi.n + " 檔（科技類股的子集），和預警檢驗的重建半導體指數、類股表的「半導體（模擬）」是同一批。");
 
