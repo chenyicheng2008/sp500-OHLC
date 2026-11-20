@@ -1,5 +1,5 @@
 ﻿stock,Short Name,Market Cap,Sector,Industry,PE Ratio,Dividend Yield,Forward P/E Ratio,50日均差%,200日均差%,CurrentY成長,NextY成長,CurrentQ成長,NextQ成長,name,ethnic_group,Main_business_direction,Featured_Growth_Focus
-MSFT,Microsoft Corporation,3700472676352,technology,software-infrastructure,26.007307,0.007313083,20.590195,-0.04162314,0.12544633,0.1582,0.2092,0.1729,0.15619999,,CSP,,
+MSFT,Microsoft Corporation,3700472676352,technology,software-infrastructure,26.007307,0.007313083,20.58771,-0.04162314,0.12544633,0.1582,0.2092,0.1729,0.15619999,,CSP,,
 GOOG,Alphabet Inc.,3331919708160,communication-services,internet-content-information,14.15248,0.003080229,17.716759,-0.15803647,-0.19214538,0.21090001,0.16870001,0.15359999,0.2204,,CSP,,
 AMZN,"Amazon.com, Inc.",2782977327104,consumer-cyclical,internet-retail,20.805983,0.0,23.555567,0.008813044,0.050884373,0.7853,-0.1674,0.22780001,-0.1737,,CSP,,
 PLTR,Palantir Technologies Inc.,370291572736,technology,software-infrastructure,108.22535,0.0,60.53325,-0.16468553,-0.00097367546,1.2689,0.4919,1.0809,0.574,PALANTIR,Cloud data platform,AI data analysis platform,AIP Enterprise AI Transformation Engine
@@ -23,7 +23,7 @@ TEAM,Atlassian Corporation,33498963968,technology,software-application,403.06058
 RBLX,Roblox Corporation,33173311488,communication-services,electronic-gaming-multimedia,0.0,0.0,-36.386047,-0.041912023,-0.08411977,0.0683,0.0833,-0.1126,0.1775,ROBLOX,Consumption and social AI,Metaverse Platform,AI generates virtual world and content
 TWLO,Twilio Inc.,27663349760,technology,software-infrastructure,22.459799,0.0,26.090929,-0.2863114,-0.079220355,0.2611,0.111099996,0.1664,0.0583,TWILIO,Marketing and Advertising AI,Cloud communication API,AI customer service and marketing automation
 ROKU,"Roku, Inc.",23933745152,communication-services,entertainment,46.259365,0.0,40.135017,0.033199202,0.23376773,0.0,0.0,0.0,0.0,ROKU,Consumption and social AI,Streaming video platform,AI ad matching and audience analysis
-MDB,"MongoDB, Inc.",23889088512,technology,software-infrastructure,412.5139,0.0,37.487396,-0.17881536,-0.10927638,0.3189,0.2087,0.21790001,0.0377,MONGODB,Cloud data platform,Cloud native database,Support AI application development
+MDB,"MongoDB, Inc.",23926040576,technology,software-infrastructure,412.5139,0.0,37.487396,-0.17881536,-0.10927638,0.3189,0.2087,0.21790001,0.0377,MONGODB,Cloud data platform,Cloud native database,Support AI application development
 U,Unity Software Inc.,20726800384,technology,software-application,0.0,0.0,17.65095,0.06431956,0.4463466,0.71889997,0.78980005,1.2156,1.4874,UNITY,AI-based content creation,Games and 3D engines,AI generated simulation and game scenes
 RDDT,"Reddit, Inc.",17355264000,communication-services,internet-content-information,18.342855,0.0,9.876499,-0.3384746,-0.41046625,1.0977,0.2401,0.4757,0.2149,REDDIT,Consumption and social AI,social platform,AI recommendation and content summary
 DOCU,"DocuSign, Inc.",14028897280,technology,software-application,45.76829,0.0,14.390199,0.0048569506,0.33711278,0.2034,0.1288,0.1672,0.17629999,DOCUSIGN,AI health education,Electronic signature platform,AI document generation and approval
