@@ -1,0 +1,703 @@
+<meta charset="utf-8">
+<title>費城半導體指數檢視</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  color-scheme: light;
+  --plane:#f4f5f7; --surface:#fbfbfc; --raised:#ffffff; --sunken:#eef0f3;
+  --ink:#101317; --ink-2:#565d66; --ink-3:#8a9099;
+  --rule:#e2e3e7; --rule-strong:#c9ccd2;
+  --accent:#2a78d6; --accent-soft:#e7f0fc;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#8a5cd6;
+  --good:#0ca30c; --warn:#fab219; --serious:#ec835a; --critical:#d03b3b;
+  --pos:#2a78d6; --neg:#d03b3b; --mid:#f0efec;
+  --grid:#e6e7eb; --axis:#c9ccd2;
+  --shadow:0 1px 2px rgba(16,19,23,.05), 0 8px 24px -16px rgba(16,19,23,.22);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --plane:#0e1013; --surface:#191c21; --raised:#21252b; --sunken:#14171b;
+    --ink:#f2f4f7; --ink-2:#b9bec6; --ink-3:#878d96;
+    --rule:#2b2f36; --rule-strong:#3c414a;
+    --accent:#3987e5; --accent-soft:#152438;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#a07ef0;
+    --good:#0ca30c; --warn:#fab219; --serious:#ec835a; --critical:#d03b3b;
+    --pos:#3987e5; --neg:#e66767; --mid:#383835;
+    --grid:#24282e; --axis:#3c414a;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --plane:#0e1013; --surface:#191c21; --raised:#21252b; --sunken:#14171b;
+  --ink:#f2f4f7; --ink-2:#b9bec6; --ink-3:#878d96;
+  --rule:#2b2f36; --rule-strong:#3c414a;
+  --accent:#3987e5; --accent-soft:#152438;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#a07ef0;
+  --good:#0ca30c; --warn:#fab219; --serious:#ec835a; --critical:#d03b3b;
+  --pos:#3987e5; --neg:#e66767; --mid:#383835;
+  --grid:#24282e; --axis:#3c414a;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -18px rgba(0,0,0,.8);
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--plane); color:var(--ink);
+  font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  font-size:15px; line-height:1.75; margin:0;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1080px; margin:0 auto; padding-inline:20px; padding-block:0 72px}
+h1,h2,h3{font-family:"Noto Serif TC",Georgia,serif; text-wrap:balance; margin:0}
+.mono{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,monospace; font-variant-numeric:tabular-nums}
+.num{font-family:"IBM Plex Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums; font-weight:500}
+
+/* ---------- masthead ---------- */
+.mast{border-bottom:1px solid var(--rule); background:var(--surface)}
+.mast-in{max-width:1080px; margin:0 auto; padding-inline:20px; padding-block:40px 28px}
+.kicker{
+  font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--ink-3); margin:0 0 14px
+}
+h1{font-size:clamp(28px,5vw,42px); font-weight:700; line-height:1.25; letter-spacing:-.01em}
+.dek{color:var(--ink-2); font-size:16px; max-width:62ch; margin:16px 0 0}
+.stamp{
+  display:flex; flex-wrap:wrap; gap:8px 22px; margin-top:22px;
+  font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--ink-3)
+}
+.stamp b{color:var(--ink-2); font-weight:500}
+
+/* ---------- verdict ---------- */
+.verdict{
+  display:grid; grid-template-columns:auto 1fr; gap:0 20px; align-items:start;
+  background:var(--raised); border:1px solid var(--rule); border-radius:3px;
+  padding:22px 24px; margin-top:28px; box-shadow:var(--shadow);
+}
+.verdict::before{
+  content:""; grid-row:1/3; width:3px; border-radius:2px; align-self:stretch;
+  background:var(--warn);
+}
+.verdict h2{font-size:19px; line-height:1.5}
+.verdict p{margin:10px 0 0; color:var(--ink-2); font-size:14.5px; max-width:70ch}
+
+/* ---------- stat row ---------- */
+.stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(168px,1fr)); gap:1px;
+  background:var(--rule); border:1px solid var(--rule); border-radius:3px; margin-top:20px; overflow:hidden}
+.stat{background:var(--raised); padding:18px 18px 16px; display:flex; flex-direction:column; gap:4px}
+.stat-k{font-size:11.5px; color:var(--ink-3); letter-spacing:.04em; line-height:1.5}
+.stat-v{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums;
+  font-size:26px; font-weight:600; letter-spacing:-.02em; line-height:1.15}
+.stat-n{font-size:11.5px; color:var(--ink-3); line-height:1.5}
+
+/* ---------- nav ---------- */
+nav{position:sticky; top:0; z-index:40; background:color-mix(in srgb,var(--plane) 92%,transparent);
+  backdrop-filter:blur(8px); border-bottom:1px solid var(--rule)}
+.nav-in{max-width:1080px; margin:0 auto; padding-inline:20px; display:flex; gap:4px;
+  overflow-x:auto; scrollbar-width:none}
+.nav-in::-webkit-scrollbar{display:none}
+nav a{
+  flex:none; padding:12px 12px 10px; font-size:13px; color:var(--ink-3); text-decoration:none;
+  border-bottom:2px solid transparent; white-space:nowrap
+}
+nav a:hover{color:var(--ink)}
+nav a.on{color:var(--ink); border-bottom-color:var(--accent)}
+nav a .n{font-family:"IBM Plex Mono",monospace; font-size:11.5px; color:var(--accent); margin-right:5px}
+
+/* ---------- adjustable time range ---------- */
+.rangebar{padding:8px 20px 0}
+.rb-row{display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-bottom:6px}
+.rb-row button{font:inherit; font-size:12px; padding:3px 10px; border-radius:3px; cursor:pointer;
+  border:1px solid var(--rule-strong); background:var(--surface); color:var(--ink-2)}
+.rb-row button:hover{color:var(--ink); border-color:var(--ink-3)}
+.rb-row button.on{background:var(--ink); color:var(--surface); border-color:var(--ink); font-weight:600}
+.rb-row button:focus-visible,.rangebar svg:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.rb-info{margin-left:auto; font-family:"IBM Plex Mono",monospace; font-size:11.5px; color:var(--ink-3)}
+.rb-hint{font-size:11.5px; color:var(--ink-3); margin-top:4px}
+
+/* ---------- chapter index ---------- */
+.toc{margin-top:40px; border:1px solid var(--rule); border-radius:3px; background:var(--surface); padding:16px 20px 8px}
+.toc h2{font-size:14px; font-weight:600; color:var(--ink-2); letter-spacing:.06em}
+.toc ol{list-style:none; margin:10px 0 0; padding:0; display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); column-gap:28px}
+.toc li{border-top:1px solid var(--rule)}
+.toc a{display:grid; grid-template-columns:30px 1fr; gap:2px 8px; padding:10px 0; text-decoration:none; color:inherit}
+.toc a:hover b{color:var(--accent)}
+.toc a:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:2px}
+.toc .n{font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--accent); padding-top:2px; grid-row:span 2}
+.toc b{font-size:14.5px; font-weight:600}
+.toc span.q{font-size:12.5px; color:var(--ink-3); line-height:1.55}
+nav a:focus-visible{outline:2px solid var(--accent); outline-offset:-2px; border-radius:2px}
+
+/* ---------- sections ---------- */
+section{padding-top:52px; scroll-margin-top:56px}
+.sec-head{display:flex; align-items:baseline; gap:14px; border-bottom:1px solid var(--rule-strong); padding-bottom:10px}
+.sec-no{font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--accent); letter-spacing:.1em; flex:none}
+.sec-head h2{font-size:23px; font-weight:700; letter-spacing:-.01em}
+.sec-sub{color:var(--ink-2); font-size:14px; margin:14px 0 0; max-width:68ch}
+
+/* ---------- panels & charts ---------- */
+.panel{background:var(--surface); border:1px solid var(--rule); border-radius:3px; margin-top:22px}
+.panel-head{padding:16px 20px 0}
+.panel-head h3{font-size:15.5px; font-weight:600; font-family:"Noto Sans TC",sans-serif}
+.panel-head p{margin:6px 0 0; font-size:13px; color:var(--ink-2); max-width:70ch}
+.panel-body{padding:12px 12px 16px}
+.grid2{display:grid; grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); gap:22px; margin-top:22px}
+.grid2 .panel{margin-top:0}
+figure{margin:0}
+figcaption{padding:0 20px 16px; font-size:12.5px; color:var(--ink-3); line-height:1.6}
+svg{display:block; width:100%; height:auto; max-width:100%; overflow:visible}
+.legend{display:flex; flex-wrap:wrap; gap:6px 18px; padding:4px 20px 0; font-size:12.5px; color:var(--ink-2)}
+.legend span{display:inline-flex; align-items:center; gap:7px}
+.swatch{width:14px; height:3px; border-radius:2px; flex:none}
+.swatch.dot{width:9px; height:9px; border-radius:50%}
+
+/* ---------- tables ---------- */
+.tw{overflow-x:auto; border:1px solid var(--rule); border-radius:3px; background:var(--surface); margin-top:22px}
+table{border-collapse:collapse; width:100%; font-size:13px; min-width:560px}
+caption{text-align:left; padding:16px 18px 12px; font-size:15.5px; font-weight:600; color:var(--ink)}
+caption small{display:block; font-weight:400; font-size:12.5px; color:var(--ink-2); margin-top:5px; line-height:1.6}
+th,td{padding:8px 12px; text-align:right; border-bottom:1px solid var(--rule); white-space:nowrap}
+th{font-size:11px; font-weight:500; color:var(--ink-3); letter-spacing:.05em; text-align:right;
+  background:var(--sunken); position:sticky; top:0}
+th:first-child,td:first-child{text-align:left; position:sticky; left:0; background:var(--surface)}
+th:first-child{background:var(--sunken); z-index:2}
+tbody tr:hover td{background:var(--sunken)}
+tbody tr:hover td:first-child{background:var(--sunken)}
+tbody tr:last-child td{border-bottom:none}
+#t-kd-down td:last-child,#t-kd-down th:last-child,#t-kd-up td:last-child,#t-kd-up th:last-child{text-align:left; white-space:normal}
+#t-tech-moves td:last-child,#t-tech-moves th:last-child{text-align:left; white-space:normal; min-width:320px}
+#t-tech-trans td.diag{color:var(--ink-3)}
+#members td:not(.n),#members th{text-align:left}
+#members th:nth-child(n+5){text-align:right}
+#members td.c,#members th.c{text-align:center}
+.mem-more{margin-top:22px}
+.mem-more summary{cursor:pointer; font-size:14px; font-weight:600; color:var(--ink-2); padding:8px 0}
+.mem-more summary:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+#t-bt-eps td:nth-child(8),#t-bt-eps th:nth-child(8){text-align:left; white-space:normal; min-width:220px; max-width:300px}
+#t-bt-eps td:nth-child(9) .sub{white-space:nowrap}
+#t-signals td:last-child,#t-signals th:last-child{text-align:left; white-space:normal; min-width:280px}
+#t-signals td:nth-child(2),#t-signals th:nth-child(2){text-align:left}
+td.n{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums}
+.sub{color:var(--ink-3); font-size:11.5px}
+.tag{display:inline-block; padding:1px 7px; border-radius:2px; font-size:11px;
+  font-family:"IBM Plex Mono",monospace; letter-spacing:.02em; border:1px solid transparent}
+.tag.cyc{color:var(--s1); border-color:color-mix(in srgb,var(--s1) 35%,transparent); background:color-mix(in srgb,var(--s1) 9%,transparent)}
+.tag.def{color:var(--s2); border-color:color-mix(in srgb,var(--s2) 35%,transparent); background:color-mix(in srgb,var(--s2) 9%,transparent)}
+
+/* signal pills */
+.pill{display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:500;
+  font-family:"IBM Plex Mono",monospace; padding:2px 9px; border-radius:2px; border:1px solid}
+.pill i{width:7px; height:7px; border-radius:50%; flex:none; font-style:normal}
+.p-good{color:var(--good); border-color:color-mix(in srgb,var(--good) 40%,transparent); background:color-mix(in srgb,var(--good) 10%,transparent)}
+.p-warn{color:var(--warn); border-color:color-mix(in srgb,var(--warn) 45%,transparent); background:color-mix(in srgb,var(--warn) 12%,transparent)}
+.p-ser{color:var(--serious); border-color:color-mix(in srgb,var(--serious) 45%,transparent); background:color-mix(in srgb,var(--serious) 12%,transparent)}
+.p-bad{color:var(--critical); border-color:color-mix(in srgb,var(--critical) 40%,transparent); background:color-mix(in srgb,var(--critical) 10%,transparent)}
+.p-neu{color:var(--ink-2); border-color:var(--rule-strong); background:var(--sunken)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .p-warn{color:#e8a71a}}
+:root[data-theme="dark"] .p-warn{color:#e8a71a}
+
+/* inline bar inside a table cell */
+.bar{position:relative; height:16px; min-width:110px; display:block}
+.bar i{position:absolute; top:3px; height:10px; border-radius:2px; display:block}
+.bar u{position:absolute; top:0; bottom:0; width:1px; background:var(--rule-strong); left:50%}
+
+/* ---------- takeaways ---------- */
+ul.take{list-style:none; padding:0; margin:20px 0 0; display:flex; flex-direction:column; gap:0}
+ul.take li{display:grid; grid-template-columns:22px 1fr; gap:14px; padding:14px 0;
+  border-bottom:1px solid var(--rule); font-size:14.5px; color:var(--ink-2)}
+ul.take li:last-child{border-bottom:none}
+ul.take li::before{content:attr(data-i); font-family:"IBM Plex Mono",monospace; font-size:12px;
+  color:var(--ink-3); padding-top:3px}
+ul.take li > span{min-width:0}
+ul.take b{color:var(--ink); font-weight:500}
+
+/* ---------- tooltip ---------- */
+#tip{position:fixed; z-index:90; pointer-events:none; opacity:0; transition:opacity .1s;
+  background:var(--raised); color:var(--ink); border:1px solid var(--rule-strong); border-radius:3px;
+  padding:9px 11px; font-size:12.5px; line-height:1.65; box-shadow:var(--shadow); max-width:250px}
+#tip .tt-h{font-family:"IBM Plex Mono",monospace; font-size:11px; color:var(--ink-3);
+  letter-spacing:.04em; margin-bottom:4px}
+#tip .tt-r{display:flex; align-items:center; gap:8px; justify-content:space-between}
+#tip .tt-r span{display:inline-flex; align-items:center; gap:6px}
+#tip b{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums; font-weight:600}
+
+/* ---------- event timeline ---------- */
+.ev-list{list-style:none; margin:0; padding:0 20px 14px; display:flex; flex-direction:column}
+.ev-list li{display:grid; grid-template-columns:30px 76px 1fr; gap:4px 14px; padding:13px 0;
+  border-top:1px solid var(--rule); align-items:start}
+.ev-date{font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--ink-3); padding-top:3px}
+.ev-body{min-width:0}
+.ev-body b{font-weight:600; font-size:14px}
+.ev-body p{margin:4px 0 0; color:var(--ink-2); font-size:13px; line-height:1.7}
+.ev-meta{display:flex; flex-wrap:wrap; gap:4px 14px; margin-top:7px; font-size:12px; color:var(--ink-3)}
+.ev-meta a{color:var(--accent); text-decoration:none; overflow-wrap:anywhere}
+.ev-meta a:hover{text-decoration:underline}
+.ev-meta a:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:2px}
+.cat{display:inline-block; font-size:11px; padding:0 6px; border-radius:2px; margin-left:8px;
+  border:1px solid var(--rule-strong); color:var(--ink-2); vertical-align:2px}
+.cat.soon{border-color:color-mix(in srgb,var(--warn) 55%,transparent); color:var(--ink)}
+.mv{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums}
+.ev-badge{display:block}
+@media (max-width:520px){
+  .ev-list li{grid-template-columns:30px 1fr}
+  .ev-body{grid-column:1/-1}
+}
+/* ---------- KD small multiples ---------- */
+.kd-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:14px; padding:8px 16px 18px}
+.kd-cell{border:1px solid var(--rule); border-radius:3px; padding:10px 10px 4px; background:var(--raised)}
+.kd-cell h4{margin:0 0 2px; font-size:13px; font-weight:600; display:flex; justify-content:space-between;
+  gap:8px; font-family:"IBM Plex Mono",monospace}
+.kd-cell h4 span{font-family:"Noto Sans TC",sans-serif; font-weight:400; font-size:11.5px; color:var(--ink-3)}
+.note-box{margin-top:18px; padding:12px 16px; border:1px solid color-mix(in srgb,var(--warn) 45%,transparent);
+  background:color-mix(in srgb,var(--warn) 9%,transparent); border-radius:3px; font-size:13px; color:var(--ink-2); max-width:78ch}
+.note-box b{color:var(--ink)}
+.zone{font-size:11px; padding:0 6px; border-radius:2px; border:1px solid var(--rule-strong); color:var(--ink-2); margin-left:6px}
+.zone.main{border-color:color-mix(in srgb,var(--accent) 50%,transparent); color:var(--accent)}
+
+footer{margin-top:56px; padding-top:24px; border-top:1px solid var(--rule);
+  font-size:12.5px; color:var(--ink-3); line-height:1.8}
+footer b{color:var(--ink-2); font-weight:500}
+footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:var(--sunken);
+  padding:1px 5px; border-radius:2px; color:var(--ink-2)}
+/* ---------- print / PDF ---------- */
+@media print{
+  nav, #tip, .rb-row button, .rangebar svg, .rb-hint{display:none!important}
+  .rb-row{margin:0} .rb-info{margin-left:0}
+  section{padding-top:28px}
+  figure, .panel, .stats, .stat, .toc, .verdict, .note-box, tr, .sec-head{break-inside:avoid}
+  .sec-head{break-after:avoid}
+  .tw{overflow:visible!important}
+  .mem-more summary{display:none}
+  a{color:inherit; text-decoration:none}
+}
+@media (prefers-reduced-motion: reduce){*{animation:none!important; transition:none!important}}
+@media (max-width:520px){
+  .mast-in{padding-block:30px 22px}
+  .verdict{grid-template-columns:1fr; gap:14px}
+  .verdict::before{grid-row:auto; width:32px; height:3px}
+  .stat-v{font-size:22px}
+}
+
+.mast-in,.wrap{padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px))}
+.lead{color:var(--ink-2); font-size:14.5px; max-width:70ch; margin:10px 0 0}
+td.l{text-align:left; white-space:normal; min-width:220px}
+.ev-up{color:var(--ink-3)}
+</style>
+
+<header class="mast"><div class="mast-in">
+  <p class="kicker">PHLX SEMICONDUCTOR INDEX · <span id="m-sym"></span></p>
+  <h1 id="m-h1">—</h1>
+  <p class="dek" id="m-dek">—</p>
+  <div class="stamp"><span>資料日 <b id="m-asof"></b></span><span>報告產出 <b id="m-gen"></b></span><span>資料起點 <b id="m-start"></b></span></div>
+  <div class="stats" id="m-stats"></div>
+</div></header>
+
+<div class="wrap">
+<section id="long">
+  <div class="sec-head"><span class="sec-no">01</span><h2>長期走勢與回檔</h2></div>
+  <p class="sec-sub" id="long-sub">—</p>
+  <figure class="panel">
+    <div class="panel-head"><h3>週收盤（對數刻度）與距歷史高點的跌幅</h3><p id="long-def">—</p></div>
+    <div class="rb-row" id="long-rb" style="padding:10px 20px 0"></div>
+    <div class="legend" id="long-lg"></div>
+    <div class="panel-body"><div id="c-long"></div></div>
+    <figcaption id="long-cap"></figcaption>
+  </figure>
+  <div class="tw"><table id="t-eps"><caption>歷次回檔<small id="eps-cap">—</small></caption></table></div>
+</section>
+
+<section id="recent">
+  <div class="sec-head"><span class="sec-no">02</span><h2>近半年日K與均線</h2></div>
+  <p class="sec-sub" id="recent-sub">—</p>
+  <figure class="panel">
+    <div class="panel-head"><h3>日K、50 日與 200 日均線</h3><p>標記的編號對應下方事件表；漲跌幅都是本資料的收盤計算。</p></div>
+    <div class="legend" id="k-lg"></div>
+    <div class="panel-body"><div id="c-k"></div></div>
+    <figcaption id="k-cap"></figcaption>
+  </figure>
+  <div class="tw"><table id="t-ev"><caption>事件<small>事件內容引自所列來源；漲跌幅是 ^SOX 當日收盤變化，由本資料計算，不採用文章數字。同日事件不代表因果。</small></caption></table></div>
+</section>
+
+<section id="days">
+  <div class="sec-head"><span class="sec-no">03</span><h2>單日重挫</h2></div>
+  <p class="sec-sub" id="days-sub">—</p>
+  <figure class="panel">
+    <div class="panel-head"><h3 id="yr-h">—</h3><p>每一年單日收盤跌幅達門檻的交易日數；當年未過完的年份只算到資料日。</p></div>
+    <div class="panel-body"><div id="c-yr"></div></div>
+  </figure>
+  <div class="tw"><table id="t-worst"><caption>資料期間最大的十次單日跌幅<small>「當時距高點」是該日收盤距之前歷史高點的跌幅。</small></caption></table></div>
+</section>
+
+<section id="comp">
+  <div class="sec-head"><span class="sec-no">04</span><h2>和 S&amp;P 500 半導體成分股比較</h2></div>
+  <p class="sec-sub" id="comp-sub">—</p>
+  <div class="tw"><table id="t-comp"><caption>^SOX 與重建的 S&amp;P 500 半導體指數<small id="comp-cap">—</small></caption></table></div>
+</section>
+
+<section id="method">
+  <div class="sec-head"><span class="sec-no">05</span><h2>方法與限制</h2></div>
+  <ul class="take" id="m-list" style="margin-top:14px"></ul>
+</section>
+
+<footer id="foot"></footer>
+</div>
+<div id="tip"></div>
+
+<script>
+(function () {
+  "use strict";
+  var D = {"asof":"2026-11-20","generated":"2026-11-21","start":"2014-11-21","n_bars":3017,"symbol":"^SOX","close":8408.59,"chg":-10.73,"ath":14634.72,"ath_date":"2026-06-22","dd":-42.5,"ytd":18.7,"r1y":26.1,"r3m":-26.4,"r1m":-21.6,"ma50":11334.79,"ma200":10921.22,"vs_ma200":-23.0,"vs_ma50":-25.8,"cross":{"date":"2025-07-03","kind":"golden"},"episode_thr":-20,"episodes":[{"peak":"2015-06-01","peak_v":746.08,"hit":"2015-08-20","trough":"2016-02-11","depth":-25.1,"further":-5.1,"w_down":36,"recovered":"2016-07-25","w_up":24,"ongoing":false,"reached_now":false},{"peak":"2018-03-12","peak_v":1445.9,"hit":"2018-10-24","trough":"2018-12-24","depth":-26.0,"further":-6.0,"w_down":41,"recovered":"2019-04-03","w_up":14,"ongoing":false,"reached_now":false},{"peak":"2020-02-19","peak_v":1979.5,"hit":"2020-03-09","trough":"2020-03-18","depth":-35.0,"further":-15.0,"w_down":4,"recovered":"2020-06-05","w_up":11,"ongoing":false,"reached_now":false},{"peak":"2021-12-27","peak_v":4039.51,"hit":"2022-03-07","trough":"2022-10-14","depth":-46.5,"further":-26.5,"w_down":42,"recovered":"2023-12-14","w_up":61,"ongoing":false,"reached_now":true},{"peak":"2024-07-10","peak_v":5904.54,"hit":"2024-08-02","trough":"2025-04-08","depth":-39.7,"further":-19.7,"w_down":39,"recovered":"2025-09-10","w_up":22,"ongoing":false,"reached_now":false},{"peak":"2026-06-22","peak_v":14634.72,"hit":"2026-07-17","trough":"2026-11-20","depth":-42.5,"further":-22.5,"w_down":22,"recovered":null,"w_up":null,"ongoing":true,"reached_now":true}],"rank":2,"n_eps":6,"big_day":-5.0,"by_year":[{"year":2014,"n":0},{"year":2015,"n":0},{"year":2016,"n":1},{"year":2017,"n":0},{"year":2018,"n":1},{"year":2019,"n":1},{"year":2020,"n":10},{"year":2021,"n":3},{"year":2022,"n":8},{"year":2023,"n":0},{"year":2024,"n":6},{"year":2025,"n":7},{"year":2026,"n":13}],"worst":[{"date":"2020-03-16","pct":-15.9,"dd":-34.4},{"date":"2026-11-05","pct":-12.25,"dd":-38.4},{"date":"2020-03-12","pct":-10.91,"dd":-29.7},{"date":"2026-11-20","pct":-10.73,"dd":-42.5},{"date":"2026-06-05","pct":-10.26,"dd":-12.2},{"date":"2025-04-03","pct":-9.88,"dd":-34.1},{"date":"2020-03-18","pct":-9.79,"dd":-35.0},{"date":"2025-01-27","pct":-9.15,"dd":-17.8},{"date":"2020-03-09","pct":-8.34,"dd":-21.3},{"date":"2025-04-10","pct":-7.97,"dd":-34.1}],"worst_rank_last":4,"long":{"dates":["2014-11-21","2014-11-28","2014-12-05","2014-12-12","2014-12-19","2014-12-26","2015-01-02","2015-01-09","2015-01-16","2015-01-23","2015-01-30","2015-02-06","2015-02-13","2015-02-20","2015-02-27","2015-03-06","2015-03-13","2015-03-20","2015-03-27","2015-04-03","2015-04-10","2015-04-17","2015-04-24","2015-05-01","2015-05-08","2015-05-15","2015-05-22","2015-05-29","2015-06-05","2015-06-12","2015-06-19","2015-06-26","2015-07-03","2015-07-10","2015-07-17","2015-07-24","2015-07-31","2015-08-07","2015-08-14","2015-08-21","2015-08-28","2015-09-04","2015-09-11","2015-09-18","2015-09-25","2015-10-02","2015-10-09","2015-10-16","2015-10-23","2015-10-30","2015-11-06","2015-11-13","2015-11-20","2015-11-27","2015-12-04","2015-12-11","2015-12-18","2015-12-25","2016-01-01","2016-01-08","2016-01-15","2016-01-22","2016-01-29","2016-02-05","2016-02-12","2016-02-19","2016-02-26","2016-03-04","2016-03-11","2016-03-18","2016-03-25","2016-04-01","2016-04-08","2016-04-15","2016-04-22","2016-04-29","2016-05-06","2016-05-13","2016-05-20","2016-05-27","2016-06-03","2016-06-10","2016-06-17","2016-06-24","2016-07-01","2016-07-08","2016-07-15","2016-07-22","2016-07-29","2016-08-05","2016-08-12","2016-08-19","2016-08-26","2016-09-02","2016-09-09","2016-09-16","2016-09-23","2016-09-30","2016-10-07","2016-10-14","2016-10-21","2016-10-28","2016-11-04","2016-11-11","2016-11-18","2016-11-25","2016-12-02","2016-12-09","2016-12-16","2016-12-23","2016-12-30","2017-01-06","2017-01-13","2017-01-20","2017-01-27","2017-02-03","2017-02-10","2017-02-17","2017-02-24","2017-03-03","2017-03-10","2017-03-17","2017-03-24","2017-03-31","2017-04-07","2017-04-14","2017-04-21","2017-04-28","2017-05-05","2017-05-12","2017-05-19","2017-05-26","2017-06-02","2017-06-09","2017-06-16","2017-06-23","2017-06-30","2017-07-07","2017-07-14","2017-07-21","2017-07-28","2017-08-04","2017-08-11","2017-08-18","2017-08-25","2017-09-01","2017-09-08","2017-09-15","2017-09-22","2017-09-29","2017-10-06","2017-10-13","2017-10-20","2017-10-27","2017-11-03","2017-11-10","2017-11-17","2017-11-24","2017-12-01","2017-12-08","2017-12-15","2017-12-22","2017-12-29","2018-01-05","2018-01-12","2018-01-19","2018-01-26","2018-02-02","2018-02-09","2018-02-16","2018-02-23","2018-03-02","2018-03-09","2018-03-16","2018-03-23","2018-03-30","2018-04-06","2018-04-13","2018-04-20","2018-04-27","2018-05-04","2018-05-11","2018-05-18","2018-05-25","2018-06-01","2018-06-08","2018-06-15","2018-06-22","2018-06-29","2018-07-06","2018-07-13","2018-07-20","2018-07-27","2018-08-03","2018-08-10","2018-08-17","2018-08-24","2018-08-31","2018-09-07","2018-09-14","2018-09-21","2018-09-28","2018-10-05","2018-10-12","2018-10-19","2018-10-26","2018-11-02","2018-11-09","2018-11-16","2018-11-23","2018-11-30","2018-12-07","2018-12-14","2018-12-21","2018-12-28","2019-01-04","2019-01-11","2019-01-18","2019-01-25","2019-02-01","2019-02-08","2019-02-15","2019-02-22","2019-03-01","2019-03-08","2019-03-15","2019-03-22","2019-03-29","2019-04-05","2019-04-12","2019-04-19","2019-04-26","2019-05-03","2019-05-10","2019-05-17","2019-05-24","2019-05-31","2019-06-07","2019-06-14","2019-06-21","2019-06-28","2019-07-05","2019-07-12","2019-07-19","2019-07-26","2019-08-02","2019-08-09","2019-08-16","2019-08-23","2019-08-30","2019-09-06","2019-09-13","2019-09-20","2019-09-27","2019-10-04","2019-10-11","2019-10-18","2019-10-25","2019-11-01","2019-11-08","2019-11-15","2019-11-22","2019-11-29","2019-12-06","2019-12-13","2019-12-20","2019-12-27","2020-01-03","2020-01-10","2020-01-17","2020-01-24","2020-01-31","2020-02-07","2020-02-14","2020-02-21","2020-02-28","2020-03-06","2020-03-13","2020-03-20","2020-03-27","2020-04-03","2020-04-10","2020-04-17","2020-04-24","2020-05-01","2020-05-08","2020-05-15","2020-05-22","2020-05-29","2020-06-05","2020-06-12","2020-06-19","2020-06-26","2020-07-03","2020-07-10","2020-07-17","2020-07-24","2020-07-31","2020-08-07","2020-08-14","2020-08-21","2020-08-28","2020-09-04","2020-09-11","2020-09-18","2020-09-25","2020-10-02","2020-10-09","2020-10-16","2020-10-23","2020-10-30","2020-11-06","2020-11-13","2020-11-20","2020-11-27","2020-12-04","2020-12-11","2020-12-18","2020-12-25","2021-01-01","2021-01-08","2021-01-15","2021-01-22","2021-01-29","2021-02-05","2021-02-12","2021-02-19","2021-02-26","2021-03-05","2021-03-12","2021-03-19","2021-03-26","2021-04-02","2021-04-09","2021-04-16","2021-04-23","2021-04-30","2021-05-07","2021-05-14","2021-05-21","2021-05-28","2021-06-04","2021-06-11","2021-06-18","2021-06-25","2021-07-02","2021-07-09","2021-07-16","2021-07-23","2021-07-30","2021-08-06","2021-08-13","2021-08-20","2021-08-27","2021-09-03","2021-09-10","2021-09-17","2021-09-24","2021-10-01","2021-10-08","2021-10-15","2021-10-22","2021-10-29","2021-11-05","2021-11-12","2021-11-19","2021-11-26","2021-12-03","2021-12-10","2021-12-17","2021-12-24","2021-12-31","2022-01-07","2022-01-14","2022-01-21","2022-01-28","2022-02-04","2022-02-11","2022-02-18","2022-02-25","2022-03-04","2022-03-11","2022-03-18","2022-03-25","2022-04-01","2022-04-08","2022-04-15","2022-04-22","2022-04-29","2022-05-06","2022-05-13","2022-05-20","2022-05-27","2022-06-03","2022-06-10","2022-06-17","2022-06-24","2022-07-01","2022-07-08","2022-07-15","2022-07-22","2022-07-29","2022-08-05","2022-08-12","2022-08-19","2022-08-26","2022-09-02","2022-09-09","2022-09-16","2022-09-23","2022-09-30","2022-10-07","2022-10-14","2022-10-21","2022-10-28","2022-11-04","2022-11-11","2022-11-18","2022-11-25","2022-12-02","2022-12-09","2022-12-16","2022-12-23","2022-12-30","2023-01-06","2023-01-13","2023-01-20","2023-01-27","2023-02-03","2023-02-10","2023-02-17","2023-02-24","2023-03-03","2023-03-10","2023-03-17","2023-03-24","2023-03-31","2023-04-07","2023-04-14","2023-04-21","2023-04-28","2023-05-05","2023-05-12","2023-05-19","2023-05-26","2023-06-02","2023-06-09","2023-06-16","2023-06-23","2023-06-30","2023-07-07","2023-07-14","2023-07-21","2023-07-28","2023-08-04","2023-08-11","2023-08-18","2023-08-25","2023-09-01","2023-09-08","2023-09-15","2023-09-22","2023-09-29","2023-10-06","2023-10-13","2023-10-20","2023-10-27","2023-11-03","2023-11-10","2023-11-17","2023-11-24","2023-12-01","2023-12-08","2023-12-15","2023-12-22","2023-12-29","2024-01-05","2024-01-12","2024-01-19","2024-01-26","2024-02-02","2024-02-09","2024-02-16","2024-02-23","2024-03-01","2024-03-08","2024-03-15","2024-03-22","2024-03-29","2024-04-05","2024-04-12","2024-04-19","2024-04-26","2024-05-03","2024-05-10","2024-05-17","2024-05-24","2024-05-31","2024-06-07","2024-06-14","2024-06-21","2024-06-28","2024-07-05","2024-07-12","2024-07-19","2024-07-26","2024-08-02","2024-08-09","2024-08-16","2024-08-23","2024-08-30","2024-09-06","2024-09-13","2024-09-20","2024-09-27","2024-10-04","2024-10-11","2024-10-18","2024-10-25","2024-11-01","2024-11-08","2024-11-15","2024-11-22","2024-11-29","2024-12-06","2024-12-13","2024-12-20","2024-12-27","2025-01-03","2025-01-10","2025-01-17","2025-01-24","2025-01-31","2025-02-07","2025-02-14","2025-02-21","2025-02-28","2025-03-07","2025-03-14","2025-03-21","2025-03-28","2025-04-04","2025-04-11","2025-04-18","2025-04-25","2025-05-02","2025-05-09","2025-05-16","2025-05-23","2025-05-30","2025-06-06","2025-06-13","2025-06-20","2025-06-27","2025-07-04","2025-07-11","2025-07-18","2025-07-25","2025-08-01","2025-08-08","2025-08-15","2025-08-22","2025-08-29","2025-09-05","2025-09-12","2025-09-19","2025-09-26","2025-10-03","2025-10-10","2025-10-17","2025-10-24","2025-10-31","2025-11-07","2025-11-14","2025-11-21","2025-11-28","2025-12-05","2025-12-12","2025-12-19","2025-12-26","2026-01-02","2026-01-09","2026-01-16","2026-01-23","2026-01-30","2026-02-06","2026-02-13","2026-02-20","2026-02-27","2026-03-06","2026-03-13","2026-03-20","2026-03-27","2026-04-03","2026-04-10","2026-04-17","2026-04-24","2026-05-01","2026-05-08","2026-05-15","2026-05-22","2026-05-29","2026-06-05","2026-06-12","2026-06-19","2026-06-26","2026-07-03","2026-07-10","2026-07-17","2026-07-24","2026-07-31","2026-08-07","2026-08-14","2026-08-21","2026-08-28","2026-09-04","2026-09-11","2026-09-18","2026-09-25","2026-10-02","2026-10-09","2026-10-16","2026-10-23","2026-10-30","2026-11-06","2026-11-13","2026-11-20"],"close":[662.95,685.74,703.12,671.33,686.09,697.0,686.73,685.52,663.86,680.54,653.14,671.84,705.08,711.25,714.65,712.42,707.79,730.91,694.32,689.17,709.05,696.09,693.73,705.5,702.13,709.52,720.2,745.41,726.29,714.13,723.37,698.36,685.51,658.88,667.05,642.48,646.29,636.82,631.04,578.59,613.91,597.62,615.81,610.75,592.88,608.46,629.51,652.63,683.71,662.52,676.47,643.71,665.76,670.51,691.49,660.78,653.72,674.39,663.48,600.48,574.29,598.42,613.68,586.25,571.9,605.46,624.65,650.62,659.14,675.03,666.14,681.59,671.31,673.49,669.03,645.34,637.5,633.26,665.08,695.71,705.6,699.04,689.09,675.4,685.01,701.07,723.64,742.37,766.78,773.78,779.84,797.06,801.4,806.95,768.37,801.55,804.59,835.6,837.02,809.39,814.53,818.88,802.88,837.24,872.63,890.97,847.7,892.51,900.85,927.92,906.47,908.65,924.67,930.01,962.26,964.02,963.05,976.8,973.44,973.97,991.93,1004.6,1004.35,1011.4,999.35,960.01,992.94,1005.53,1011.03,1045.24,1060.77,1084.85,1103.4,1090.05,1067.23,1088.48,1034.91,1054.9,1104.32,1107.54,1092.99,1079.45,1066.22,1071.89,1080.5,1119.34,1093.49,1146.68,1149.59,1171.74,1191.45,1219.21,1231.34,1263.55,1299.97,1303.06,1306.93,1341.69,1258.65,1238.24,1250.89,1271.17,1253.05,1325.71,1322.1,1372.03,1381.27,1317.98,1255.81,1318.32,1351.09,1363.78,1431.16,1422.54,1323.92,1328.9,1265.25,1329.4,1270.83,1258.11,1296.73,1350.46,1345.2,1390.84,1411.31,1412.29,1422.04,1371.0,1313.7,1349.19,1340.83,1359.19,1372.24,1381.64,1354.8,1323.41,1375.88,1401.2,1360.77,1377.31,1383.09,1366.74,1315.84,1253.58,1225.94,1153.0,1239.16,1229.05,1220.14,1179.24,1239.6,1157.86,1177.57,1101.29,1147.37,1143.96,1213.04,1228.33,1281.16,1287.4,1302.42,1351.18,1364.78,1363.13,1318.21,1392.36,1400.37,1395.51,1477.65,1497.12,1558.13,1547.4,1570.7,1478.87,1402.01,1311.97,1296.18,1378.81,1356.55,1410.5,1458.96,1461.7,1504.28,1523.91,1593.86,1488.43,1464.34,1479.25,1446.38,1504.92,1568.34,1605.65,1563.0,1542.87,1574.39,1591.13,1590.09,1648.67,1689.93,1736.78,1742.93,1690.79,1716.84,1724.21,1796.04,1853.87,1858.59,1853.98,1866.35,1916.62,1924.03,1789.93,1864.36,1956.56,1891.05,1705.54,1699.89,1544.26,1298.54,1488.75,1443.04,1601.73,1705.64,1702.56,1644.4,1775.61,1700.89,1802.31,1852.49,2003.76,1903.85,1966.79,1921.92,1993.61,2069.79,2068.99,2038.71,2136.41,2178.86,2200.81,2198.33,2264.14,2212.73,2136.37,2160.97,2177.84,2221.12,2398.04,2399.76,2360.23,2246.15,2529.27,2508.82,2555.5,2631.56,2793.03,2704.08,2764.74,2750.24,2795.5,2936.47,2992.77,3074.4,2887.08,2985.01,3219.87,3223.46,3067.62,2920.75,2965.09,3011.37,3106.28,3240.17,3294.53,3253.08,3196.98,3108.99,3112.03,2981.42,3052.1,3186.56,3214.14,3210.06,3152.81,3241.48,3315.83,3278.39,3145.45,3280.06,3356.53,3412.05,3335.04,3256.5,3436.45,3430.89,3416.66,3421.16,3453.92,3261.18,3246.27,3314.41,3370.28,3451.27,3756.55,3794.5,3912.02,3757.13,3804.54,3914.67,3761.04,3932.39,3946.17,3796.32,3900.61,3434.79,3303.4,3453.07,3365.25,3384.3,3452.67,3258.92,3144.15,3432.3,3525.34,3366.64,3120.16,3028.22,2989.83,2919.74,2982.06,2970.37,2882.65,3115.35,3062.59,2831.98,2578.54,2718.47,2458.46,2618.02,2693.77,2842.41,2967.14,3053.39,3067.84,2953.34,2798.44,2599.26,2721.77,2563.14,2408.9,2306.7,2356.75,2162.32,2336.69,2433.66,2398.24,2754.9,2724.03,2751.27,2771.24,2721.02,2636.1,2535.49,2532.11,2636.1,2800.66,2794.69,2945.27,3082.11,3011.15,3005.87,2935.11,3028.34,2923.93,3083.52,3121.26,3230.86,3071.77,3070.45,3021.44,2994.97,3007.69,2972.85,3203.49,3545.67,3501.4,3524.97,3673.14,3506.71,3673.06,3577.73,3750.41,3698.85,3851.76,3699.2,3514.55,3462.74,3495.65,3682.84,3565.99,3476.39,3365.29,3434.29,3475.21,3452.97,3316.14,3227.09,3454.57,3591.74,3748.65,3747.93,3738.27,3774.17,4117.0,4132.85,4175.47,3933.49,4052.43,4375.65,4342.1,4336.73,4567.3,4527.68,4615.03,4929.58,4957.78,4757.71,4908.26,4905.21,4819.13,4745.05,4306.87,4735.29,4716.19,4808.03,4983.02,5220.92,5123.36,5287.24,5598.31,5538.54,5472.26,5656.31,5775.19,5267.16,5103.13,4607.76,4709.45,5170.25,5228.65,5158.82,4528.22,4980.49,5000.06,5217.23,5206.84,5335.94,5208.62,5212.83,5001.43,5290.52,4833.59,4955.8,4926.56,5061.3,5149.78,4964.91,5122.97,5163.65,5037.47,5309.74,5341.94,5015.85,5009.34,5160.94,5136.59,4766.75,4629.59,4598.79,4557.95,4284.91,3597.66,3990.9,3832.47,4251.61,4397.05,4466.5,4922.19,4702.38,4758.06,5038.06,5112.24,5211.48,5544.99,5647.12,5696.29,5732.62,5645.86,5527.61,5678.02,5752.74,5754.46,5668.94,5761.4,6001.74,6232.25,6305.05,6583.74,6407.6,6777.98,6976.94,7228.66,6947.36,6811.2,6406.43,7025.15,7294.84,7033.57,7067.87,7207.64,7367.47,7638.78,7927.41,7957.93,7998.47,8048.62,8137.86,8260.42,8098.37,7514.74,7646.64,7670.61,7457.67,7833.39,8889.83,9555.88,10513.66,10595.34,11775.5,11588.46,12202.54,12829.38,12220.76,13371.47,14341.78,13203.57,12626.22,12967.16,11673.89,11818.88,11311.08,12356.79,12417.05,11740.37,11469.66,11735.26,11824.0,11921.69,12668.93,13136.67,12572.42,11137.29,10779.46,10688.8,9390.25,10146.32,8408.59],"dd":[0.0,0.0,0.0,-4.5,-2.4,-0.9,-2.3,-2.5,-5.6,-3.2,-7.1,-4.4,0.0,0.0,0.0,-0.3,-1.0,0.0,-5.0,-5.7,-3.0,-4.8,-5.1,-3.5,-3.9,-2.9,-1.5,0.0,-2.6,-4.2,-3.0,-6.3,-8.0,-11.6,-10.5,-13.8,-13.3,-14.6,-15.3,-22.4,-17.6,-19.8,-17.4,-18.1,-20.5,-18.4,-15.5,-12.4,-8.3,-11.1,-9.2,-13.6,-10.7,-10.0,-7.2,-11.4,-12.3,-9.5,-11.0,-19.4,-23.0,-19.7,-17.7,-21.4,-23.3,-18.8,-16.2,-12.7,-11.6,-9.4,-10.6,-8.6,-9.9,-9.6,-10.2,-13.4,-14.5,-15.0,-10.8,-6.7,-5.3,-6.2,-7.6,-9.4,-8.1,-5.9,-2.9,-0.4,0.0,0.0,0.0,0.0,0.0,0.0,-4.8,-0.7,-0.3,0.0,0.0,-3.3,-2.7,-2.2,-4.1,0.0,0.0,0.0,-4.9,0.0,0.0,0.0,-2.3,-2.1,-0.4,0.0,0.0,0.0,-0.1,0.0,-0.3,-0.3,0.0,0.0,-0.0,0.0,-1.2,-5.1,-1.8,-0.6,-0.0,0.0,0.0,0.0,0.0,-1.2,-3.3,-1.4,-6.2,-4.4,0.0,0.0,-1.3,-2.5,-3.7,-3.2,-2.4,0.0,-2.3,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,-6.2,-7.7,-6.8,-5.3,-6.6,-1.2,-1.5,0.0,0.0,-4.6,-9.1,-4.6,-2.2,-1.3,0.0,-0.6,-7.5,-7.1,-11.6,-7.1,-11.2,-12.1,-9.4,-5.6,-6.0,-2.8,-1.4,-1.3,-0.6,-4.2,-8.2,-5.7,-6.3,-5.0,-4.1,-3.5,-5.3,-7.5,-3.9,-2.1,-4.9,-3.8,-3.4,-4.5,-8.1,-12.4,-14.3,-19.4,-13.4,-14.1,-14.7,-17.6,-13.4,-19.1,-17.7,-23.0,-19.8,-20.1,-15.2,-14.2,-10.5,-10.0,-9.0,-5.6,-4.6,-4.8,-7.9,-2.7,-2.2,-2.5,0.0,0.0,0.0,-0.7,0.0,-5.8,-10.7,-16.5,-17.5,-12.2,-13.6,-10.2,-7.1,-6.9,-4.2,-3.0,0.0,-6.6,-8.1,-7.2,-9.3,-5.6,-1.6,0.0,-2.7,-3.9,-1.9,-0.9,-1.0,0.0,0.0,0.0,0.0,-3.0,-1.5,-1.1,0.0,0.0,0.0,-0.2,0.0,0.0,0.0,-7.0,-3.1,0.0,-3.3,-12.8,-13.1,-21.1,-33.6,-23.9,-26.2,-18.1,-12.8,-13.0,-16.0,-9.2,-13.1,-7.9,-5.3,0.0,-5.0,-1.8,-4.1,-0.5,0.0,-0.0,-1.5,0.0,0.0,0.0,-0.1,0.0,-2.3,-5.6,-4.6,-3.8,-1.9,0.0,0.0,-1.6,-6.4,0.0,-0.8,0.0,0.0,0.0,-3.2,-1.0,-1.5,0.0,0.0,0.0,0.0,-6.1,-2.9,0.0,0.0,-4.8,-9.4,-8.0,-6.6,-3.6,0.0,0.0,-1.3,-3.0,-5.6,-5.5,-9.5,-7.4,-3.3,-2.4,-2.6,-4.3,-1.6,0.0,-1.1,-5.1,-1.1,0.0,0.0,-2.3,-4.6,0.0,-0.2,-0.6,-0.4,0.0,-5.6,-6.0,-4.0,-2.4,-0.1,0.0,0.0,0.0,-4.0,-2.7,0.0,-3.9,0.0,0.0,-3.8,-1.2,-13.0,-16.3,-12.5,-14.7,-14.2,-12.5,-17.4,-20.3,-13.0,-10.7,-14.7,-20.9,-23.3,-24.2,-26.0,-24.4,-24.7,-27.0,-21.1,-22.4,-28.2,-34.7,-31.1,-37.7,-33.7,-31.7,-28.0,-24.8,-22.6,-22.3,-25.2,-29.1,-34.1,-31.0,-35.0,-39.0,-41.5,-40.3,-45.2,-40.8,-38.3,-39.2,-30.2,-31.0,-30.3,-29.8,-31.0,-33.2,-35.7,-35.8,-33.2,-29.0,-29.2,-25.4,-21.9,-23.7,-23.8,-25.6,-23.3,-25.9,-21.9,-20.9,-18.1,-22.2,-22.2,-23.4,-24.1,-23.8,-24.7,-18.8,-10.1,-11.3,-10.7,-6.9,-11.1,-6.9,-9.3,-5.0,-6.3,-2.4,-6.3,-10.9,-12.3,-11.4,-6.7,-9.6,-11.9,-14.7,-13.0,-11.9,-12.5,-16.0,-18.2,-12.5,-9.0,-5.0,-5.0,-5.3,-4.4,0.0,0.0,0.0,-5.8,-2.9,0.0,-0.8,-0.9,0.0,-0.9,0.0,0.0,0.0,-4.0,-1.0,-1.1,-2.8,-4.3,-13.1,-4.5,-4.9,-3.0,0.0,0.0,-1.9,0.0,0.0,-1.1,-2.3,0.0,0.0,-8.8,-11.6,-20.2,-18.5,-10.5,-9.5,-10.7,-21.6,-13.8,-13.4,-9.7,-9.8,-7.6,-9.8,-9.7,-13.4,-8.4,-16.3,-14.2,-14.7,-12.4,-10.8,-14.0,-11.3,-10.6,-12.8,-8.1,-7.5,-13.1,-13.3,-10.6,-11.1,-17.5,-19.8,-20.4,-21.1,-25.8,-37.7,-30.9,-33.6,-26.4,-23.9,-22.7,-14.8,-18.6,-17.6,-12.8,-11.5,-9.8,-4.0,-2.2,-1.4,-0.7,-2.2,-4.3,-1.7,-0.4,-0.4,-1.8,-0.2,0.0,0.0,0.0,0.0,-2.7,0.0,0.0,0.0,-3.9,-5.8,-11.4,-2.8,0.0,-3.6,-3.1,-1.2,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,-2.0,-9.0,-7.4,-7.1,-9.7,-5.2,0.0,0.0,0.0,0.0,0.0,-1.6,0.0,0.0,-4.7,0.0,0.0,-7.9,-12.0,-9.6,-18.6,-17.6,-21.1,-13.8,-13.4,-18.1,-20.0,-18.2,-17.6,-16.9,-11.7,-8.4,-12.3,-22.3,-24.8,-25.5,-34.5,-29.3,-41.4],"rebuilt":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,578.59,617.07,602.66,625.28,619.32,606.3,625.11,646.86,667.92,703.04,677.01,683.66,647.91,678.45,684.01,708.89,680.42,671.97,696.33,685.51,620.48,587.96,606.65,625.05,591.78,578.53,606.07,627.94,656.47,668.85,687.6,677.59,692.69,682.62,685.05,686.15,662.43,657.34,656.53,683.31,716.82,722.08,720.29,714.21,700.9,717.16,737.47,760.9,772.01,790.93,802.5,806.15,825.3,828.02,834.15,796.37,838.67,835.25,867.08,871.13,849.2,841.27,842.77,825.88,857.41,885.94,908.21,866.32,909.89,920.48,949.41,927.71,927.54,940.09,943.39,973.71,969.72,964.45,979.78,980.83,981.81,998.18,1001.77,1001.25,1013.92,1001.42,964.34,996.1,1003.8,1012.24,1042.21,1054.08,1079.3,1097.24,1085.43,1068.31,1082.43,1035.56,1054.25,1104.93,1107.71,1096.72,1097.64,1080.29,1086.13,1084.86,1119.86,1096.78,1152.9,1155.85,1178.82,1202.83,1229.56,1242.98,1288.58,1337.01,1336.43,1336.49,1362.52,1295.23,1269.37,1288.52,1318.14,1299.4,1354.88,1342.85,1387.34,1425.07,1342.39,1293.61,1357.43,1396.89,1408.11,1474.77,1471.01,1380.17,1395.56,1319.47,1397.06,1355.81,1352.11,1381.67,1445.26,1434.09,1490.39,1520.3,1520.65,1523.66,1468.0,1395.39,1435.02,1425.13,1427.84,1411.35,1427.5,1408.52,1367.96,1428.02,1455.85,1416.56,1428.37,1436.41,1441.09,1395.5,1321.67,1281.0,1204.97,1284.35,1284.93,1256.7,1199.36,1271.74,1185.01,1216.02,1133.17,1179.4,1175.81,1245.82,1264.05,1282.85,1291.07,1306.92,1365.82,1375.94,1374.67,1338.16,1415.23,1423.33,1422.0,1496.99,1512.67,1564.04,1517.82,1535.12,1430.33,1362.81,1284.18,1262.77,1345.8,1328.27,1377.8,1427.96,1428.42,1474.36,1484.6,1550.16,1447.86,1422.23,1434.38,1404.76,1469.85,1537.72,1570.58,1528.92,1503.87,1535.29,1551.55,1552.59,1625.03,1650.72,1706.67,1709.91,1681.32,1704.12,1702.73,1761.05,1821.57,1829.33,1828.4,1830.37,1875.56,1940.07,1816.48,1897.83,1993.01,1934.23,1719.45,1714.83,1578.51,1327.57,1534.59,1505.09,1651.47,1764.58,1751.04,1691.86,1816.31,1774.94,1875.85,1908.83,2023.5,1923.29,1977.62,1928.9,1998.33,2068.34,2054.05,1988.32,2057.81,2119.72,2151.2,2188.98,2255.17,2215.13,2135.81,2153.05,2195.58,2232.37,2365.45,2388.07,2319.57,2179.72,2439.68,2384.31,2411.27,2473.76,2634.15,2538.33,2578.78,2550.14,2600.3,2703.81,2742.81,2819.12,2673.72,2764.27,2974.94,2983.5,2838.27,2712.72,2755.71,2802.4,2865.87,2971.7,3053.8,3038.7,2946.06,2882.82,2882.48,2760.51,2835.67,2967.01,3023.54,3018.21,2992.47,3063.98,3171.6,3125.08,2978.29,3095.23,3168.53,3240.62,3174.61,3126.82,3307.05,3298.95,3277.54,3269.09,3300.16,3140.59,3136.25,3219.22,3270.48,3388.8,3760.26,3821.93,3989.09,3852.48,3835.24,3913.35,3754.01,3940.66,3940.02,3758.98,3836.8,3376.54,3278.0,3441.4,3349.23,3343.79,3432.14,3283.32,3154.76,3478.95,3613.06,3456.44,3182.71,3046.1,2976.27,2884.16,2960.82,2926.22,2815.53,3061.09,3015.9,2773.3,2543.83,2681.71,2428.0,2595.32,2648.5,2800.95,2889.48,2986.74,2997.73,2879.7,2705.83,2482.85,2591.04,2427.94,2290.58,2193.03,2229.13,2074.94,2233.24,2362.5,2354.8,2675.34,2605.62,2656.65,2694.2,2657.17,2592.89,2487.71,2477.06,2583.87,2730.94,2743.04,2912.91,3047.61,2985.52,2986.22,2974.76,3087.76,3005.78,3226.28,3281.13,3397.94,3270.6,3255.49,3239.7,3248.2,3280.72,3242.82,3508.45,3992.97,3998.52,3993.83,4260.04,4103.59,4231.06,4157.92,4378.19,4330.63,4530.36,4362.45,4095.67,4140.68,4268.72,4496.28,4321.6,4211.44,4044.98,4158.1,4274.8,4271.73,4029.88,3941.3,4288.86,4537.36,4688.2,4641.33,4579.48,4633.75,5006.77,5021.76,5089.05,4875.32,5168.72,5608.33,5604.51,5776.41,6130.05,6125.19,6418.41,6799.53,6944.82,6800.46,7172.49,7034.5,6872.03,6820.82,6072.65,6765.22,6754.23,6880.07,7136.97,7760.28,7777.46,8285.58,8995.57,8746.49,8563.42,8801.51,8990.02,8204.41,7900.47,7320.67,7306.38,8356.0,8556.88,8148.34,7077.49,8056.81,8008.61,8353.1,8481.03,8915.55,8905.54,9000.72,8652.93,9332.95,8746.37,8789.71,8638.06,8890.79,8883.44,8771.95,9073.62,9294.18,8885.12,9181.47,9402.9,8312.78,8661.2,9137.79,8926.54,8285.7,7772.6,8095.98,7912.97,7364.29,6286.09,7298.8,6809.83,7507.09,7743.73,7924.02,8963.75,8682.9,8937.31,9350.42,9426.04,9567.91,10370.94,10514.31,10764.38,11090.82,11099.21,11047.02,11562.83,11556.35,11389.37,11248.89,11246.69,11929.66,11914.15,11985.15,12501.42,12204.89,12609.33,12892.03,13677.41,12899.32,12901.75,12218.78,12904.58,13139.2,12579.47,12710.47,13219.68,13246.59,13340.61,13612.26,13523.27,13765.06,13510.77,13449.04,13811.06,13188.61,12890.12,13079.72,12779.14,12324.78,12993.28,14423.27,15478.15,16450.7,16297.43,18087.65,18123.52,18063.06,18710.15,17422.33,18408.19,19464.46,18089.44,17622.46,18610.17,17234.35,17614.65,16960.67,18529.58,18569.62,17595.15,17508.37,18177.45,17901.34,18180.8,18918.62,19447.05,18843.06,17068.46,16695.22,16389.49,14589.96,14758.1,13621.17]},"candles":{"dates":["2026-05-19","2026-05-20","2026-05-21","2026-05-22","2026-05-26","2026-05-27","2026-05-28","2026-05-29","2026-06-01","2026-06-02","2026-06-03","2026-06-04","2026-06-05","2026-06-08","2026-06-09","2026-06-10","2026-06-11","2026-06-12","2026-06-15","2026-06-16","2026-06-17","2026-06-18","2026-06-22","2026-06-23","2026-06-24","2026-06-25","2026-06-26","2026-06-29","2026-06-30","2026-07-01","2026-07-02","2026-07-06","2026-07-07","2026-07-08","2026-07-09","2026-07-10","2026-07-13","2026-07-14","2026-07-15","2026-07-16","2026-07-17","2026-07-20","2026-07-21","2026-07-22","2026-07-23","2026-07-24","2026-07-27","2026-07-28","2026-07-29","2026-07-30","2026-07-31","2026-08-03","2026-08-04","2026-08-05","2026-08-06","2026-08-07","2026-08-10","2026-08-11","2026-08-12","2026-08-13","2026-08-14","2026-08-17","2026-08-18","2026-08-19","2026-08-20","2026-08-21","2026-08-24","2026-08-25","2026-08-26","2026-08-27","2026-08-28","2026-08-31","2026-09-01","2026-09-02","2026-09-03","2026-09-04","2026-09-08","2026-09-09","2026-09-10","2026-09-11","2026-09-14","2026-09-15","2026-09-16","2026-09-17","2026-09-18","2026-09-21","2026-09-22","2026-09-23","2026-09-24","2026-09-25","2026-09-28","2026-09-29","2026-09-30","2026-10-01","2026-10-02","2026-10-05","2026-10-06","2026-10-07","2026-10-08","2026-10-09","2026-10-12","2026-10-13","2026-10-14","2026-10-15","2026-10-16","2026-10-19","2026-10-20","2026-10-21","2026-10-22","2026-10-23","2026-10-26","2026-10-27","2026-10-28","2026-10-29","2026-10-30","2026-11-02","2026-11-03","2026-11-04","2026-11-05","2026-11-06","2026-11-09","2026-11-10","2026-11-11","2026-11-12","2026-11-13","2026-11-16","2026-11-17","2026-11-18","2026-11-19","2026-11-20"],"o":[11053.99,11580.08,11826.09,12070.17,12616.63,13029.79,12748.59,12973.77,12706.62,13242.7,13971.15,13243.66,13062.55,12838.88,13142.99,12501.84,12506.65,13053.93,13901.24,13968.28,13694.01,14084.76,14607.05,13586.29,13484.17,14156.43,13419.14,13241.97,13787.92,13718.08,13268.22,12914.47,12375.86,12277.28,13119.41,12779.22,12563.63,12837.38,12774.43,12114.97,11485.89,11952.7,12311.28,12123.32,12235.8,12131.29,11888.9,11150.04,11011.87,11085.96,11715.46,11046.09,11834.77,12141.69,11825.86,12299.98,12424.67,12135.41,12518.94,12413.97,12440.5,12615.71,12166.12,12063.85,11762.11,11901.79,11513.88,11583.05,11564.43,11870.16,11731.58,11529.16,11296.63,11243.55,11219.44,11508.7,11987.29,11866.5,11663.0,11753.87,11191.82,11233.04,11347.68,11568.47,11691.0,12145.92,12338.88,12659.08,12309.09,12565.84,12595.14,12667.37,12665.67,12651.56,13130.76,13148.84,13260.97,12932.51,12842.79,12796.0,12361.24,11959.54,11960.04,11280.89,11345.01,11466.12,11170.58,11494.43,11049.07,10675.54,10843.37,11251.73,11557.38,11496.2,10855.81,10762.48,10574.1,10485.88,9806.31,9495.21,9496.83,9876.81,10469.04,10174.12,10412.08,9685.03,9698.26,9788.63,9938.33,9160.8],"h":[11513.99,11818.39,12003.01,12304.52,12932.81,13037.91,12961.19,13115.28,13088.01,13733.72,13998.14,13819.62,13111.44,13129.02,13264.12,12870.53,13194.28,13513.44,14134.6,14133.6,13965.6,14461.79,14655.29,13857.16,13597.38,14194.68,13519.55,13733.35,14332.76,13844.42,13526.72,13252.54,12417.51,12615.37,13249.07,13065.02,12646.78,12846.29,12785.4,12191.41,11939.44,12071.83,12404.11,12525.71,12480.88,12261.52,11949.46,11187.44,11125.05,11406.82,11885.74,11495.28,12258.08,12361.25,12288.56,12425.74,12432.94,12204.46,12531.76,12704.38,12495.15,12770.71,12228.06,12138.51,11863.72,11943.96,11513.88,11708.13,11632.43,11910.03,11794.28,11587.26,11389.62,11388.99,11371.33,11750.25,12023.86,12016.09,11733.68,11910.2,11285.3,11304.24,11413.46,11643.88,11922.95,12491.61,12708.34,12660.91,12517.92,12732.78,12665.4,12773.89,12731.1,12913.4,13269.33,13179.71,13349.96,13082.11,12997.48,12826.67,12378.31,12217.21,12022.21,11620.14,11480.76,11550.92,11460.13,11562.25,11140.33,10923.18,11182.46,11527.33,11731.3,11620.79,10957.32,10890.94,10761.85,10652.02,9838.13,9627.26,10116.64,10197.21,10787.05,10688.24,10461.98,9818.76,9745.95,9828.19,10109.88,9204.42],"l":[10895.75,11528.13,11739.81,12069.04,12548.24,12452.36,12528.69,12737.19,12631.03,13202.18,13554.37,13041.28,12217.32,12676.74,11794.15,12157.66,12475.23,12986.06,13860.32,13291.75,13471.22,14062.28,14393.89,13374.44,13115.83,13379.94,13159.24,12782.53,13750.67,13322.63,12374.41,12890.62,11960.84,12215.22,12915.54,12656.87,12289.05,12489.54,12022.94,11768.96,11194.6,11718.21,12085.99,12113.95,12188.05,11711.39,11217.35,10799.84,10445.44,10963.89,11231.79,10922.31,11834.77,11979.94,11707.78,12082.63,11992.95,12006.51,12386.31,12398.82,12269.44,12548.76,11828.46,11633.8,11649.47,11631.72,11263.34,11494.78,11471.03,11690.19,11435.7,11444.21,11172.9,11154.67,11056.38,11467.34,11843.26,11854.22,11561.04,11711.33,11110.11,11128.88,11132.26,11533.95,11686.09,12059.3,12338.52,12371.37,12258.39,12549.59,12277.41,12588.86,12555.65,12587.34,13082.01,13004.67,13196.5,12864.94,12483.95,12507.88,12216.45,11861.28,11638.92,11171.53,11128.08,11293.45,11043.24,11355.29,10666.41,10667.92,10823.85,11217.67,11488.36,11363.8,10439.01,10300.97,10530.68,10064.73,8997.39,9221.35,9467.26,9777.17,10287.32,10174.12,9828.98,9587.11,9295.02,9493.93,9412.19,8342.21],"c":[11305.5,11813.29,11964.08,12202.54,12876.91,12702.19,12829.14,12829.38,12965.65,13726.27,13916.96,13617.5,12220.76,12906.69,12657.81,12206.46,13171.44,13371.47,14099.62,13294.22,13477.07,14341.78,14634.72,13482.51,13458.2,13940.87,13203.57,13709.66,14246.96,13353.28,12626.22,12900.14,12300.52,12574.97,12960.0,12967.16,12347.78,12661.93,12398.89,11867.5,11673.89,11743.85,12356.16,12410.67,12343.84,11818.88,11554.88,11035.68,10447.49,11302.99,11311.08,11430.35,12179.26,12008.88,12048.69,12356.79,11993.86,12098.47,12399.38,12456.0,12417.05,12621.0,11992.46,11738.23,11800.02,11740.37,11423.17,11588.04,11611.24,11882.17,11469.66,11535.05,11288.61,11339.25,11352.13,11735.26,11887.87,11931.32,11614.17,11824.0,11131.28,11175.55,11246.11,11599.49,11921.69,12433.17,12689.82,12534.28,12492.54,12668.93,12465.24,12629.16,12628.62,12829.0,13136.67,13172.74,13217.82,13066.15,12623.71,12572.42,12236.79,12208.79,11684.38,11581.21,11137.29,11316.34,11283.81,11505.56,10731.98,10779.46,11083.47,11482.5,11684.0,11518.2,10688.8,10328.33,10600.4,10268.65,9011.14,9390.25,10033.93,9998.33,10564.11,10506.67,10146.32,9610.65,9642.88,9652.8,9419.72,8408.59],"ma50":[9340.53,9419.49,9500.48,9591.67,9696.27,9794.39,9894.24,9994.92,10096.97,10218.08,10340.96,10455.86,10540.92,10647.33,10751.33,10852.62,10964.28,11075.67,11200.99,11308.55,11418.02,11534.63,11653.54,11745.39,11833.76,11928.1,12007.38,12094.99,12188.81,12263.89,12323.47,12383.29,12427.73,12468.96,12520.0,12578.63,12620.16,12663.32,12699.39,12726.05,12739.92,12745.34,12769.24,12781.94,12787.2,12789.23,12779.97,12759.21,12736.39,12736.4,12736.51,12728.85,12733.16,12729.28,12712.72,12705.81,12689.1,12674.49,12663.16,12637.75,12607.76,12587.83,12583.26,12559.89,12542.74,12533.41,12498.45,12462.78,12413.01,12384.77,12344.62,12288.49,12221.57,12178.7,12136.58,12092.47,12066.15,12030.59,11977.93,11947.35,11917.45,11882.95,11861.87,11842.36,11821.59,11810.91,11817.75,11815.2,11817.07,11833.1,11848.93,11866.63,11872.08,11880.45,11896.31,11923.38,11956.64,11997.25,12040.78,12066.16,12084.68,12100.25,12090.35,12081.8,12063.57,12042.76,12028.56,12016.7,11983.35,11949.82,11923.15,11900.38,11894.21,11889.81,11867.59,11839.34,11822.89,11796.5,11744.5,11694.66,11665.95,11635.21,11620.72,11604.07,11579.95,11537.46,11492.56,11446.99,11403.1,11334.79],"ma200":[7556.11,7587.05,7619.06,7652.33,7688.54,7723.66,7759.46,7794.4,7829.77,7868.97,7909.79,7949.0,7981.74,8018.12,8053.4,8085.66,8122.73,8160.55,8201.93,8239.13,8278.17,8321.85,8367.06,8406.14,8444.62,8485.28,8522.2,8560.95,8602.21,8638.97,8671.8,8705.91,8737.11,8768.59,8802.23,8835.41,8865.61,8897.44,8928.01,8955.82,8982.61,9009.48,9038.76,9067.69,9096.49,9121.71,9146.31,9167.19,9185.22,9209.7,9232.64,9256.94,9284.0,9310.04,9336.4,9363.76,9389.53,9416.63,9444.39,9471.79,9498.04,9525.17,9548.49,9571.1,9593.96,9616.3,9638.52,9660.51,9683.48,9708.15,9729.71,9752.49,9773.52,9796.12,9818.83,9843.98,9870.66,9896.97,9923.28,9950.37,9972.51,9994.81,10016.55,10039.42,10063.92,10090.34,10117.39,10143.98,10169.97,10196.44,10221.9,10247.71,10273.8,10302.77,10333.5,10364.58,10397.19,10428.2,10455.98,10483.11,10508.38,10533.4,10555.78,10577.8,10597.64,10618.8,10638.38,10658.68,10674.09,10690.11,10708.34,10727.56,10747.61,10766.46,10781.4,10793.85,10807.22,10819.59,10824.43,10831.11,10841.49,10851.85,10864.08,10875.08,10884.21,10892.27,10899.81,10908.25,10917.25,10921.22]},"events":[{"id":"E01","date":"2026-10-12","cat":"industry","title":"光通訊股集體重挫","detail":"Ciena、Lumentum 單日約跌 10%、Coherent 約跌 8%；三家公司前一週皆無公告，報導歸因於漲多後獲利了結與資金轉向防禦類股。","source":"TIKR；247 Wall St.","url":"https://www.tikr.com/blog/coherent-stock-falls-nearly-8-as-ciena-and-lumentum-drop-about-10-heres-where-the-stock-could-go-by-2031","move":-2.67,"upcoming":false},{"id":"E02","date":"2026-10-13","cat":"stock","title":"大型銀行財報分歧","detail":"Goldman Sachs 第三季 EPS 17.01 美元遠優於預期（股票交易收入年增 72%）；JPMorgan EPS 5.57 美元低於預期，約三年來首次不如預期；Wells Fargo 營收低於預期。","source":"24/7 Wall St.","url":"https://247wallst.com/investing/2026/10/13/goldman-sachs-rises-on-equities-led-earnings-beat-jpmorgan-chase-treads-water-wells-fargo-declines-3/","move":-0.23,"upcoming":false},{"id":"E03","date":"2026-10-14","cat":"macro","title":"9 月 CPI 高於預期","detail":"CPI 年增 3.7%（預期 3.6%）、核心 CPI 月增 0.3%（預期 0.2%），汽油單月漲 9.1%；市場一度定價 10 月升息機率逾五成。","source":"investingLive","url":"https://investinglive.com/news/us-september-cpi-vs-3-6-expected-0/","move":-4.3,"upcoming":false},{"id":"E04","date":"2026-10-14","cat":"industry","title":"Barclays 下調 AI 硬體股評等","detail":"Barclays 將 Dell、HPE、NetApp 降評，認為企業客戶的 AI 支出未見「實質拐點」；Oracle 同日重挫約 9%，AI 相關股市值估計蒸發約 800 億美元。","source":"Barchart","url":"https://www.barchart.com/story/news/36602262/why-dell-dell-shares-are-falling-today","move":-4.3,"upcoming":false},{"id":"E05","date":"2026-10-16","cat":"macro","title":"油價逼近 100 美元、科技股領跌","detail":"WTI 收 99.04 美元；科技類 ETF 約跌 3%、能源類 ETF 約漲 2.5%，那斯達克約跌 2.1%。","source":"Thrive in Markets","url":"https://thriveinmarkets.com/market-insights/evening-review-2026-10-16/","move":-3.83,"upcoming":false},{"id":"E06","date":"2026-10-20","cat":"stock","title":"Equifax、Hasbro 財報後大漲","detail":"兩家公司公布財報後同列當日最大漲幅（3M、KeyCorp 亦在列）。","source":"Cantech Letter","url":"https://www.cantechletter.com/newswires/outside-big-tech-tuesdays-earnings-winners-jumped-as-much-as-11/","move":-0.29,"upcoming":false},{"id":"E07","date":"2026-10-21","cat":"macro","title":"伊朗供應疑慮推升油價","detail":"原油連續四週上漲，報導歸因於伊朗供應減少與全球需求強勁；OPEC 官員表示增產能否補足缺口仍不確定。","source":"Oil & Gas 360","url":"https://www.oilandgas360.com/?p=821937","move":1.97,"upcoming":false},{"id":"E08","date":"2026-10-22","cat":"industry","title":"半導體設備股重挫","detail":"Lam Research 財報與財測皆優於預期但幅度有限，股價跳空走低；同日那斯達克約跌 2.6%，必需消費與公用事業逆勢上漲。","source":"XTB；Tapeboard","url":"https://www.xtb.com/en/market-analysis/lam-research-strong-numbers-limited-upside-surprise","move":-6.72,"upcoming":false},{"id":"E09","date":"2026-10-22","cat":"stock","title":"Moderna 重挫","detail":"癌症疫苗三期早期結果外洩，加上多家券商調整目標價，其中 Citi 給予賣出評等。","source":"Trefis","url":"https://www.trefis.com/articles/620111/how-much-downside-is-left-in-moderna-stock/2026-10-23","move":-6.72,"upcoming":false},{"id":"E10","date":"2026-10-22","cat":"stock","title":"Pool Corp 財報後大漲","detail":"第三季財報於盤前公布，股價當日大漲；Goldman Sachs 下調目標價但維持買進。","source":"StocksToTrade","url":"https://stockstotrade.com/news/pool-corporation-pool-news-2026_10_22/","move":-6.72,"upcoming":false},{"id":"E11","date":"2026-10-23","cat":"macro","title":"AI 交易疑慮未散、等待巨頭財報","detail":"路透：標普 500 收 7623.86 點、跌 0.52%；市場仍在消化對 AI 交易的質疑，下週約三分之一成分股公布財報，含三家 AI 雲端巨頭的資本支出計畫。","source":"Reuters（Virginia Business 轉載）","url":"https://virginiabusiness.com/sp-500-closes-lower-ai-trade-earnings-outlook/","move":0.44,"upcoming":false},{"id":"E12","date":"2026-10-28","cat":"macro","title":"FOMC 維持利率不變","detail":"聯準會將聯邦基金利率目標區間維持在 3.75%–4.00%，決議票數 10 比 2，兩位反對者皆主張升息；市場仍在定價 12 月升息的可能。","source":"Federal Reserve；Admiral Markets","url":"https://federalreserve.gov/newsevents/pressreleases/monetary20261028a.htm","move":1.75,"upcoming":false},{"id":"E13","date":"2026-10-29","cat":"stock","title":"Alphabet 財報後重挫","detail":"10-28 盤後公布第三季財報：營收 1,276 億美元略低於預期，EPS 2.12 美元遠低於約 3 美元的預期，資本支出使自由現金流轉負；2026 年資本支出指引維持 1,950–2,050 億美元，並預期 2027 年續增。","source":"XTB","url":"https://www.xtb.com/en/market-analysis/news-and-research/alphabet-disappoints-wall-street-despite-record-results-shares-plunge-over-8-and-test-300","move":-1.42,"upcoming":false},{"id":"E14","date":"2026-10-29","cat":"industry","title":"軟體股財報後重挫","detail":"Fortinet 第三季獲利優於預期，但服務營收成長放緩、全年服務營收預估下修；ServiceNow 財測疲弱。軟體類股普遍走弱。","source":"24/7 Wall St.；Trefis","url":"https://247wallst.com/investing/2026/10/29/software-stocks-are-getting-crushed-again-after-hours/","move":-1.42,"upcoming":false},{"id":"E15","date":"2026-10-30","cat":"stock","title":"Intel 財測疲弱、創 1974 年來最大跌幅","detail":"10-29 盤後公布第三季財報，第四季財測遠低於市場預期，報導歸因於 PC 市場轉弱與記憶體供應問題；分析師隨後下修目標價與獲利預估。","source":"Koala Gains","url":"https://koalagains.com/daily-top-movers/top-losers/details/489ce2f1-82f6-4c7a-816b-b69190813034","move":-7.2,"upcoming":false},{"id":"E18","date":"2026-11-04","cat":"macro","title":"期中選舉結果衝擊 AI 電力股","detail":"民主黨贏得國會，德州新任州長當選人主張暫停新建資料中心；Vistra、Vertiv、GE Vernova 等 AI 電力與資料中心設備股重挫，大盤則上漲。","source":"TIKR","url":"https://www.tikr.com/blog/vertiv-sinks-9-ge-vernova-down-8-as-democrats-win-congress-reviving-data-center-fears","move":-3.13,"upcoming":false},{"id":"E19","date":"2026-11-04","cat":"stock","title":"FIS 財報後重挫","detail":"Fidelity National Information Services 公布第三季財報，疲弱的展望蓋過季度結果，股價大跌；公司 8 月已下修過全年財測。","source":"FinChannel","url":"https://finchannel.com/?p=140597","move":-3.13,"upcoming":false},{"id":"E20","date":"2026-11-05","cat":"industry","title":"記憶體與 AI 晶片股全面重挫","detail":"記憶體、半導體與 AI 硬體股同步大跌，那斯達克跌逾 4%；Trefis 指出記憶體股自 11-03 起已轉弱。FXStreet 的盤勢評論將部分恐慌歸因於市場擔心民主黨推動 AI 監管（屬評論觀點）。","source":"Trefis；FXStreet","url":"https://www.trefis.com/stock/mu/articles/623345/what-sent-micron-stock-lower/2026-11-06","move":-12.25,"upcoming":false},{"id":"E17","date":"2026-11-06","cat":"macro","title":"10 月非農就業遠優於預期","detail":"10 月非農新增 16.5 萬人，遠高於約 6 萬人的預期；民間部門新增 15.9 萬人。是聯準會 12 月會議前的關鍵數據。","source":"First Trust","url":"https://www.ftportfolios.com/Commentary/EconomicResearch/2026/11/6/nonfarm-payrolls-increased-165,000-in-october","move":4.21,"upcoming":false},{"id":"E21","date":"2026-11-09","cat":"industry","title":"晶片股自前週 AI 賣壓反彈","detail":"科技股與晶片股從前一週的 AI 賣壓反彈，Nasdaq 100 大漲；同日 Nvidia 下跌。","source":"StockAnalysis","url":"https://stockanalysis.com/news/nasdaq-100-rallies-after-ai-selloff-nvidia-falls/","move":6.85,"upcoming":false},{"id":"E22","date":"2026-11-10","cat":"macro","title":"10 月 CPI 高於預期","detail":"10 月消費者物價月增 0.4%（預期 0.3%），核心月增 0.3%（預期 0.2%），升息疑慮升溫。","source":"CNBC","url":"https://www.cnbc.com/2026/11/10/cpi-inflation-report-october-2026.html","move":-0.35,"upcoming":false},{"id":"E23","date":"2026-11-10","cat":"stock","title":"Nvidia 受調查疑慮拖累","detail":"熱 CPI 與市場對 Nvidia 的審查疑慮同日衝擊美股。","source":"Finimize","url":"https://finimize.com/content/hotter-cpi-and-nvidia-scrutiny-rattle-us-stocks","move":-0.35,"upcoming":false},{"id":"E24","date":"2026-11-11","cat":"industry","title":"CoreWeave 財報帶動記憶體股反彈","detail":"CoreWeave 財報重新點燃 AI 交易，Seagate、Sandisk、Micron 等記憶體與儲存股大漲。","source":"24/7 Wall St.","url":"https://247wallst.com/investing/2026/11/11/seagate-spikes-9-sandisk-surges-8-as-coreweaves-results-revive-ai-trade-micron-climbs-7/","move":5.66,"upcoming":false},{"id":"E25","date":"2026-11-12","cat":"stock","title":"黃仁勳辭任 Nvidia 執行長","detail":"Nvidia 宣布執行長交接：黃仁勳辭去總裁、執行長與董事職務，財務長 Colette Kress 暫代執行長，Harvey Jones 出任董事長。公司未說明原因。","source":"NVIDIA Newsroom","url":"https://nvidianews.nvidia.com/news/nvidia-announces-ceo-transition","move":-0.54,"upcoming":false},{"id":"E26","date":"2026-11-12","cat":"stock","title":"Corteva 財報疲弱、更新全年財測","detail":"11-11 盤後公布第三季：淨銷售年減 9%，調整後每股盈餘 0.06 美元、年減 57%；因巴西市況弱於預期更新全年財測。","source":"Corteva Form 8-K (SEC)","url":"https://www.sec.gov/Archives/edgar/data/0001755672/000175567226000031/a3q_2026xearningsxnewsxr.htm","move":-0.54,"upcoming":false},{"id":"E28","date":"2026-11-13","cat":"industry","title":"科技股走弱，S&P 500 與 Nasdaq 收低","detail":"Nvidia 等科技股下跌拖累 S&P 500 與 Nasdaq 收低，但主要指數仍收週線上漲；市場等待 Nvidia 財報與 Anthropic 上市。","source":"Yahoo Finance","url":"https://finance.yahoo.com/markets/stocks/articles/stock-market-today-futures-tick-133734502.html","move":-3.43,"upcoming":false},{"id":"E29","date":"2026-11-16","cat":"industry","title":"晶片股續跌，Nasdaq 100 兩日跌約 6%","detail":"報導指 Nasdaq 100 兩個交易日累計跌約 6%，並歸因於 Nvidia 財報前的疑慮、黃仁勳離任，以及美國對亞洲晶片出口的新限制（屬報導歸因）。","source":"Trading and Investment News","url":"https://www.tradingandinvestmentnews.co.uk/nasdaq-futures-chip-selloff-pauses/","move":-5.28,"upcoming":false},{"id":"E27","date":"2026-11-18","cat":"stock","title":"Nvidia 第三季財報優於預期，股價仍收低","detail":"11-17 盤後公布第三季（FY2027）：營收 1,158 億美元、年增 103%；第四季營收展望 1,300 億美元 ±3%，且未計入中國資料中心運算營收。盤前一度上漲，收盤轉跌。","source":"NVIDIA 新聞稿（StockTitan 轉載）","url":"https://www.stocktitan.net/news/NVDA/nvidia-announces-financial-results-for-third-quarter-fiscal-fpx9dw5egxqa.html","move":0.1,"upcoming":false},{"id":"E30","date":"2026-11-19","cat":"macro","title":"美股六連跌，S&P 500 跌約 2%","detail":"S&P 500 連續第六天下跌，下跌家數遠多於上漲、11 個類股全數收低；Williams-Sonoma 大跌。同日 Anthropic 掛牌交易。","source":"StockTitan","url":"https://www.stocktitan.net/articles/stock-market-today-live-november-19-2026","move":-2.41,"upcoming":false},{"id":"E32","date":"2026-11-20","cat":"macro","title":"AI 股賣壓加速，美股大跌","detail":"美股大跌，AI 相關股的賣壓加速。","source":"BNN Bloomberg","url":"https://www.bnnbloomberg.ca/markets/2026/11/20/us-stocks-tumble-and-the-sp-500-drops-as-the-sell-off-for-ai-stocks-accelerates/","move":-10.73,"upcoming":false},{"id":"E31","date":"2026-11-25","cat":"macro","title":"第三季 GDP 修正值與 10 月 PCE 物價","detail":"11-25 美東上午 8:30 同時公布第三季 GDP 第二次估計與 10 月 PCE 物價，之後為聯準會褐皮書；11-26 感恩節休市。","source":"CMC Markets","url":"https://www.cmcmarkets.com/en-gb/news-and-analysis/the-week-ahead-global-pmis-us-pce-dell-earnings","move":null,"upcoming":true}],"comp":{"start":"2015-08-21","end":"2026-11-20","member_asof":"2026-11-19","weeks":588,"corr":0.956,"sox":{"total":1528.0,"y1":47.0,"peak":"2026-06-19","dd":-34.3},"rebuilt":{"total":2254.2,"y1":11.5,"peak":"2026-06-19","dd":-30.0},"n":18,"net_now":-54.5,"universe":"AI 硬體股","overlap_n":8}};
+  var $ = function (id) { return document.getElementById(id); };
+  var css = function (v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); };
+  var NS = "http://www.w3.org/2000/svg";
+  function el(tag, at, txt) {
+    var e = document.createElementNS(NS, tag);
+    for (var k in at) if (at[k] !== null && at[k] !== undefined) e.setAttribute(k, at[k]);
+    if (txt !== undefined) e.textContent = txt;
+    return e;
+  }
+  function svg(w, h) { var s = el("svg", { width: w, height: h, viewBox: "0 0 " + w + " " + h }); s.style.display = "block"; return s; }
+  var pct = function (v, d) { return v === null || v === undefined ? "—" : (v > 0 ? "+" : "") + v.toFixed(d === undefined ? 1 : d) + "%"; };
+  var num = function (v) { return v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+  var MONO = "IBM Plex Mono, monospace";
+  var tip = $("tip");
+  function showTip(html, ev) {
+    tip.innerHTML = html; tip.style.opacity = 1;
+    var x = ev.clientX + 14, y = ev.clientY + 14, r = tip.getBoundingClientRect();
+    if (x + r.width > innerWidth - 8) x = ev.clientX - r.width - 14;
+    if (y + r.height > innerHeight - 8) y = ev.clientY - r.height - 14;
+    tip.style.left = x + "px"; tip.style.top = y + "px";
+  }
+  function hideTip() { tip.style.opacity = 0; }
+  function fillTable(id, head, rows) {
+    var t = $(id), cap = t.querySelector("caption");
+    t.innerHTML = ""; if (cap) t.appendChild(cap);
+    var th = document.createElement("thead"), tr = document.createElement("tr");
+    head.forEach(function (h) { var c = document.createElement("th"); c.innerHTML = h; tr.appendChild(c); });
+    th.appendChild(tr); t.appendChild(th);
+    var tb = document.createElement("tbody");
+    rows.forEach(function (r) {
+      var row = document.createElement("tr");
+      r.forEach(function (c, i) {
+        var td = document.createElement("td");
+        if (c && typeof c === "object") { td.innerHTML = c.html; if (c.cls) td.className = c.cls; if (c.color) td.style.color = c.color; }
+        else { td.innerHTML = c; if (i > 0) td.className = "n"; }
+        row.appendChild(td);
+      });
+      tb.appendChild(row);
+    });
+    t.appendChild(tb);
+  }
+  var wk = function (n) { return n === null ? "—" : n + " 週"; };
+  var ordinal = function (k) { return k === 1 ? "最深" : "第 " + k + " 深"; };
+
+  /* ---------------- static text ---------------- */
+  function renderStatic() {
+    var E = D.episodes, cur = E.length && E[E.length - 1].ongoing ? E[E.length - 1] : null;
+    $("m-sym").textContent = D.symbol;
+    $("m-asof").textContent = D.asof; $("m-gen").textContent = D.generated; $("m-start").textContent = D.start;
+    $("m-h1").textContent = cur
+      ? "費城半導體指數距高點 " + pct(D.dd) + "，" + D.start.slice(0, 4) + " 年以來" + ordinal(D.rank) + "的回檔"
+      : "費城半導體指數距高點 " + pct(D.dd) + (D.dd > -5 ? "，接近歷史高點" : "");
+    var below200 = D.vs_ma200 < 0, below50 = D.vs_ma50 < 0;
+    $("m-dek").textContent = "收盤 " + num(D.close) + "（當日 " + pct(D.chg, 2) + "），歷史高點 " + num(D.ath) + " 在 " + D.ath_date + "。" +
+      "目前" + (below50 && below200 ? "同時在 50 日與 200 日均線之下" : below200 ? "在 200 日均線之下、50 日均線之上" : below50 ? "在 50 日均線之下、仍守住 200 日均線" : "站在 50 日與 200 日均線之上") +
+      "（距 200 日均線 " + pct(D.vs_ma200) + "）" +
+      (D.cross ? "；50 日均線最近一次" + (D.cross.kind === "death" ? "跌破" : "站上") + " 200 日均線是在 " + D.cross.date : "") + "。";
+    var stat = function (k, v, n) { return "<div class='stat'><div class='stat-k'>" + k + "</div><div class='stat-v'>" + v + "</div><div class='stat-n'>" + n + "</div></div>"; };
+    $("m-stats").innerHTML =
+      stat("收盤", num(D.close), "當日 " + pct(D.chg, 2)) +
+      stat("距歷史高點", pct(D.dd), "高點 " + D.ath_date) +
+      stat("今年以來", pct(D.ytd), "近 1 年 " + pct(D.r1y)) +
+      stat("近 3 個月", pct(D.r3m), "近 1 個月 " + pct(D.r1m)) +
+      stat("距 200 日均線", pct(D.vs_ma200), "距 50 日均線 " + pct(D.vs_ma50));
+
+    // episodes
+    var done = E.filter(function (e) { return !e.ongoing; });
+    var deeper = done.filter(function (e) { return e.depth <= D.dd; });
+    $("long-sub").textContent = D.start.slice(0, 4) + " 年以來，^SOX 從歷史高點回檔 " + Math.abs(D.episode_thr) + "% 以上共 " + E.length + " 次" +
+      (cur ? "（含目前這一次）" : "") + "。" + (cur
+        ? "目前距高點 " + pct(D.dd) + "，在這 " + E.length + " 次裡排" + ordinal(D.rank) + "；已結束的 " + done.length + " 次中，" +
+          (deeper.length ? deeper.length + " 次曾跌得比現在更深（" + deeper.map(function (e) { return e.peak.slice(0, 7) + " 高點起的 " + pct(e.depth); }).join("、") + "）。"
+            : "沒有一次跌得比現在更深。")
+        : "目前不在 " + Math.abs(D.episode_thr) + "% 以上的回檔中。");
+    $("long-def").textContent = "上：週收盤，對數刻度，同樣的漲跌幅在不同年代一樣高。下：距之前歷史高點的跌幅；色塊是跌幅達 " + Math.abs(D.episode_thr) + "% 的期間。" +
+      (D.comp ? "虛線是用 S&P 500 半導體成分股重建的指數，從 " + D.comp.start + " 起和 ^SOX 對齊，只到 " + D.comp.member_asof + "。" : "");
+    var fmtRow = function (e) {
+      return [e.peak, { html: num(e.peak_v), cls: "n" }, e.hit, e.trough, { html: pct(e.depth), cls: "n", color: css("--neg") },
+        { html: pct(e.further), cls: "n" }, { html: wk(e.w_down), cls: "n" },
+        e.ongoing ? { html: "進行中", cls: "n" } : e.recovered, { html: e.ongoing ? "—" : wk(e.w_up), cls: "n" }];
+    };
+    fillTable("t-eps", ["高點", "高點收盤", "跌破 -" + Math.abs(D.episode_thr) + "%", "最低點", "最大跌幅", "跌破後再跌", "高點到最低", "回到高點", "最低到回高"],
+      E.slice().reverse().map(fmtRow));
+    var med = function (a) { var s = a.slice().sort(function (x, y) { return x - y; }); return s.length ? s[Math.floor((s.length - 1) / 2)] : null; };
+    var ups = done.map(function (e) { return e.w_up; }), downs = done.map(function (e) { return e.w_down; });
+    $("eps-cap").textContent = "新到舊。「跌破後再跌」是從第一次跌到 -" + Math.abs(D.episode_thr) + "% 之後，還要再跌多少才見底。已結束的 " + done.length +
+      " 次：高點到最低中位數 " + wk(med(downs)) + "，最低到回到高點中位數 " + wk(med(ups)) + "。" +
+      (cur ? "進行中的一次，最低點與跌幅都只算到資料日。" : "") + "樣本只有個位數，只能看大致範圍。";
+
+    // recent
+    $("recent-sub").textContent = "近 " + D.candles.dates.length + " 個交易日（" + D.candles.dates[0] + " 起）。近 1 個月 " + pct(D.r1m) +
+      "、近 3 個月 " + pct(D.r3m) + "；50 日均線 " + num(D.ma50) + "、200 日均線 " + num(D.ma200) + "，收盤" +
+      (below200 ? "在 200 日均線之下 " + Math.abs(D.vs_ma200).toFixed(1) + "%" : "在 200 日均線之上 " + D.vs_ma200.toFixed(1) + "%") + "。";
+    var CAT = { macro: "經濟", industry: "產業", stock: "個股" };
+    fillTable("t-ev", ["編號", "日期", "類別", "事件", "^SOX 當日", "來源"], D.events.slice().reverse().map(function (e) {
+      return [e.id, e.date, CAT[e.cat] || e.cat, { html: "<b>" + e.title + "</b><br><span style='color:var(--ink-2)'>" + e.detail + "</span>", cls: "l" },
+        e.upcoming ? { html: "即將", cls: "n ev-up" } : { html: pct(e.move, 2), cls: "n", color: e.move < 0 ? css("--neg") : e.move > 0 ? css("--pos") : null },
+        { html: "<a href='" + e.url + "' target='_blank' rel='noopener'>" + e.source + "</a>", cls: "l" }];
+    }));
+
+    // big days
+    var thisYear = D.by_year[D.by_year.length - 1], other = D.by_year.slice(0, -1);
+    var maxPrev = other.reduce(function (a, b) { return b.n > a.n ? b : a; }, { n: -1 });
+    $("yr-h").textContent = "每年單日跌幅 ≥ " + Math.abs(D.big_day) + "% 的天數";
+    $("days-sub").textContent = thisYear.year + " 年到資料日為止，單日跌幅 ≥ " + Math.abs(D.big_day) + "% 的有 " + thisYear.n + " 天；" +
+      (thisYear.n > maxPrev.n ? "比資料期間任何一個完整年度都多（之前最多是 " + maxPrev.year + " 年 " + maxPrev.n + " 天）。"
+        : thisYear.n === maxPrev.n ? "和之前最多的 " + maxPrev.year + " 年一樣多。" : "之前最多的是 " + maxPrev.year + " 年 " + maxPrev.n + " 天。") +
+      (D.worst_rank_last ? "資料日當天 " + pct(D.chg, 2) + "，在 " + D.n_bars + " 個交易日中排第 " + D.worst_rank_last + " 大跌幅。" : "");
+    fillTable("t-worst", ["日期", "單日跌幅", "當時距高點"], D.worst.map(function (w) {
+      return [w.date, { html: pct(w.pct, 2), cls: "n", color: css("--neg") }, { html: pct(w.dd), cls: "n" }];
+    }));
+
+    // comparison
+    var C = D.comp;
+    if (C) {
+      $("comp-sub").textContent = "^SOX 是費城證交所編的半導體指數，成分包含不在 S&P 500 裡的公司，加權方式也和我們的重建不同。重建指數用 Yahoo 產業為半導體與半導體設備的 S&P 500 成分股 " +
+        C.n + " 檔，市值加權、固定股數、逐週連鎖。兩者週報酬相關 " + C.corr.toFixed(2) + "，" + (C.corr >= 0.9 ? "大致同步" : "差異明顯") + "；" +
+        (C.sox.peak !== C.rebuilt.peak ? "週收盤高點的週別不同：^SOX 在 " + C.sox.peak + " 那週，重建指數在 " + C.rebuilt.peak + " 那週。" : "週收盤高點落在同一週（" + C.sox.peak + " 那週）。") +
+        "另外，" + C.universe + "名單（和重建半導體指數重疊 " + C.overlap_n + " 檔）的週線多空排列差目前 " + (C.net_now > 0 ? "+" : "") + C.net_now.toFixed(1) + "。";
+      var row = function (lab, k) { return [lab, { html: pct(C.sox[k]), cls: "n" }, { html: pct(C.rebuilt[k]), cls: "n" }]; };
+      fillTable("t-comp", ["項目", "^SOX", "重建（" + C.n + " 檔）"], [
+        row("期間報酬（" + C.start + " 起）", "total"), row("近 52 週", "y1"), row("距期間高點", "dd"),
+        ["週收盤高點（週別）", C.sox.peak, C.rebuilt.peak]]);
+      $("comp-cap").textContent = "只比較兩者都有的週（" + C.start + " 至 " + C.end + " 那週）。成分股資料到 " + C.member_asof +
+        (C.member_asof < D.asof ? "，比 ^SOX 少了 " + D.asof + " 那個交易日，所以這張表的 ^SOX 數字和上方不同。" : "。") +
+        "重建指數用今天的成分名單往回推，有存活者偏差，長期報酬偏高。";
+    } else {
+      $("comp-sub").textContent = "資料夾裡沒有重建半導體指數的輸出，這一節略過。";
+      $("t-comp").closest(".tw").style.display = "none";
+    }
+
+    $("m-list").innerHTML = [
+      ["資料", D.symbol + " 日線（" + D.start + " 至 " + D.asof + "，" + D.n_bars + " 個交易日），由每日抓取程式從 Yahoo Finance 取得，存在 data/weekly_reutin/index_ohlc.csv。報告不自行修正官方數字。"],
+      ["回檔", "從歷史高點下跌達 " + Math.abs(D.episode_thr) + "% 算一次，直到收盤重新站上舊高點才結束；資料起點之前的高點看不到，所以最早一次的高點是資料期間內的高點。"],
+      ["均線", "50 日與 200 日簡單移動平均，以收盤價計算。"],
+      ["事件", "事件取自報告共用的事件表（data/events/market_events.csv），每一列都有來源；漲跌幅由本資料計算。"],
+      ["限制", "樣本期間約 " + Math.round(D.n_bars / 252) + " 年，20% 以上的回檔只有個位數次，任何「通常」的說法都只是少數案例。這份檢視描述走勢，不預測後市，也不是投資建議。"]
+    ].map(function (x, i) { return "<li data-i='" + String(i + 1).padStart(2, "0") + "'><span><b>" + x[0] + "</b>　" + x[1] + "</span></li>"; }).join("");
+    $("foot").innerHTML = "費城半導體指數檢視 · 資料日 <b>" + D.asof + "</b> · 報告產出 <b>" + D.generated + "</b> · 由 <code>analysis/sox_review.py</code> 產生";
+  }
+
+  /* ---------------- charts ---------------- */
+  var LONG_N = Infinity;
+  function rangeButtons() {
+    var host = $("long-rb"); host.innerHTML = "";
+    [["1 年", 52], ["3 年", 156], ["5 年", 260], ["全部", Infinity]].forEach(function (p) {
+      var b = document.createElement("button"); b.type = "button"; b.textContent = p[0];
+      if (LONG_N === p[1]) b.className = "on";
+      b.setAttribute("aria-pressed", LONG_N === p[1] ? "true" : "false");
+      b.addEventListener("click", function () { LONG_N = p[1]; rangeButtons(); drawLong(); });
+      host.appendChild(b);
+    });
+  }
+  function yearTicks(g, dates, X, y, ink3) {
+    var n = dates.length, span = dates[n - 1].slice(0, 4) - dates[0].slice(0, 4);
+    if (span >= 3) {
+      var every = Math.max(1, Math.ceil(span / 10)), last = null;
+      dates.forEach(function (d, i) {
+        var yr = d.slice(0, 4); if (yr === last) return; last = yr;
+        if (i === 0 || +yr % every) return;
+        g.appendChild(el("text", { x: X(i), y: y, "text-anchor": "middle", fill: ink3, "font-size": 10.5, "font-family": MONO }, yr));
+      });
+    } else {
+      var st = Math.max(1, Math.round(n / 6));
+      for (var q = 0; q < n; q += st) {
+        if (n - 1 - q < st * 0.55 && q) continue;
+        g.appendChild(el("text", { x: X(q), y: y, "text-anchor": q ? "middle" : "start", fill: ink3, "font-size": 10.5, "font-family": MONO }, dates[q].slice(2, 7).replace("-", "/")));
+      }
+      g.appendChild(el("text", { x: X(n - 1), y: y, "text-anchor": "end", fill: ink3, "font-size": 10.5, "font-family": MONO }, dates[n - 1].slice(2, 7).replace("-", "/")));
+    }
+  }
+  function logTicks(lo, hi) {
+    var t = [];
+    for (var e = Math.floor(Math.log10(lo)); e <= Math.ceil(Math.log10(hi)); e++)
+      [1, 2, 3, 5, 7].forEach(function (f) { var v = f * Math.pow(10, e); if (v >= lo && v <= hi) t.push(v); });
+    if (t.length > 7) t = t.filter(function (v, i) { return i % Math.ceil(t.length / 6) === 0; });
+    return t;
+  }
+  function drawLong() {
+    var L = D.long, N = L.dates.length, a = Math.max(0, N - Math.min(N, LONG_N));
+    var dates = L.dates.slice(a), close = L.close.slice(a), dd = L.dd.slice(a), reb = L.rebuilt ? L.rebuilt.slice(a) : null, n = dates.length;
+    var host = $("c-long"), w = Math.max(320, host.clientWidth), small = w < 520;
+    var m = { l: small ? 46 : 54, r: small ? 64 : 80 }, top = { y: 10, h: small ? 200 : 250 }, bot = { y: (small ? 200 : 250) + 30, h: small ? 110 : 130 };
+    var h = bot.y + bot.h + 26, iw = w - m.l - m.r, s = svg(w, h);
+    var X = function (i) { return m.l + iw * i / Math.max(1, n - 1); };
+    var ink3 = css("--ink-3"), rule = css("--rule"), c1 = css("--s2"), cR = css("--ink-2"), neg = css("--neg");
+    var vals = close.concat(reb ? reb.filter(function (v) { return v; }) : []);
+    var lo = Math.min.apply(null, vals) * 0.95, hi = Math.max.apply(null, vals) * 1.05;
+    var LY = function (v) { return top.y + top.h * (1 - (Math.log(v) - Math.log(lo)) / (Math.log(hi) - Math.log(lo))); };
+    logTicks(lo, hi).forEach(function (v) {
+      s.appendChild(el("line", { x1: m.l, x2: m.l + iw, y1: LY(v), y2: LY(v), stroke: rule }));
+      s.appendChild(el("text", { x: m.l - 6, y: LY(v) + 4, "text-anchor": "end", fill: ink3, "font-size": 10.5, "font-family": MONO }, v >= 1000 ? (v / 1000) + "k" : v));
+    });
+    var ddMin = Math.min(-50, Math.floor(Math.min.apply(null, dd) / 10) * 10);
+    var DY = function (v) { return bot.y + bot.h * (v / ddMin); };
+    for (var g = 0; g >= ddMin; g -= 10) {
+      if (g % 20 && ddMin < -40) continue;
+      s.appendChild(el("line", { x1: m.l, x2: m.l + iw, y1: DY(g), y2: DY(g), stroke: rule }));
+      s.appendChild(el("text", { x: m.l - 6, y: DY(g) + 4, "text-anchor": "end", fill: ink3, "font-size": 10.5, "font-family": MONO }, g + "%"));
+    }
+    // episode bands on the drawdown panel and faintly on the price panel
+    var idx = {}; dates.forEach(function (d, i) { idx[d] = i; });
+    var near = function (d) { for (var i = 0; i < n; i++) if (dates[i] >= d) return i; return n - 1; };
+    D.episodes.forEach(function (e) {
+      var end = e.recovered || dates[n - 1];
+      if (end < dates[0] || e.peak > dates[n - 1]) return;
+      var i0 = e.peak < dates[0] ? 0 : near(e.peak), i1 = near(end);
+      s.appendChild(el("rect", { x: X(i0), y: bot.y, width: Math.max(2, X(i1) - X(i0)), height: bot.h, fill: neg, opacity: 0.12 }));
+      s.appendChild(el("rect", { x: X(i0), y: top.y, width: Math.max(2, X(i1) - X(i0)), height: top.h, fill: neg, opacity: 0.05 }));
+    });
+    var path = function (arr, Y, col, wd, dash) {
+      var d = "", pen = false;
+      arr.forEach(function (v, i) { if (v === null || v === undefined) { pen = false; return; } d += (pen ? "L" : "M") + X(i).toFixed(1) + " " + Y(v).toFixed(1); pen = true; });
+      s.appendChild(el("path", { d: d, fill: "none", stroke: col, "stroke-width": wd, "stroke-linejoin": "round", "stroke-dasharray": dash || null }));
+    };
+    var area = "M" + X(0) + " " + DY(0);
+    dd.forEach(function (v, i) { area += "L" + X(i).toFixed(1) + " " + DY(v).toFixed(1); });
+    area += "L" + X(n - 1) + " " + DY(0) + "Z";
+    s.appendChild(el("path", { d: area, fill: neg, opacity: 0.35 }));
+    if (reb) path(reb, LY, cR, 1.4, "5 3");
+    path(close, LY, c1, 2);
+    // end labels
+    var lab = function (y, col, t, dash) {
+      s.appendChild(el("line", { x1: m.l + iw + 4, x2: m.l + iw + 11, y1: y, y2: y, stroke: col, "stroke-width": 2, "stroke-dasharray": dash ? "3 2" : null }));
+      s.appendChild(el("text", { x: m.l + iw + 14, y: y + 4, fill: css("--ink-2"), "font-size": 10.5, "font-weight": 600, "font-family": MONO }, t));
+    };
+    var ch = function (arr) { var f = arr.filter(function (v) { return v; }); return pct(100 * (f[f.length - 1] / f[0] - 1), 0); };
+    var ly = LY(close[n - 1]), ry = null;
+    if (reb) { var j = n - 1; while (j > 0 && !reb[j]) j--; ry = LY(reb[j]); if (Math.abs(ry - ly) < 13) ry = ly + (ry > ly ? 13 : -13); }
+    lab(ly, c1, ch(close));
+    if (reb && ry !== null) lab(ry, cR, ch(reb), true);
+    lab(DY(dd[n - 1]), neg, pct(dd[n - 1], 0));
+    yearTicks(s, dates, X, h - 8, ink3);
+    var cross = el("line", { y1: top.y, y2: bot.y + bot.h, stroke: css("--ink"), opacity: 0 }); s.appendChild(cross);
+    var hit = el("rect", { x: m.l, y: top.y, width: iw, height: bot.y + bot.h - top.y, fill: "transparent" });
+    hit.addEventListener("mousemove", function (ev) {
+      var bb = s.getBoundingClientRect(), i = Math.max(0, Math.min(n - 1, Math.round((ev.clientX - bb.left - m.l) / (iw / Math.max(1, n - 1)))));
+      cross.setAttribute("x1", X(i)); cross.setAttribute("x2", X(i)); cross.setAttribute("opacity", 0.3);
+      showTip("<div class='tt-h'>" + dates[i] + "</div><div class='tt-r'><span>^SOX</span><b>" + num(close[i]) + "</b></div>" +
+        "<div class='tt-r'><span>距高點</span><b>" + pct(dd[i]) + "</b></div>", ev);
+    });
+    hit.addEventListener("mouseleave", function () { hideTip(); cross.setAttribute("opacity", 0); });
+    s.appendChild(hit);
+    host.innerHTML = ""; host.appendChild(s);
+    $("long-lg").innerHTML = "<span><i class='swatch' style='background:" + c1 + "'></i>^SOX 週收盤</span>" +
+      (reb ? "<span><i class='swatch' style='background:repeating-linear-gradient(90deg," + cR + " 0 5px,transparent 5px 8px)'></i>重建 S&amp;P 500 半導體指數（虛線）</span>" : "") +
+      "<span><i class='swatch' style='background:" + neg + ";opacity:.5'></i>距歷史高點</span>";
+    $("long-cap").textContent = "圖右的百分比是目前畫面範圍內的漲跌；按鈕只改變畫面範圍，表格與文字是全期數字。";
+  }
+  function drawK() {
+    var K = D.candles, n = K.dates.length, host = $("c-k"), w = Math.max(320, host.clientWidth), small = w < 520;
+    var m0 = { r: small ? 56 : 70, l: small ? 46 : 54 }, iw0 = w - m0.l - m0.r;
+    var nrows = (function () {                      // how many label rows the events need at this width
+      var di = {}; K.dates.forEach(function (d, i) { di[d] = i; });
+      var xs = D.events.filter(function (e) { return di[e.date] !== undefined; }).map(function (e) { return m0.l + iw0 / n * (di[e.date] + 0.5); }).sort(function (a, b) { return a - b; });
+      var rr = []; xs.forEach(function (x) { var r = 0; while (r < rr.length && rr[r] > x - (small ? 15 : 28)) r++; rr[r] = x; });
+      return Math.min(rr.length, small ? 5 : 99);
+    })();
+    var m = { t: 14 + 12 * nrows, r: m0.r, b: 26, l: m0.l }, h = (small ? 300 : 360) + 12 * nrows, iw = w - m.l - m.r, ih = h - m.t - m.b;
+    var s = svg(w, h), ink3 = css("--ink-3"), rule = css("--rule"), up = css("--pos"), dn = css("--neg");
+    var all = K.h.concat(K.l, K.ma50.filter(function (v) { return v; }), K.ma200.filter(function (v) { return v; }));
+    var lo = Math.min.apply(null, all) * 0.98, hi = Math.max.apply(null, all) * 1.02;
+    var Y = function (v) { return m.t + ih * (1 - (v - lo) / (hi - lo)); };
+    var step = (iw / n), X = function (i) { return m.l + step * (i + 0.5); };
+    var raw = (hi - lo) / 5, mag = Math.pow(10, Math.floor(Math.log10(raw))), st = [1, 2, 2.5, 5, 10].map(function (f) { return f * mag; }).filter(function (x) { return x >= raw; })[0];
+    for (var v = Math.ceil(lo / st) * st; v <= hi; v += st) {
+      s.appendChild(el("line", { x1: m.l, x2: m.l + iw, y1: Y(v), y2: Y(v), stroke: rule }));
+      s.appendChild(el("text", { x: m.l - 6, y: Y(v) + 4, "text-anchor": "end", fill: ink3, "font-size": 10.5, "font-family": MONO }, v >= 1000 ? (v / 1000).toFixed(st < 1000 ? 1 : 0) + "k" : v));
+    }
+    var bw = Math.max(1, step * 0.62);
+    for (var i = 0; i < n; i++) {
+      var col = K.c[i] >= K.o[i] ? up : dn;
+      s.appendChild(el("line", { x1: X(i), x2: X(i), y1: Y(K.h[i]), y2: Y(K.l[i]), stroke: col, "stroke-width": 1 }));
+      var y0 = Y(Math.max(K.o[i], K.c[i])), y1 = Y(Math.min(K.o[i], K.c[i]));
+      s.appendChild(el("rect", { x: X(i) - bw / 2, y: y0, width: bw, height: Math.max(1, y1 - y0), fill: col }));
+    }
+    var line = function (arr, col) {
+      var d = ""; arr.forEach(function (v, i) { if (v) d += (d ? "L" : "M") + X(i).toFixed(1) + " " + Y(v).toFixed(1); });
+      s.appendChild(el("path", { d: d, fill: "none", stroke: col, "stroke-width": 1.6 }));
+    };
+    var c50 = css("--s2"), c200 = css("--s4");
+    line(K.ma50, c50); line(K.ma200, c200);
+    // event labels sit in rows above the plot (greedy: first row with room), a tick marks the candle
+    var idx = {}; K.dates.forEach(function (d, i) { idx[d] = i; });
+    var rows = [], LW = small ? 15 : 28, RH = 12, MAXR = small ? 5 : 99, ink2 = css("--ink-2"), hidden = 0;
+    D.events.filter(function (e) { return idx[e.date] !== undefined; })
+      .sort(function (a, b) { return idx[a.date] - idx[b.date]; })
+      .forEach(function (e) {
+        var x = X(idx[e.date]), r = 0;
+        while (r < rows.length && rows[r] > x - LW) r++;
+        var yh = Y(K.h[idx[e.date]]);
+        if (r >= MAXR) {                            // no room left: keep a tick on the candle, label in the table
+          hidden++;
+          s.appendChild(el("line", { x1: x, x2: x, y1: yh - 8, y2: yh - 3, stroke: ink2, "stroke-width": 0.8, opacity: 0.7 }));
+          return;
+        }
+        rows[r] = x;
+        var ly = m.t - 6 - r * RH;
+        s.appendChild(el("line", { x1: x, x2: x, y1: ly + 3, y2: yh - 3, stroke: ink2, "stroke-width": 0.6, "stroke-dasharray": "1 2", opacity: 0.6 }));
+        s.appendChild(el("text", { x: x, y: ly, "text-anchor": "middle", fill: ink2, "font-size": 9.5, "font-family": MONO }, small ? e.id.replace(/^E/, "") : e.id));
+      });
+    var labs = [[K.c[n - 1], css("--ink"), num(K.c[n - 1])], [K.ma50[n - 1], c50, "50日"], [K.ma200[n - 1], c200, "200日"]]
+      .map(function (x) { return { y: Y(x[0]), c: x[1], t: x[2] }; }).sort(function (a, b) { return a.y - b.y; });
+    for (var q = 1; q < labs.length; q++) if (labs[q].y - labs[q - 1].y < 13) labs[q].y = labs[q - 1].y + 13;
+    labs.forEach(function (lb) {
+      s.appendChild(el("line", { x1: m.l + iw + 3, x2: m.l + iw + 9, y1: lb.y, y2: lb.y, stroke: lb.c, "stroke-width": 2 }));
+      s.appendChild(el("text", { x: m.l + iw + 12, y: lb.y + 4, fill: css("--ink-2"), "font-size": 10, "font-weight": 600, "font-family": MONO }, lb.t));
+    });
+    var stp = Math.max(1, Math.round(n / (small ? 4 : 7)));
+    for (var t = 0; t < n; t += stp) s.appendChild(el("text", { x: X(t), y: h - 8, "text-anchor": t ? "middle" : "start", fill: ink3, "font-size": 10.5, "font-family": MONO }, K.dates[t].slice(5).replace("-", "/")));
+    var hit = el("rect", { x: m.l, y: m.t, width: iw, height: ih, fill: "transparent" });
+    hit.addEventListener("mousemove", function (ev) {
+      var bb = s.getBoundingClientRect(), i = Math.max(0, Math.min(n - 1, Math.floor((ev.clientX - bb.left - m.l) / step)));
+      var chg = i ? 100 * (K.c[i] / K.c[i - 1] - 1) : null;
+      var evs = D.events.filter(function (e) { return e.date === K.dates[i]; }).map(function (e) { return "<div class='tt-r'><span>" + e.id + "</span><b style='font-weight:500'>" + e.title + "</b></div>"; }).join("");
+      showTip("<div class='tt-h'>" + K.dates[i] + "</div><div class='tt-r'><span>收盤</span><b>" + num(K.c[i]) + "</b></div>" +
+        "<div class='tt-r'><span>當日</span><b>" + pct(chg, 2) + "</b></div>" + evs, ev);
+    });
+    hit.addEventListener("mouseleave", hideTip);
+    s.appendChild(hit);
+    host.innerHTML = ""; host.appendChild(s);
+    $("k-lg").innerHTML = "<span><i class='swatch' style='background:" + up + "'></i>上漲（收盤高於開盤）</span><span><i class='swatch' style='background:" + dn + "'></i>下跌</span>" +
+      "<span><i class='swatch' style='background:" + c50 + "'></i>50 日均線</span><span><i class='swatch' style='background:" + c200 + "'></i>200 日均線</span>";
+    var mx = 0, mxi = 0, mn = 0, mni = 0;
+    for (var z = 1; z < n; z++) { var cz = 100 * (K.c[z] / K.c[z - 1] - 1); if (cz > mx) { mx = cz; mxi = z; } if (cz < mn) { mn = cz; mni = z; } }
+    $("k-cap").textContent = "這段期間最大單日跌幅在 " + K.dates[mni] + "（" + pct(mn, 2) + "），最大單日漲幅在 " + K.dates[mxi] + "（" + pct(mx, 2) + "）。" +
+      (small ? "窄螢幕上編號省略字母 E" + (hidden ? "，另有 " + hidden + " 則事件只標短線、不標編號" : "") + "，完整內容見下方事件表。" : "");
+  }
+  function drawYears() {
+    var B = D.by_year, host = $("c-yr"), w = Math.max(320, host.clientWidth), h = 180, m = { t: 18, r: 10, b: 24, l: 30 };
+    var iw = w - m.l - m.r, ih = h - m.t - m.b, s = svg(w, h), ink3 = css("--ink-3");
+    var mx = Math.max.apply(null, B.map(function (b) { return b.n; })) || 1, bw = iw / B.length;
+    var Y = function (v) { return m.t + ih * (1 - v / mx); };
+    B.forEach(function (b, i) {
+      var last = i === B.length - 1, x = m.l + bw * i + bw * 0.18, ww = bw * 0.64;
+      s.appendChild(el("rect", { x: x, y: Y(b.n), width: ww, height: Math.max(0, Y(0) - Y(b.n)), fill: last ? css("--neg") : css("--rule-strong"), rx: 1.5 }));
+      if (b.n) s.appendChild(el("text", { x: x + ww / 2, y: Y(b.n) - 4, "text-anchor": "middle", fill: css("--ink-2"), "font-size": 10.5, "font-family": MONO }, b.n));
+      if (w > 480 || i % 2 === 0 || last) s.appendChild(el("text", { x: x + ww / 2, y: h - 7, "text-anchor": "middle", fill: ink3, "font-size": 10, "font-family": MONO }, String(b.year).slice(2)));
+    });
+    s.appendChild(el("line", { x1: m.l, x2: m.l + iw, y1: Y(0), y2: Y(0), stroke: css("--axis") }));
+    host.innerHTML = ""; host.appendChild(s);
+  }
+  function renderCharts() { rangeButtons(); drawLong(); drawK(); drawYears(); }
+
+  renderStatic(); renderCharts();
+  var tmr; addEventListener("resize", function () { clearTimeout(tmr); tmr = setTimeout(renderCharts, 150); });
+  try { matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function () { renderStatic(); renderCharts(); }); } catch (e) {}
+  new MutationObserver(function () { renderStatic(); renderCharts(); }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+})();
+</script>

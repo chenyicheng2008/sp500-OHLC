@@ -247,6 +247,25 @@ every page label says 多空排列差 — don't reintroduce 淨值.
   `offProxy` makes the caption say 「有一部分來自」 for ^SOX and ^SP500-45). Our 83-name "technology" uses Yahoo's sector, not GICS, so expect a
   gap; why exactly (which names differ) has not been checked against S&P's list.
 
+## ^SOX review page (`analysis/sox_review.py`, asked 2026-11-21: 「費城半導體指數檢視並發佈」)
+
+`python analysis/sox_review.py` (after `regime_backtest.py`) → `analysis/reports/sox_review_<asof>.html`,
+its own artifact. Reads ^SOX from `index_ohlc.csv`, so its data date can be a session
+**ahead** of the constituent reports (2026-11-20 vs 11-19). CSS is copied from
+`report_template.html` at build time (same look, nothing forked by hand); the payload and all
+prose follow the same no-typed-figure rule. Sections: masthead (close, distance from the
+high, YTD / 1y / 3m, vs 50/200-day), weekly log chart + drawdown with ≥20% episodes shaded
+and the rebuilt S&P semiconductor index dashed (presets 1/3/5 years / all), the episode
+table, 130-session daily K-line with MA50/200 and event IDs (labels stacked in rows above
+the plot; on phones numbers only, max 5 rows, the rest as ticks), the events table with
+^SOX's own move, ≥5% down days per year, the ten worst days, and ^SOX vs the rebuilt index
+on common weeks only (cut at the members' data date, so its ^SOX figures differ from the
+masthead and the caption says so). First run 2026-11-20: 8,408.59, -42.5% from 14,634.72
+(2026-06-22), 2nd-deepest of 6 ≥20% episodes since 2014-11 (2021-12 peak: -46.5%);
+11-20 -10.73% (4th-worst day of 3,017); 13 days ≤ -5% in 2026 vs a previous yearly max of
+10 (2020); weekly correlation with the rebuilt index 0.96. E32 (11-20, BNN Bloomberg) was
+added for this page; the constituent reports will show it from the next refresh on.
+
 ## Share above moving averages, long run (section 03 first chart, asked 2026-11-13)
 
 「站上均線的成分股比例 模倣加SP500指數/等權重指數之比較, 拉長時間序列, 加Slide bar」.
