@@ -337,7 +337,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
   </div>
 </section>
 
-<section id="trend" data-toc="趨勢與背離" data-q="站上均線比例、等權對市值加權、騰落線與新高新低的走勢，和指數是否同向。">
+<section id="trend" data-toc="趨勢與背離" data-q="站上均線比例、等權對市值加權、騰落線、新高新低與麥克連擺盪指標的走勢，和指數是否同向。">
   <div class="sec-head"><span class="sec-no">03</span><h2>趨勢與背離</h2></div>
   <p class="sec-sub" id="sub-trend">—</p>
 
@@ -407,6 +407,15 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     <div class="panel-head"><h3>52 週新高減新低（10 日均）</h3><p>零軸之上是新高主導，之下是新低主導。</p></div>
     <div class="panel-body"><div id="c-hl"></div></div>
     <figcaption id="cap-hl"></figcaption>
+  </figure>
+
+  <figure class="panel" id="f-mcc">
+    <div class="panel-head"><h3>麥克連擺盪指標（McClellan Oscillator）</h3><p id="mcc-def">—</p></div>
+    <div class="rb-row" id="mcc-rb" style="padding:10px 20px 0"></div>
+    <div class="legend" id="mcc-lg"></div>
+    <div class="panel-body"><div id="c-mcc"></div></div>
+    <figcaption id="mcc-cap"></figcaption>
+    <ul class="take" id="mcc-take" style="padding:0 20px 8px; margin-top:0"></ul>
   </figure>
 </section>
 
@@ -614,6 +623,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
 <div id="tip" role="status" aria-live="polite"></div>
 
 <script>window.__SPX__=__REPORT_DATA__;window.__VIEW__="__REPORT_VIEW__";</script>
+<script>__MCC_JS__</script>
 <script>
 (function () {
   "use strict";
@@ -3232,6 +3242,10 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     renderKDCharts();
     renderTrendCharts();
     renderBacktestCharts();
+    if (D.mcc && window.MCC) MCC.render(D.mcc, { key: "sp", idxName: "S&P 500（重建）",
+      groupName: "S&P 500 成分股 " + D.n_tickers + " 檔",
+      ids: { chart: "c-mcc", rb: "mcc-rb", lg: "mcc-lg", def: "mcc-def", cap: "mcc-cap", take: "mcc-take" } });
+    else document.getElementById("f-mcc").style.display = "none";
     var s1 = css("--s1"), s2 = css("--s2"), s3 = css("--s3");
 
     drawMaPanel({ id: "ma", ML: D.ma_long, pre: "", offCW: "S&P 500 官方 ^GSPC", offEW: "S&P 500 等權重官方 ^SPXEW", offSyms: "^GSPC／^SPXEW" });

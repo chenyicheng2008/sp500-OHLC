@@ -16,6 +16,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from mcclellan import study as mcclellan_study
+
 REPO = Path(__file__).resolve().parent.parent
 ENC = "utf-8-sig"
 
@@ -201,6 +203,9 @@ def main() -> None:
         payload["ma_long_aihw"] = ma_payload(d / "breadth_long_weekly_aihw.csv",
                                              pd.read_csv(d / "breadth_daily_aihw.csv", index_col=0, parse_dates=True))
         payload["ma_long_aihw"]["n"] = payload["ma_long_aihw"]["n_max"]
+
+    # --- McClellan oscillator: chart series, current reading, signals, divergence --------
+    payload["mcc"] = mcclellan_study(b["mcclellan_osc"], b["mcclellan_sum"], b["cap_weighted"], fixed=60)
 
     # --- does the regime net warn of large falls? (regime_backtest.py) -------------
     bt_json = d / "regime_backtest.json"

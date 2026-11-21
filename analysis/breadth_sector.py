@@ -254,6 +254,14 @@ def daily_group(daily: pd.DataFrame, shares: pd.Series) -> pd.DataFrame:
     out = moving_average_breadth(daily)[["pct_above_20dma", "pct_above_50dma", "pct_above_200dma"]]
     out["cap_weighted"] = 100 * (1 + cw_ret.fillna(0)).cumprod()
     out["equal_weighted"] = 100 * (1 + r.mean(axis=1).fillna(0)).cumprod()
+    # participation inside the group: A/D line, McClellan (ratio-adjusted, so a small group
+    # stays on the same scale as the whole index) and 52-week new highs / lows
+    ad = advance_decline(daily)
+    for c in ("advances", "declines", "ad_line", "mcclellan_osc", "mcclellan_sum"):
+        out[c] = ad[c]
+    hl = new_highs_lows(daily)
+    for c in ("new_highs", "new_lows"):
+        out[c] = hl[c]
     return out
 
 

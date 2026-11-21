@@ -266,6 +266,28 @@ masthead and the caption says so). First run 2026-11-20: 8,408.59, -42.5% from 1
 10 (2020); weekly correlation with the rebuilt index 0.96. E32 (11-20, BNN Bloomberg) was
 added for this page; the constituent reports will show it from the next refresh on.
 
+## McClellan oscillator panel (both pages, asked 2026-11-21: 「SP500及費城半導體指數兩篇, 加入麥克連擺盪指標圖及分析」)
+
+One implementation for both pages: `analysis/mcclellan.py` (`study()`: chart series, current
+reading, declustered extreme readings and their 10/20-session index returns against every
+day as the base, divergence of the last 20 sessions vs the 40 before) and
+`analysis/mcclellan_view.js` (three stacked panels — index, oscillator bars with thresholds,
+summation index — plus the read-out; inlined at build time through `__MCC_JS__` by
+`build_report.py` and `sox_review.py`). Never copy it into either page. The oscillator is
+`advance_decline()`'s ratio-adjusted 19/39 EMA spread; the first 39 sessions are dropped as
+warm-up, so the history is ~2 years (2025-01 on). Thresholds: S&P 500 ±60 (the signal
+board's); a small group uses its own 10th/90th percentiles (semis -80/+80). Divergence needs
+a 5-point difference in the oscillator (`DIV_TOL`) — on 2026-11-19 the S&P lows were -79.1
+vs -79.0, which must read 「看不出背離」, not 「同步創低」. 2026-11-19: S&P -79.1 (1st
+percentile, oversold); after past ≤-60 readings the 20-day median was +2.18% vs +1.30% for
+all days (5 done — 相差不大). Semis -84.9, positive divergence (^SOX lower low, oscillator
+-84.9 vs -127.2). `daily_group()` now also writes each group's A/D line, McClellan and new
+highs/lows (tech, semi, AI-hardware daily files).
+
+The ^SOX page's breadth section uses the 18 S&P 500 semiconductor names — ^SOX's own members
+are not in our data (several are not S&P 500 stocks); every caption says so and no member
+count of ^SOX is typed. Its section numbers are generated from the visible sections.
+
 ## Share above moving averages, long run (section 03 first chart, asked 2026-11-13)
 
 「站上均線的成分股比例 模倣加SP500指數/等權重指數之比較, 拉長時間序列, 加Slide bar」.

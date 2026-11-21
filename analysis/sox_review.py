@@ -24,6 +24,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from mcclellan import study as mcclellan_study
+
 REPO = Path(__file__).resolve().parent.parent
 ENC = "utf-8-sig"
 SYM = "^SOX"
@@ -73,6 +75,14 @@ def episodes(c: pd.Series, now_dd: float) -> list:
                      # did this episode, at some point, sit as deep as today's drawdown?
                      "reached_now": bool(e["depth"] <= now_dd)})
     return rows
+
+
+def last_as_low(x: pd.Series, skip: int = 13):
+    """The last week, more than `skip` weeks back, when the reading was at or below today's --
+    the weeks just before are usually the same slide and say nothing."""
+    cur, past = x.iloc[-1], x.iloc[:-skip]
+    hit = past[past <= cur]
+    return hit.index[-1].date().isoformat() if len(hit) else None
 
 
 def main() -> None:
@@ -157,6 +167,34 @@ def main() -> None:
                "ma50": [round(float(v), 2) for v in ma50.iloc[-CANDLE_DAYS:]],
                "ma200": [round(float(v), 2) for v in ma200.iloc[-CANDLE_DAYS:]]}
 
+    # breadth inside the group we can measure: the S&P 500 semiconductor names (the same 18 as
+    # the rebuilt index), not ^SOX's own members -- several of those are not in our data
+    breadth, mcc = None, None
+    sd_p, sw_p, all_p = A / "breadth_daily_semi.csv", A / "breadth_long_weekly_semi.csv", A / "breadth_daily.csv"
+    if sd_p.exists() and sw_p.exists() and all_p.exists():
+        sd = pd.read_csv(sd_p, index_col=0, parse_dates=True)
+        sw = pd.read_csv(sw_p, index_col=0, parse_dates=True)
+        mk = pd.read_csv(all_p, index_col=0, parse_dates=True)
+        r1 = lambda v: None if pd.isna(v) else round(float(v), 1)
+        wsox = c[c.index <= sd.index[-1]].resample("W-FRI").last().reindex(sw.index)
+        p40, p10 = sw["pct_above_40w"], sw["pct_above_10w"]
+        breadth = {
+            "n": int(sw["n_valid"].max()), "asof": sd.index[-1].date().isoformat(),
+            "now": {k: r1(sd[c_].iloc[-1]) for k, c_ in (("p20", "pct_above_20dma"), ("p50", "pct_above_50dma"), ("p200", "pct_above_200dma"))},
+            "mkt": {k: r1(mk[c_].iloc[-1]) for k, c_ in (("p20", "pct_above_20dma"), ("p50", "pct_above_50dma"), ("p200", "pct_above_200dma"))},
+            "nh": int(sd["new_highs"].iloc[-1]), "nl": int(sd["new_lows"].iloc[-1]),
+            "nh20": int(sd["new_highs"].tail(20).sum()), "nl20": int(sd["new_lows"].tail(20).sum()),
+            "ad_chg20": int(sd["ad_line"].iloc[-1] - sd["ad_line"].iloc[-21]),
+            "adv": int(sd["advances"].iloc[-1]), "dec": int(sd["declines"].iloc[-1]),
+            "w": {"dates": [d.date().isoformat() for d in sw.index], "p10": [r1(v) for v in p10], "p40": [r1(v) for v in p40],
+                  "sox": [None if pd.isna(v) else round(float(v), 2) for v in wsox]},
+            "p40_now": r1(p40.iloc[-1]), "p40_pctile": round(float(100 * (p40 < p40.iloc[-1]).mean()), 0),
+            "p40_median": r1(p40.median()), "p10_now": r1(p10.iloc[-1]),
+            "p10_pctile": round(float(100 * (p10 < p10.iloc[-1]).mean()), 0), "p10_median": r1(p10.median()),
+            "p40_last_as_low": last_as_low(p40), "skip": 13,
+        }
+        mcc = mcclellan_study(sd["mcclellan_osc"], sd["mcclellan_sum"], c.reindex(sd.index))
+
     payload = {
         "asof": asof.date().isoformat(), "generated": date.today().isoformat(), "start": c.index[0].date().isoformat(),
         "n_bars": int(len(c)), "symbol": SYM,
@@ -170,12 +208,14 @@ def main() -> None:
         "cross": cross, "episode_thr": round(100 * EPISODE), "episodes": eps, "rank": rank, "n_eps": len(eps),
         "big_day": BIG_DAY, "by_year": [{"year": y, "n": by_year.get(y, 0)} for y in years],
         "worst": worst, "worst_rank_last": int((r < r.iloc[-1]).sum()) + 1 if r.iloc[-1] < 0 else None,
-        "long": long, "candles": candles, "events": events, "comp": comp,
+        "long": long, "candles": candles, "events": events, "comp": comp, "breadth": breadth, "mcc": mcc,
     }
 
     tpl = (REPO / "analysis" / "report_template.html").read_text(encoding="utf-8")
     css = tpl[tpl.index("<style>") + len("<style>"): tpl.index("</style>")]
-    page = PAGE.replace("__CSS__", css).replace("__DATA__", json.dumps(payload, ensure_ascii=False, separators=(",", ":")))
+    mcc_js = (REPO / "analysis" / "mcclellan_view.js").read_text(encoding="utf-8")
+    page = (PAGE.replace("__CSS__", css).replace("__MCC_JS__", mcc_js)
+            .replace("__DATA__", json.dumps(payload, ensure_ascii=False, separators=(",", ":"))))
     out = Path(args.out_dir) / f"sox_review_{payload['asof']}.html"
     out.write_text(page, encoding="utf-8")
     print(f"wrote {out} ({len(page):,} bytes); {SYM} {payload['close']} on {payload['asof']}, "
@@ -205,7 +245,7 @@ td.l{text-align:left; white-space:normal; min-width:220px}
 
 <div class="wrap">
 <section id="long">
-  <div class="sec-head"><span class="sec-no">01</span><h2>長期走勢與回檔</h2></div>
+  <div class="sec-head"><span class="sec-no"></span><h2>長期走勢與回檔</h2></div>
   <p class="sec-sub" id="long-sub">—</p>
   <figure class="panel">
     <div class="panel-head"><h3>週收盤（對數刻度）與距歷史高點的跌幅</h3><p id="long-def">—</p></div>
@@ -218,7 +258,7 @@ td.l{text-align:left; white-space:normal; min-width:220px}
 </section>
 
 <section id="recent">
-  <div class="sec-head"><span class="sec-no">02</span><h2>近半年日K與均線</h2></div>
+  <div class="sec-head"><span class="sec-no"></span><h2>近半年日K與均線</h2></div>
   <p class="sec-sub" id="recent-sub">—</p>
   <figure class="panel">
     <div class="panel-head"><h3>日K、50 日與 200 日均線</h3><p>標記的編號對應下方事件表；漲跌幅都是本資料的收盤計算。</p></div>
@@ -229,8 +269,34 @@ td.l{text-align:left; white-space:normal; min-width:220px}
   <div class="tw"><table id="t-ev"><caption>事件<small>事件內容引自所列來源；漲跌幅是 ^SOX 當日收盤變化，由本資料計算，不採用文章數字。同日事件不代表因果。</small></caption></table></div>
 </section>
 
+<section id="breadth">
+  <div class="sec-head"><span class="sec-no"></span><h2>成分股廣度</h2></div>
+  <p class="sec-sub" id="br-sub">—</p>
+  <div class="tw"><table id="t-br"><caption>目前讀數<small id="br-cap">—</small></caption></table></div>
+  <figure class="panel">
+    <div class="panel-head"><h3>週收盤與站上週均線的比例</h3><p id="br-def">—</p></div>
+    <div class="rb-row" id="br-rb" style="padding:10px 20px 0"></div>
+    <div class="legend" id="br-lg"></div>
+    <div class="panel-body"><div id="c-br"></div></div>
+    <figcaption id="br-fig"></figcaption>
+  </figure>
+</section>
+
+<section id="mcc">
+  <div class="sec-head"><span class="sec-no"></span><h2>麥克連擺盪指標</h2></div>
+  <p class="sec-sub" id="mcc-sub">—</p>
+  <figure class="panel">
+    <div class="panel-head"><h3>麥克連擺盪指標（McClellan Oscillator）</h3><p id="mcc-def">—</p></div>
+    <div class="rb-row" id="mcc-rb" style="padding:10px 20px 0"></div>
+    <div class="legend" id="mcc-lg"></div>
+    <div class="panel-body"><div id="c-mcc"></div></div>
+    <figcaption id="mcc-cap"></figcaption>
+    <ul class="take" id="mcc-take" style="padding:0 20px 8px; margin-top:0"></ul>
+  </figure>
+</section>
+
 <section id="days">
-  <div class="sec-head"><span class="sec-no">03</span><h2>單日重挫</h2></div>
+  <div class="sec-head"><span class="sec-no"></span><h2>單日重挫</h2></div>
   <p class="sec-sub" id="days-sub">—</p>
   <figure class="panel">
     <div class="panel-head"><h3 id="yr-h">—</h3><p>每一年單日收盤跌幅達門檻的交易日數；當年未過完的年份只算到資料日。</p></div>
@@ -240,20 +306,20 @@ td.l{text-align:left; white-space:normal; min-width:220px}
 </section>
 
 <section id="comp">
-  <div class="sec-head"><span class="sec-no">04</span><h2>和 S&amp;P 500 半導體成分股比較</h2></div>
+  <div class="sec-head"><span class="sec-no"></span><h2>和 S&amp;P 500 半導體成分股比較</h2></div>
   <p class="sec-sub" id="comp-sub">—</p>
   <div class="tw"><table id="t-comp"><caption>^SOX 與重建的 S&amp;P 500 半導體指數<small id="comp-cap">—</small></caption></table></div>
 </section>
 
 <section id="method">
-  <div class="sec-head"><span class="sec-no">05</span><h2>方法與限制</h2></div>
+  <div class="sec-head"><span class="sec-no"></span><h2>方法與限制</h2></div>
   <ul class="take" id="m-list" style="margin-top:14px"></ul>
 </section>
 
 <footer id="foot"></footer>
 </div>
 <div id="tip"></div>
-
+<script>__MCC_JS__</script>
 <script>
 (function () {
   "use strict";
@@ -388,6 +454,41 @@ td.l{text-align:left; white-space:normal; min-width:220px}
       $("comp-sub").textContent = "資料夾裡沒有重建半導體指數的輸出，這一節略過。";
       $("t-comp").closest(".tw").style.display = "none";
     }
+
+    // breadth of the S&P 500 semiconductor names
+    var BR = D.breadth;
+    if (BR) {
+      var vs = function (a, b) { return Math.abs(a - b) < 3 ? "和全市場差不多" : a > b ? "高於全市場" : "低於全市場"; };
+      $("br-sub").textContent = "^SOX 自己的成分股（含不在 S&P 500 的公司）不在我們的資料裡，所以廣度用 S&P 500 裡產業為半導體與半導體設備的 " + BR.n +
+        " 檔來量，和「和 S&P 500 半導體成分股比較」一節的重建指數是同一批。到 " + BR.asof + "，站上 200 日均線的 " + BR.now.p200.toFixed(0) + "%（" + vs(BR.now.p200, BR.mkt.p200) + "的 " + BR.mkt.p200.toFixed(0) +
+        "%）、50 日 " + BR.now.p50.toFixed(0) + "%（全市場 " + BR.mkt.p50.toFixed(0) + "%）、20 日 " + BR.now.p20.toFixed(0) + "%（全市場 " + BR.mkt.p20.toFixed(0) + "%）。" +
+        "週線上，站上 40 週均線的 " + BR.p40_now.toFixed(0) + "%，在 " + BR.w.dates[0].slice(0, 4) + " 年以來第 " + BR.p40_pctile.toFixed(0) + " 百分位（中位 " + BR.p40_median.toFixed(0) + "%）" +
+        (BR.p40_last_as_low ? "；不算最近 " + BR.skip + " 週，上一次這麼低是 " + BR.p40_last_as_low + " 那週。" : "；不算最近 " + BR.skip + " 週，期間沒有這麼低的時候。");
+      var row = function (lab, a, b, fmtv) { return [lab, { html: fmtv(a), cls: "n" }, { html: b === null ? "—" : fmtv(b), cls: "n" }]; };
+      var p0 = function (v) { return v.toFixed(0) + "%"; }, i0 = function (v) { return String(v); };
+      fillTable("t-br", ["項目", "半導體 " + BR.n + " 檔", "S&amp;P 500 全體"], [
+        row("站上 20 日均線", BR.now.p20, BR.mkt.p20, p0), row("站上 50 日均線", BR.now.p50, BR.mkt.p50, p0), row("站上 200 日均線", BR.now.p200, BR.mkt.p200, p0),
+        row("當日上漲／下跌家數", BR.adv + "／" + BR.dec, null, i0), row("近 20 日 52 週新高／新低（家次）", BR.nh20 + "／" + BR.nl20, null, i0),
+        row("騰落線近 20 日變化", (BR.ad_chg20 > 0 ? "+" : "") + BR.ad_chg20, null, i0)]);
+      $("br-cap").textContent = "資料到 " + BR.asof + "（成分股資料比 ^SOX 少最後一個交易日）。「家次」把同一檔在不同日的新高或新低分開計算。";
+      $("br-def").textContent = "上：^SOX 週收盤（對數刻度）。下：" + BR.n + " 檔中站上 10 週與 40 週均線（約當 50 與 200 日）的比例。名單是今天的成分股往回推，早年偏強（存活者偏差）；一檔約占 " +
+        (100 / BR.n).toFixed(0) + " 個百分點，比例跳動大。";
+      $("br-fig").textContent = "站上 10 週均線目前 " + BR.p10_now.toFixed(0) + "%（第 " + BR.p10_pctile.toFixed(0) + " 百分位，中位 " + BR.p10_median.toFixed(0) + "%）。按鈕只改變畫面範圍，文字是全期數字。";
+    } else {
+      $("breadth").style.display = "none";
+    }
+    if (D.mcc) {
+      $("mcc-sub").textContent = "擺盪指標看的是上漲與下跌家數的差距，和指數漲跌幅無關：指數續跌時若下跌家數不再擴大，擺盪指標會先止跌。這裡的家數同樣是 S&P 500 半導體 " +
+        (BR ? BR.n : "") + " 檔；圖上的 ^SOX 只到成分股資料的最後一天。";
+    } else {
+      $("mcc").style.display = "none";
+    }
+    // section numbers follow the visible sections, never typed
+    var k = 0;
+    document.querySelectorAll(".wrap > section").forEach(function (sec) {
+      if (sec.style.display === "none") return;
+      var no = sec.querySelector(".sec-no"); if (no) no.textContent = String(++k).padStart(2, "0");
+    });
 
     $("m-list").innerHTML = [
       ["資料", D.symbol + " 日線（" + D.start + " 至 " + D.asof + "，" + D.n_bars + " 個交易日），由每日抓取程式從 Yahoo Finance 取得，存在 data/weekly_reutin/index_ohlc.csv。報告不自行修正官方數字。"],
@@ -600,7 +701,72 @@ td.l{text-align:left; white-space:normal; min-width:220px}
     s.appendChild(el("line", { x1: m.l, x2: m.l + iw, y1: Y(0), y2: Y(0), stroke: css("--axis") }));
     host.innerHTML = ""; host.appendChild(s);
   }
-  function renderCharts() { rangeButtons(); drawLong(); drawK(); drawYears(); }
+  var BR_N = Infinity;
+  function drawBreadth() {
+    var BR = D.breadth; if (!BR) return;
+    var host = $("br-rb"); host.innerHTML = "";
+    [["1 年", 52], ["3 年", 156], ["5 年", 260], ["全部", Infinity]].forEach(function (p) {
+      var b = document.createElement("button"); b.type = "button"; b.textContent = p[0];
+      if (BR_N === p[1]) b.className = "on";
+      b.setAttribute("aria-pressed", BR_N === p[1] ? "true" : "false");
+      b.addEventListener("click", function () { BR_N = p[1]; drawBreadth(); });
+      host.appendChild(b);
+    });
+    var W = BR.w, N = W.dates.length, a = Math.max(0, N - Math.min(N, BR_N));
+    var dates = W.dates.slice(a), sox = W.sox.slice(a), p10 = W.p10.slice(a), p40 = W.p40.slice(a), n = dates.length;
+    var hostC = $("c-br"), w = Math.max(320, hostC.clientWidth), small = w < 520;
+    var m = { l: small ? 46 : 54, r: small ? 50 : 60 }, T = { y: 10, h: small ? 160 : 200 }, B = { y: 0, h: small ? 130 : 160 };
+    B.y = T.y + T.h + 22;
+    var h = B.y + B.h + 26, iw = w - m.l - m.r, sv = svg(w, h), ink3 = css("--ink-3"), rule = css("--rule");
+    var X = function (i) { return m.l + iw * i / Math.max(1, n - 1); };
+    var v = sox.filter(function (x) { return x; }), lo = Math.min.apply(null, v) * 0.95, hi = Math.max.apply(null, v) * 1.05;
+    var LY = function (x) { return T.y + T.h * (1 - (Math.log(x) - Math.log(lo)) / (Math.log(hi) - Math.log(lo))); };
+    logTicks(lo, hi).forEach(function (t) {
+      sv.appendChild(el("line", { x1: m.l, x2: m.l + iw, y1: LY(t), y2: LY(t), stroke: rule }));
+      sv.appendChild(el("text", { x: m.l - 6, y: LY(t) + 4, "text-anchor": "end", fill: ink3, "font-size": 10.5, "font-family": MONO }, t >= 1000 ? (t / 1000) + "k" : t));
+    });
+    var PY = function (x) { return B.y + B.h * (1 - x / 100); };
+    [0, 25, 50, 75, 100].forEach(function (t) {
+      sv.appendChild(el("line", { x1: m.l, x2: m.l + iw, y1: PY(t), y2: PY(t), stroke: t === 50 ? css("--axis") : rule }));
+      sv.appendChild(el("text", { x: m.l - 6, y: PY(t) + 4, "text-anchor": "end", fill: ink3, "font-size": 10.5, "font-family": MONO }, t + "%"));
+    });
+    var path = function (arr, Y, col, wd, op) {
+      var d = "", pen = false;
+      arr.forEach(function (x, i) { if (x === null) { pen = false; return; } d += (pen ? "L" : "M") + X(i).toFixed(1) + " " + Y(x).toFixed(1); pen = true; });
+      sv.appendChild(el("path", { d: d, fill: "none", stroke: col, "stroke-width": wd, opacity: op || 1, "stroke-linejoin": "round" }));
+    };
+    var cS = css("--s2"), c40 = css("--s1"), c10 = css("--s3");
+    path(sox, LY, cS, 1.8); path(p10, PY, c10, 1.2, 0.8); path(p40, PY, c40, 1.8);
+    var endL = function (y, col, t) {
+      sv.appendChild(el("line", { x1: m.l + iw + 4, x2: m.l + iw + 10, y1: y, y2: y, stroke: col, "stroke-width": 2 }));
+      sv.appendChild(el("text", { x: m.l + iw + 13, y: y + 4, fill: css("--ink-2"), "font-size": 10.5, "font-weight": 600, "font-family": MONO }, t));
+    };
+    var j = n - 1; while (j > 0 && sox[j] === null) j--;
+    endL(LY(sox[j]), cS, (sox[j] / 1000).toFixed(1) + "k");
+    var y40 = PY(p40[n - 1]), y10 = PY(p10[n - 1]); if (Math.abs(y40 - y10) < 12) y10 = y40 + (y10 >= y40 ? 12 : -12);
+    endL(y40, c40, p40[n - 1].toFixed(0) + "%"); endL(y10, c10, p10[n - 1].toFixed(0) + "%");
+    yearTicks(sv, dates, X, h - 8, ink3);
+    var cross = el("line", { y1: T.y, y2: B.y + B.h, stroke: css("--ink"), opacity: 0 }); sv.appendChild(cross);
+    var hit = el("rect", { x: m.l, y: T.y, width: iw, height: B.y + B.h - T.y, fill: "transparent" });
+    hit.addEventListener("mousemove", function (ev) {
+      var bb = sv.getBoundingClientRect(), i = Math.max(0, Math.min(n - 1, Math.round((ev.clientX - bb.left - m.l) / (iw / Math.max(1, n - 1)))));
+      cross.setAttribute("x1", X(i)); cross.setAttribute("x2", X(i)); cross.setAttribute("opacity", 0.3);
+      showTip("<div class='tt-h'>" + dates[i] + "</div>" + (sox[i] ? "<div class='tt-r'><span>^SOX</span><b>" + num(sox[i]) + "</b></div>" : "") +
+        "<div class='tt-r'><span>站上 40 週均線</span><b>" + (p40[i] === null ? "—" : p40[i].toFixed(0) + "%") + "</b></div>" +
+        "<div class='tt-r'><span>站上 10 週均線</span><b>" + (p10[i] === null ? "—" : p10[i].toFixed(0) + "%") + "</b></div>", ev);
+    });
+    hit.addEventListener("mouseleave", function () { hideTip(); cross.setAttribute("opacity", 0); });
+    sv.appendChild(hit);
+    hostC.innerHTML = ""; hostC.appendChild(sv);
+    $("br-lg").innerHTML = "<span><i class='swatch' style='background:" + cS + "'></i>^SOX 週收盤</span><span><i class='swatch' style='background:" + c40 +
+      "'></i>站上 40 週均線</span><span><i class='swatch' style='background:" + c10 + "'></i>站上 10 週均線</span>";
+  }
+  function renderCharts() {
+    rangeButtons(); drawLong(); drawK(); drawBreadth(); drawYears();
+    if (D.mcc && window.MCC) MCC.render(D.mcc, { key: "sox", idxName: "^SOX",
+      groupName: "S&P 500 半導體成分股 " + (D.breadth ? D.breadth.n : "") + " 檔（不是 ^SOX 自己的成分股）",
+      ids: { chart: "c-mcc", rb: "mcc-rb", lg: "mcc-lg", def: "mcc-def", cap: "mcc-cap", take: "mcc-take" } });
+  }
 
   renderStatic(); renderCharts();
   var tmr; addEventListener("resize", function () { clearTimeout(tmr); tmr = setTimeout(renderCharts, 150); });

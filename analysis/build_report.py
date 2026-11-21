@@ -16,6 +16,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 PLACEHOLDER = "__REPORT_DATA__"
 VIEW = "__REPORT_VIEW__"
+MCC_JS = "__MCC_JS__"
 # One template, two files: the full report and a page with only the bull-bear spread sections.
 OUTPUTS = [("full", "sp500_internals_{asof}.html"), ("spread", "ai_spread_{asof}.html")]
 
@@ -37,6 +38,8 @@ def main() -> None:
     if "</script" in raw.lower():
         raise SystemExit("report data contains a </script sequence; refusing to inline it")
 
+    # the McClellan panel's code is shared with the ^SOX review page, so it lives in its own file
+    mcc_js = (REPO / "analysis" / "mcclellan_view.js").read_text(encoding="utf-8")
     asof = payload["asof"]
     out_dir = Path(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -46,7 +49,7 @@ def main() -> None:
         if view == "spread" and "trend" not in payload:
             continue                                  # no regime data, no spread page
         out = out_dir / name.format(asof=asof)
-        out.write_text(tpl.replace(VIEW, view).replace(PLACEHOLDER, raw), encoding="utf-8")
+        out.write_text(tpl.replace(VIEW, view).replace(MCC_JS, mcc_js).replace(PLACEHOLDER, raw), encoding="utf-8")
         print(f"wrote {out} ({out.stat().st_size:,} bytes)")
     print(f"  data as of {asof} · generated {payload.get('generated', 'n/a')}")
 
