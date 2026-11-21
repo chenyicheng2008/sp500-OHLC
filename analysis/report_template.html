@@ -1796,7 +1796,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
           : "。"));
     var bull0 = states.reduce(function (a, c) { return a + tr.bull[c]; }, 0);
     var newBull = tr.neither.bull + tr.bear.bull;
-    take.push("流向：一個月前的 " + bull0 + " 檔多頭" + (tr.bull.bull === 0 ? "沒有一檔維持，"
+    take.push("流向：一個月前的 " + bull0 + " 檔多頭" + (tr.bull.bull === 0 ? (bull0 === 1 ? "已不再維持，" : "沒有一檔維持，")
         : (tr.bull.bull * 2 < bull0 ? "只剩 " : "有 ") + tr.bull.bull + " 檔維持，") + tr.bull.neither + " 檔退回整理、" + tr.bull.bear +
       " 檔直接轉空頭；" + (newBull ? "同期新進多頭 " + newBull + " 檔（" + tr.neither.bull + " 檔來自整理、" + tr.bear.bull + " 檔來自空頭）。"
         : "同期沒有新進多頭。") +
@@ -1805,7 +1805,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     var inn = (T.moved["neither->bull"] || []).concat(T.moved["bear->bull"] || []);
     var top = function (a) { return byIndustry(a, T.group_of).slice(0, 3).map(function (g) { return gName(g.ind) + " " + g.tks.join("/"); }).join("、"); };
     var who = function (a, verb) {
-      return a.length === 1 ? verb + "只有" + gName(T.group_of[a[0]]) + "的 " + a[0]
+      return a.length === 1 ? verb + "只有" + (/^[A-Za-z]/.test(gName(T.group_of[a[0]])) ? " " : "") + gName(T.group_of[a[0]]) + "的 " + a[0]
         : verb + "的 " + a.length + " 檔以" + top(a) + " 為主";
     };
     if (out.length || inn.length) take.push("誰進誰出：" + (out.length ? who(out, "退出多頭") : "") +
@@ -2531,8 +2531,8 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     var now = T.signals.filter(function (s) { return s.pending.length; }).map(function (s) { return s.id; });
     var dp = sigTxt("deep40");
     take.push("現在：多空排列差 " + sgn(B.net_now, 1) + "（4 週變化 " + sgn(B.d4_now, 0) + "），科技距高點 " + pct(T.dd_now, 1) + "、半導體 " +
-      pct(S.dd_now, 1) + "。" + (now.indexOf("deep40") >= 0 ? (B.net_now <= -40 ? "多空排列差剛跌破 -40" : "多空排列差在 " + dp.t.pending[dp.t.pending.length - 1] +
-        " 跌破 -40，目前回升到 " + sgn(B.net_now, 1)) + "；歷史上" + dp.txt +
+      pct(S.dd_now, 1) + "。" + (now.indexOf("deep40") >= 0 ? ("多空排列差在 " + dp.t.pending[dp.t.pending.length - 1] + " 跌破 -40，" +
+        (B.net_now <= -40 ? "目前 " + sgn(B.net_now, 1) + "，仍在 -40 之下" : "目前回升到 " + sgn(B.net_now, 1))) + "；歷史上" + dp.txt +
         (dp.t.hits * 2 === dp.t.n_done ? "——繼續大跌與見底各占一半，多空排列差本身分不出這次是哪一種。" : "。")
         : now.length ? "近 " + H + " 週有訊號出現，結果還要等。" : "近 " + H + " 週沒有訊號。"));
     renderCycleStatic(B).forEach(function (t) { take.push(t); });
@@ -2661,7 +2661,10 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     var rl = B.indices.tech.label;
     document.getElementById("bt-off-h").firstChild.textContent = "重建" + btShort(rl) + "指數與官方 " + O.symbol + " 並列";
     if (!O.available) {
-      fillTable("t-bt-off", ["項目", "說明"], [["官方指數", { html: "資料檔裡還沒有 " + O.symbol + "（index_ohlc.csv）。每日抓取程式抓到後，這裡和上圖會並列比較。" }]]);
+      fillTable("t-bt-off", ["項目", "說明"], [["官方指數", { html: O.short
+        ? "資料檔裡的 " + O.symbol + " 只有 " + O.short.bars + " 筆（" + O.short.first + (O.short.first === O.short.last ? "" : " 至 " + O.short.last) +
+          "），資料來源（Yahoo）沒有給出歷史，不足以比較；等抓到完整歷史後，這裡和上圖會並列比較。"
+        : "資料檔裡還沒有 " + O.symbol + "（index_ohlc.csv）。每日抓取程式抓到後，這裡和上圖會並列比較。" }]]);
       document.getElementById("bt-off-cap").textContent = "";
       return;
     }
@@ -3112,7 +3115,8 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
         "同期重建" + (/^[A-Za-z]/.test(cfg.pre) ? " " : "") + cfg.pre + "指數：市值加權 " + chg(ML.cw) + "、等權重 " + chg(ML.ew) +
         (ML.off_cw ? "；" + cfg.offCW + " " + chg(ML.off_cw) + (ML.off_ew ? "、" + cfg.offEW + " " + chg(ML.off_ew) : "") : "") + "。" +
         "成分股與指數都用今天的成分名單回推，早年的強勢與漲幅都偏高（存活者偏差）" +
-        (ML.off_cw ? "，重建線與官方虛線拉開的距離就是這個偏差。" : cfg.offSyms ? "；官方 " + cfg.offSyms + " 由每日抓取程式加抓，資料進來後會以虛線並列，直接看出偏差有多大。" : "。") + (cfg.note || "") +
+        (ML.off_cw ? (cfg.offProxy ? "，重建線與官方虛線拉開的距離有一部分來自這個偏差。" : "，重建線與官方虛線拉開的距離就是這個偏差。") : cfg.offShort ? "；官方 " + cfg.offSyms + " 目前只抓到 " + cfg.offShort.bars +
+          " 筆（資料來源沒有給出歷史），不足以畫出比較線，抓到完整歷史後會以虛線並列。" : cfg.offSyms ? "；官方 " + cfg.offSyms + " 由每日抓取程式加抓，資料進來後會以虛線並列，直接看出偏差有多大。" : "。") + (cfg.note || "") +
         (ML.partial ? "最後一週尚未收完（資料到 " + D.asof + "）。" : "");
     } else {
       var DL = ML ? ML.daily : null;
@@ -3231,11 +3235,12 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     var s1 = css("--s1"), s2 = css("--s2"), s3 = css("--s3");
 
     drawMaPanel({ id: "ma", ML: D.ma_long, pre: "", offCW: "S&P 500 官方 ^GSPC", offEW: "S&P 500 等權重官方 ^SPXEW", offSyms: "^GSPC／^SPXEW" });
-    if (D.ma_long_tech) drawMaPanel({ id: "mt", ML: D.ma_long_tech, pre: "科技類股", offCW: "S&P 500 資訊科技官方 ^SP500-45",
+    if (D.ma_long_tech) drawMaPanel({ id: "mt", ML: D.ma_long_tech, pre: "科技類股", offCW: "S&P 500 資訊科技官方 ^SP500-45", offProxy: true,
+      offShort: D.backtest && D.backtest.official && D.backtest.official.tech ? D.backtest.official.tech.short : null,
       offSyms: "^SP500-45",
       note: "官方只有市值加權版，等權重線沒有官方對照。科技類股依 Yahoo 的類股分類，官方資訊科技類股依 GICS，兩者成分不完全相同，所以即使沒有存活者偏差，兩條線也不會完全重合。" });
     else document.getElementById("f-mt").style.display = "none";
-    if (D.ma_long_semi) drawMaPanel({ id: "ms", ML: D.ma_long_semi, pre: "半導體", offCW: "費城半導體指數 ^SOX", offSyms: "^SOX",
+    if (D.ma_long_semi) drawMaPanel({ id: "ms", ML: D.ma_long_semi, pre: "半導體", offCW: "費城半導體指數 ^SOX", offSyms: "^SOX", offProxy: true,
       note: "半導體只有 " + D.ma_long_semi.n + " 檔，一檔就占約 " + (100 / D.ma_long_semi.n).toFixed(0) +
         " 個百分點，比例跳動比全市場與科技類股大得多。^SOX 不是 S&P 指數，成分包含非 S&P 500 的公司，加權方式也不同，和這 " +
         D.ma_long_semi.n + " 檔不是同一批，虛線只當參考，兩條線的差距不全是存活者偏差。" });
@@ -3311,8 +3316,12 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     document.getElementById("cap-hl").textContent =
       "目前 10 日均為 " + (D.latest.net_hl_10d >= 0 ? "+" : "") + D.latest.net_hl_10d.toFixed(1) +
       "，最新一日新高 " + D.latest.new_highs + " 家、新低 " + D.latest.new_lows +
-      " 家。" + (D.latest.net_hl_10d > 5 ? "新高已重新多於新低。"
-        : D.latest.net_hl_10d < -5 ? "新低持續多於新高。" : "新高與新低大致相抵。");
+      " 家。" + (function () {
+        var nh = D.latest.new_highs, nl = D.latest.new_lows, avg = D.latest.net_hl_10d;
+        var base = avg > 5 ? "10 日平均是新高多於新低" : avg < -5 ? "10 日平均是新低多於新高" : "10 日平均新高與新低大致相抵";
+        var dayUp = nh > nl, dayDn = nl > nh;
+        return base + ((avg > 5 && dayDn) ? "，但最新一日已轉為新低較多。" : (avg < -5 && dayUp) ? "，但最新一日已轉為新高較多。" : "。");
+      })();
 
     // drawdown buckets — ordered categories, so an ordinal ramp of one hue
     var ramp = ["#184f95", "#256abf", "#3987e5", "#6da7ec", "#9ec5f4", "#cde2fb"];
@@ -3328,8 +3337,8 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     });
     var deep = D.drawdown[0].pct + D.drawdown[1].pct;
     document.getElementById("cap-dd").textContent =
-      (D.drawdown[5].pct < 10 ? "只有 " : "有 ") + D.drawdown[5].count + " 檔（" + D.drawdown[5].pct.toFixed(1) +
-      "%）正站在 52 週高點，" + deep.toFixed(1) + "% 的成分股距高點超過 20%，即個股層面的熊市區間。";
+      (D.drawdown[5].count === 0 ? "沒有一檔正站在 52 週高點，"
+        : (D.drawdown[5].pct < 10 ? "只有 " : "有 ") + D.drawdown[5].count + " 檔（" + D.drawdown[5].pct.toFixed(1) + "%）正站在 52 週高點，") + + deep.toFixed(1) + "% 的成分股距高點超過 20%，即個股層面的熊市區間。";
 
     // top-10 weights
     hbarChart(document.getElementById("c-top10"), {
@@ -3417,8 +3426,8 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
       "%）超額報酬為 " + pct(heaviest.rs_3m) + "。防禦型類股" +
       (defsAhead.length === 0
         ? "全數落後指數，代表這不是典型的避險輪動，而是全面性的縮手。"
-        : "中有 " + defsAhead.map(function (x) { return secName(x.Sector); }).join("、") +
-          " 跑贏指數，資金有部分往防禦端靠。");
+        : "中有" + defsAhead.map(function (x) { return secName(x.Sector); }).join("、") +
+          "跑贏指數，資金有部分往防禦端靠。");
   }
 
   renderStatic(); applyView();

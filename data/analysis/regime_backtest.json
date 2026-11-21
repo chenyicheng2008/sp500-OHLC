@@ -1,8 +1,8 @@
 {
- "asof": "2026-11-12",
- "last_week": "2026-11-13",
+ "asof": "2026-11-19",
+ "last_week": "2026-11-20",
  "week_partial": true,
- "start": "2015-08-14",
+ "start": "2015-08-21",
  "weeks": 588,
  "horizon": 13,
  "big_drop": -10,
@@ -14,31 +14,31 @@
    "label": "科技類股",
    "n": 83,
    "overlap_n": 21,
-   "overlap_cap": 41.0
+   "overlap_cap": 37.0
   },
   "semi": {
    "label": "半導體（含設備）",
    "n": 18,
    "overlap_n": 8,
-   "overlap_cap": 87.0
+   "overlap_cap": 86.0
   }
  },
  "independent_windows": 45,
  "by_index": {
   "tech": {
-   "base_p_big": 16.5,
+   "base_p_big": 16.3,
    "base_med_fwd_ret": 7.0,
-   "corr_past": 0.62,
-   "corr_fwd_mdd": 0.07,
-   "corr_fwd_ret": -0.05,
+   "corr_past": 0.61,
+   "corr_fwd_mdd": 0.06,
+   "corr_fwd_ret": -0.06,
    "buckets": [
     {
      "lo": -101,
      "hi": -50,
-     "weeks": 40,
-     "p_big": 30.0,
-     "med_fwd_ret": 6.7,
-     "med_fwd_mdd": -6.3
+     "weeks": 39,
+     "p_big": 30.8,
+     "med_fwd_ret": 8.1,
+     "med_fwd_mdd": -6.0
     },
     {
      "lo": -50,
@@ -53,24 +53,24 @@
      "hi": 20,
      "weeks": 127,
      "p_big": 30.7,
-     "med_fwd_ret": 6.7,
-     "med_fwd_mdd": -1.8
+     "med_fwd_ret": 6.5,
+     "med_fwd_mdd": -1.6
     },
     {
      "lo": 20,
      "hi": 50,
-     "weeks": 133,
-     "p_big": 3.8,
-     "med_fwd_ret": 9.0,
-     "med_fwd_mdd": -1.5
+     "weeks": 134,
+     "p_big": 3.7,
+     "med_fwd_ret": 8.7,
+     "med_fwd_mdd": -1.7
     },
     {
      "lo": 50,
      "hi": 80,
      "weeks": 173,
-     "p_big": 12.1,
+     "p_big": 11.6,
      "med_fwd_ret": 6.3,
-     "med_fwd_mdd": -2.4
+     "med_fwd_mdd": -2.2
     },
     {
      "lo": 80,
@@ -115,7 +115,7 @@
      "n": 18,
      "n_done": 17,
      "hits": 2,
-     "med_fwd_ret": 11.5,
+     "med_fwd_ret": 11.4,
      "dates": [
       "2016-01-15",
       "2016-04-29",
@@ -143,14 +143,15 @@
     {
      "id": "diverge",
      "label": "指數距高點 3% 以內，多空排列差卻 ≤ 0",
-     "n": 5,
-     "n_done": 5,
-     "hits": 2,
-     "med_fwd_ret": -0.4,
+     "n": 6,
+     "n_done": 6,
+     "hits": 3,
+     "med_fwd_ret": -1.4,
      "dates": [
-      "2015-08-14",
-      "2015-11-20",
-      "2018-07-20",
+      "2015-08-21",
+      "2015-11-27",
+      "2018-05-04",
+      "2018-09-28",
       "2021-10-15",
       "2024-12-20"
      ],
@@ -162,7 +163,7 @@
      "n": 9,
      "n_done": 8,
      "hits": 4,
-     "med_fwd_ret": 7.3,
+     "med_fwd_ret": 7.2,
      "dates": [
       "2015-09-18",
       "2016-01-08",
@@ -209,8 +210,8 @@
      "cross": "2018-07-20",
      "lead_weeks": -10,
      "at_cross": null,
-     "cross_to_peak": 8.0,
-     "cross_to_trough": -15.2
+     "cross_to_peak": 8.1,
+     "cross_to_trough": -15.1
     },
     {
      "peak": "2020-02-14",
@@ -226,12 +227,12 @@
      "lead_weeks": 2,
      "at_cross": -13.2,
      "cross_to_peak": null,
-     "cross_to_trough": -19.4
+     "cross_to_trough": -19.3
     },
     {
      "peak": "2021-12-10",
      "trough": "2022-10-14",
-     "depth": -34.2,
+     "depth": -33.9,
      "spread_hi": 95.2,
      "spread_hi_date": "2021-01-22",
      "spread_hi_lead": 46,
@@ -241,13 +242,13 @@
      "cross": "2021-10-01",
      "lead_weeks": -10,
      "at_cross": null,
-     "cross_to_peak": 17.2,
-     "cross_to_trough": -22.9
+     "cross_to_peak": 17.0,
+     "cross_to_trough": -22.6
     },
     {
      "peak": "2024-12-06",
      "trough": "2025-04-04",
-     "depth": -24.2,
+     "depth": -23.9,
      "spread_hi": 90.5,
      "spread_hi_date": "2024-01-26",
      "spread_hi_lead": 45,
@@ -258,12 +259,12 @@
      "lead_weeks": 2,
      "at_cross": -1.2,
      "cross_to_peak": null,
-     "cross_to_trough": -23.2
+     "cross_to_trough": -23.0
     },
     {
      "peak": "2025-10-31",
      "trough": "2026-03-27",
-     "depth": -15.5,
+     "depth": -15.7,
      "spread_hi": 100.0,
      "spread_hi_date": "2025-10-03",
      "spread_hi_lead": 4,
@@ -275,33 +276,49 @@
      "at_cross": null,
      "cross_to_peak": null,
      "cross_to_trough": null
+    },
+    {
+     "peak": "2026-10-02",
+     "trough": "2026-11-20",
+     "depth": -16.5,
+     "spread_hi": 100.0,
+     "spread_hi_date": "2025-10-03",
+     "spread_hi_lead": 52,
+     "ongoing": true,
+     "net_at_peak": 68.2,
+     "net_min": -54.5,
+     "cross": "2026-10-16",
+     "lead_weeks": 2,
+     "at_cross": -6.0,
+     "cross_to_peak": null,
+     "cross_to_trough": -11.2
     }
    ],
-   "dd_now": -11.1,
+   "dd_now": -16.5,
    "peak": "2026-10-02"
   },
   "semi": {
-   "base_p_big": 25.0,
-   "base_med_fwd_ret": 8.9,
-   "corr_past": 0.7,
+   "base_p_big": 25.4,
+   "base_med_fwd_ret": 8.7,
+   "corr_past": 0.71,
    "corr_fwd_mdd": 0.09,
    "corr_fwd_ret": -0.04,
    "buckets": [
     {
      "lo": -101,
      "hi": -50,
-     "weeks": 40,
-     "p_big": 40.0,
-     "med_fwd_ret": 11.9,
-     "med_fwd_mdd": -6.9
+     "weeks": 39,
+     "p_big": 41.0,
+     "med_fwd_ret": 12.9,
+     "med_fwd_mdd": -6.8
     },
     {
      "lo": -50,
      "hi": -20,
      "weeks": 35,
      "p_big": 45.7,
-     "med_fwd_ret": 8.9,
-     "med_fwd_mdd": -7.5
+     "med_fwd_ret": 8.8,
+     "med_fwd_mdd": -7.4
     },
     {
      "lo": -20,
@@ -309,14 +326,14 @@
      "weeks": 127,
      "p_big": 35.4,
      "med_fwd_ret": 6.4,
-     "med_fwd_mdd": -4.5
+     "med_fwd_mdd": -4.4
     },
     {
      "lo": 20,
      "hi": 50,
-     "weeks": 133,
-     "p_big": 14.3,
-     "med_fwd_ret": 11.7,
+     "weeks": 134,
+     "p_big": 15.7,
+     "med_fwd_ret": 11.3,
      "med_fwd_mdd": -2.4
     },
     {
@@ -324,7 +341,7 @@
      "hi": 80,
      "weeks": 173,
      "p_big": 22.0,
-     "med_fwd_ret": 7.3,
+     "med_fwd_ret": 7.0,
      "med_fwd_mdd": -3.5
     },
     {
@@ -332,7 +349,7 @@
      "hi": 101,
      "weeks": 67,
      "p_big": 14.9,
-     "med_fwd_ret": 8.4,
+     "med_fwd_ret": 8.1,
      "med_fwd_mdd": -1.9
     }
    ],
@@ -343,7 +360,7 @@
      "n": 14,
      "n_done": 13,
      "hits": 6,
-     "med_fwd_ret": 11.2,
+     "med_fwd_ret": 11.0,
      "dates": [
       "2015-12-11",
       "2016-04-29",
@@ -370,7 +387,7 @@
      "n": 18,
      "n_done": 17,
      "hits": 5,
-     "med_fwd_ret": 15.3,
+     "med_fwd_ret": 15.0,
      "dates": [
       "2016-01-15",
       "2016-04-29",
@@ -401,9 +418,9 @@
      "n": 4,
      "n_done": 4,
      "hits": 2,
-     "med_fwd_ret": -2.9,
+     "med_fwd_ret": 4.5,
      "dates": [
-      "2015-08-14",
+      "2015-08-21",
       "2015-11-27",
       "2021-10-15",
       "2024-12-27"
@@ -453,7 +470,7 @@
     {
      "peak": "2018-06-15",
      "trough": "2018-12-21",
-     "depth": -25.9,
+     "depth": -25.6,
      "spread_hi": 80.0,
      "spread_hi_date": "2017-07-14",
      "spread_hi_lead": 48,
@@ -463,8 +480,8 @@
      "cross": "2018-04-06",
      "lead_weeks": -10,
      "at_cross": null,
-     "cross_to_peak": 15.6,
-     "cross_to_trough": -14.3
+     "cross_to_peak": 15.5,
+     "cross_to_trough": -14.1
     },
     {
      "peak": "2019-04-19",
@@ -501,7 +518,7 @@
     {
      "peak": "2021-11-19",
      "trough": "2022-10-14",
-     "depth": -48.3,
+     "depth": -48.0,
      "spread_hi": 95.2,
      "spread_hi_date": "2020-12-04",
      "spread_hi_lead": 50,
@@ -511,13 +528,13 @@
      "cross": "2021-10-01",
      "lead_weeks": -7,
      "at_cross": null,
-     "cross_to_peak": 27.6,
-     "cross_to_trough": -34.1
+     "cross_to_peak": 27.0,
+     "cross_to_trough": -33.9
     },
     {
      "peak": "2024-03-22",
      "trough": "2024-04-19",
-     "depth": -15.4,
+     "depth": -15.3,
      "spread_hi": 90.5,
      "spread_hi_date": "2024-01-26",
      "spread_hi_lead": 8,
@@ -533,7 +550,7 @@
     {
      "peak": "2024-06-14",
      "trough": "2024-09-06",
-     "depth": -21.4,
+     "depth": -21.3,
      "spread_hi": 90.5,
      "spread_hi_date": "2024-01-26",
      "spread_hi_lead": 20,
@@ -544,12 +561,12 @@
      "lead_weeks": 7,
      "at_cross": -18.6,
      "cross_to_peak": null,
-     "cross_to_trough": -3.4
+     "cross_to_trough": -3.3
     },
     {
      "peak": "2025-01-24",
      "trough": "2025-04-04",
-     "depth": -33.2,
+     "depth": -33.1,
      "spread_hi": 90.5,
      "spread_hi_date": "2024-01-26",
      "spread_hi_lead": 52,
@@ -560,27 +577,27 @@
      "lead_weeks": -5,
      "at_cross": null,
      "cross_to_peak": 7.2,
-     "cross_to_trough": -28.4
+     "cross_to_trough": -28.3
     },
     {
-     "peak": "2026-10-02",
-     "trough": "2026-11-06",
-     "depth": -24.9,
+     "peak": "2026-06-19",
+     "trough": "2026-11-20",
+     "depth": -30.0,
      "spread_hi": 100.0,
      "spread_hi_date": "2025-10-03",
-     "spread_hi_lead": 52,
+     "spread_hi_lead": 37,
      "ongoing": true,
-     "net_at_peak": 68.2,
-     "net_min": -45.5,
+     "net_at_peak": 72.7,
+     "net_min": -54.5,
      "cross": "2026-10-16",
-     "lead_weeks": 2,
-     "at_cross": -12.2,
+     "lead_weeks": 17,
+     "at_cross": -12.3,
      "cross_to_peak": null,
-     "cross_to_trough": -14.5
+     "cross_to_trough": -20.2
     }
    ],
-   "dd_now": -21.5,
-   "peak": "2026-10-02"
+   "dd_now": -30.0,
+   "peak": "2026-06-19"
   }
  },
  "zero_crosses": [
@@ -722,24 +739,25 @@
    {
     "series": "tech",
     "swing": 15,
-    "n_peaks": 7,
+    "n_peaks": 8,
     "n_troughs": 7,
-    "n_cycles": 6,
+    "n_cycles": 7,
     "pp": [
      147,
      72,
      95,
      35,
      121,
-     47
+     47,
+     48
     ],
-    "pp_mean": 86.2,
-    "pp_median": 83.5,
+    "pp_mean": 80.7,
+    "pp_median": 72.0,
     "tt_mean": 88.0,
     "tt_median": 91.0,
     "min": 35,
     "max": 147,
-    "up_mean": 72.8,
+    "up_mean": 66.3,
     "down_mean": 14.4
    },
    {
@@ -757,15 +775,15 @@
      84,
      12,
      32,
-     88
+     73
     ],
-    "pp_mean": 62.8,
+    "pp_mean": 61.1,
     "pp_median": 44.0,
     "tt_mean": 55.8,
     "tt_median": 30.0,
     "min": 12,
     "max": 132,
-    "up_mean": 46.5,
+    "up_mean": 45.0,
     "down_mean": 12.8
    }
   ],
@@ -940,7 +958,7 @@
     "from": -70.6,
     "to": 23.5,
     "tech": 10.9,
-    "semi": 20.5
+    "semi": 20.3
    },
    {
     "dir": "down",
@@ -960,7 +978,7 @@
     "from": -47.1,
     "to": 64.7,
     "tech": 11.5,
-    "semi": 11.7
+    "semi": 11.6
    },
    {
     "dir": "down",
@@ -979,8 +997,8 @@
     "weeks": 33,
     "from": -11.1,
     "to": 100.0,
-    "tech": 24.7,
-    "semi": 45.3
+    "tech": 24.1,
+    "semi": 44.4
    },
    {
     "dir": "down",
@@ -989,8 +1007,8 @@
     "weeks": 59,
     "from": 100.0,
     "to": 0.0,
-    "tech": 36.2,
-    "semi": 36.9
+    "tech": 36.0,
+    "semi": 36.3
    },
    {
     "dir": "up",
@@ -999,8 +1017,8 @@
     "weeks": 5,
     "from": 0.0,
     "to": 70.0,
-    "tech": 12.3,
-    "semi": 13.8
+    "tech": 12.2,
+    "semi": 13.7
    },
    {
     "dir": "down",
@@ -1009,8 +1027,8 @@
     "weeks": 38,
     "from": 70.0,
     "to": -70.0,
-    "tech": -4.3,
-    "semi": -19.7
+    "tech": -3.9,
+    "semi": -19.4
    },
    {
     "dir": "up",
@@ -1019,8 +1037,8 @@
     "weeks": 21,
     "from": -70.0,
     "to": 81.0,
-    "tech": 24.1,
-    "semi": 29.6
+    "tech": 24.0,
+    "semi": 29.5
    },
    {
     "dir": "down",
@@ -1029,8 +1047,8 @@
     "weeks": 4,
     "from": 81.0,
     "to": -9.5,
-    "tech": -9.9,
-    "semi": -17.8
+    "tech": -9.8,
+    "semi": -17.7
    },
    {
     "dir": "up",
@@ -1039,8 +1057,8 @@
     "weeks": 34,
     "from": -9.5,
     "to": 71.4,
-    "tech": 36.8,
-    "semi": 53.9
+    "tech": 36.6,
+    "semi": 53.6
    },
    {
     "dir": "down",
@@ -1050,7 +1068,7 @@
     "from": 71.4,
     "to": -57.1,
     "tech": -20.0,
-    "semi": -22.3
+    "semi": -22.4
    },
    {
     "dir": "up",
@@ -1059,8 +1077,8 @@
     "weeks": 17,
     "from": -57.1,
     "to": 76.2,
-    "tech": 45.3,
-    "semi": 37.3
+    "tech": 45.4,
+    "semi": 36.7
    },
    {
     "dir": "down",
@@ -1070,7 +1088,7 @@
     "from": 76.2,
     "to": 14.3,
     "tech": 1.9,
-    "semi": 6.0
+    "semi": 5.9
    },
    {
     "dir": "up",
@@ -1079,7 +1097,7 @@
     "weeks": 5,
     "from": 14.3,
     "to": 95.2,
-    "tech": 14.5,
+    "tech": 14.4,
     "semi": 20.8
    },
    {
@@ -1089,8 +1107,8 @@
     "weeks": 44,
     "from": 95.2,
     "to": -14.3,
-    "tech": 24.0,
-    "semi": 19.5
+    "tech": 23.8,
+    "semi": 19.1
    },
    {
     "dir": "up",
@@ -1099,8 +1117,8 @@
     "weeks": 9,
     "from": -14.3,
     "to": 76.2,
-    "tech": 16.7,
-    "semi": 25.2
+    "tech": 16.5,
+    "semi": 24.8
    },
    {
     "dir": "down",
@@ -1109,8 +1127,8 @@
     "weeks": 29,
     "from": 76.2,
     "to": -95.2,
-    "tech": -28.1,
-    "semi": -38.2
+    "tech": -27.8,
+    "semi": -38.0
    },
    {
     "dir": "up",
@@ -1119,8 +1137,8 @@
     "weeks": 6,
     "from": -95.2,
     "to": 4.8,
-    "tech": 18.7,
-    "semi": 23.6
+    "tech": 18.5,
+    "semi": 23.5
    },
    {
     "dir": "down",
@@ -1129,8 +1147,8 @@
     "weeks": 8,
     "from": 4.8,
     "to": -85.7,
-    "tech": -20.1,
-    "semi": -25.8
+    "tech": -19.9,
+    "semi": -25.6
    },
    {
     "dir": "up",
@@ -1139,8 +1157,8 @@
     "weeks": 5,
     "from": -85.7,
     "to": 14.3,
-    "tech": 10.1,
-    "semi": 20.2
+    "tech": 9.9,
+    "semi": 20.0
    },
    {
     "dir": "down",
@@ -1159,8 +1177,8 @@
     "weeks": 23,
     "from": -47.6,
     "to": 76.2,
-    "tech": 38.3,
-    "semi": 62.2
+    "tech": 37.6,
+    "semi": 60.7
    },
    {
     "dir": "down",
@@ -1169,7 +1187,7 @@
     "weeks": 21,
     "from": 76.2,
     "to": -23.8,
-    "tech": -2.4,
+    "tech": -2.5,
     "semi": -1.4
    },
    {
@@ -1179,8 +1197,8 @@
     "weeks": 13,
     "from": -23.8,
     "to": 90.5,
-    "tech": 26.9,
-    "semi": 42.5
+    "tech": 26.4,
+    "semi": 42.2
    },
    {
     "dir": "down",
@@ -1189,8 +1207,8 @@
     "weeks": 12,
     "from": 90.5,
     "to": 19.1,
-    "tech": -1.9,
-    "semi": 8.7
+    "tech": -2.3,
+    "semi": 8.4
    },
    {
     "dir": "up",
@@ -1199,8 +1217,8 @@
     "weeks": 5,
     "from": 19.1,
     "to": 90.5,
-    "tech": 14.7,
-    "semi": 28.0
+    "tech": 14.2,
+    "semi": 27.8
    },
    {
     "dir": "down",
@@ -1209,8 +1227,8 @@
     "weeks": 15,
     "from": 90.5,
     "to": -9.5,
-    "tech": -0.5,
-    "semi": -8.7
+    "tech": -0.2,
+    "semi": -8.8
    },
    {
     "dir": "up",
@@ -1219,8 +1237,8 @@
     "weeks": 3,
     "from": -9.5,
     "to": 61.9,
-    "tech": 9.8,
-    "semi": 18.1
+    "tech": 9.5,
+    "semi": 18.0
    },
    {
     "dir": "down",
@@ -1229,8 +1247,8 @@
     "weeks": 29,
     "from": 61.9,
     "to": -90.5,
-    "tech": -13.3,
-    "semi": -18.4
+    "tech": -13.1,
+    "semi": -18.5
    },
    {
     "dir": "up",
@@ -1239,25 +1257,25 @@
     "weeks": 24,
     "from": -90.5,
     "to": 100.0,
-    "tech": 51.6,
-    "semi": 83.9
+    "tech": 50.1,
+    "semi": 83.6
    },
    {
     "dir": "down",
     "start": "2025-10-03",
     "end": null,
-    "weeks": 58,
+    "weeks": 59,
     "from": 100.0,
-    "to": -27.3,
+    "to": -54.5,
     "open": true,
-    "tech": 16.7,
-    "semi": 21.8
+    "tech": 8.7,
+    "semi": 9.0
    }
   ],
   "acf": {
    "zero": 34,
    "min_lag": 90,
-   "min": -0.37,
+   "min": -0.36,
    "peak_lag": 132,
    "peak": 0.19
   }
@@ -1409,19 +1427,19 @@
       "h2_val": 94.7,
       "i1": "2017-01-13",
       "i2": "2017-02-24",
-      "i1_lvl": 122.05,
-      "i2_lvl": 131.71,
+      "i1_lvl": 131.3,
+      "i2_lvl": 141.72,
       "idx_chg": 7.9,
       "complete": true,
       "ret13": 8.4,
-      "ret26": 12.3,
+      "ret26": 12.2,
       "mdd26": 0.0,
       "dip13": 0.0,
       "dip26": 0.0,
       "dip52": 0.0,
       "w5": null,
       "w10": null,
-      "weeks_left": 509,
+      "weeks_left": 510,
       "confirm": "2017-03-24",
       "confirm_pending": false
      },
@@ -1433,19 +1451,19 @@
       "h2_val": 80.0,
       "i1": "2017-02-24",
       "i2": "2017-07-21",
-      "i1_lvl": 131.71,
-      "i2_lvl": 145.3,
-      "idx_chg": 10.3,
+      "i1_lvl": 141.72,
+      "i2_lvl": 156.04,
+      "idx_chg": 10.1,
       "complete": true,
       "ret13": 7.3,
       "ret26": 20.3,
-      "mdd26": -0.4,
-      "dip13": -0.4,
-      "dip26": -0.4,
-      "dip52": -0.4,
+      "mdd26": -0.3,
+      "dip13": -0.3,
+      "dip26": -0.3,
+      "dip52": -0.3,
       "w5": null,
       "w10": null,
-      "weeks_left": 487,
+      "weeks_left": 488,
       "confirm": "2017-08-25",
       "confirm_pending": false
      },
@@ -1457,19 +1475,19 @@
       "h2_val": 60.0,
       "i1": "2017-11-03",
       "i2": "2018-01-26",
-      "i1_lvl": 165.49,
-      "i2_lvl": 179.34,
+      "i1_lvl": 177.64,
+      "i2_lvl": 192.51,
       "idx_chg": 8.4,
       "complete": true,
-      "ret13": -0.0,
-      "ret26": 10.3,
+      "ret13": 0.0,
+      "ret26": 10.4,
       "mdd26": -3.8,
       "dip13": -3.8,
       "dip26": -3.8,
-      "dip52": -4.5,
+      "dip52": -4.2,
       "w5": null,
       "w10": null,
-      "weeks_left": 462,
+      "weeks_left": 463,
       "confirm": "2018-02-16",
       "confirm_pending": false
      },
@@ -1481,19 +1499,19 @@
       "h2_val": 40.0,
       "i1": "2018-03-09",
       "i2": "2018-06-15",
-      "i1_lvl": 186.54,
-      "i2_lvl": 192.67,
+      "i1_lvl": 200.24,
+      "i2_lvl": 206.87,
       "idx_chg": 3.3,
       "complete": true,
-      "ret13": 7.5,
-      "ret26": -7.7,
-      "mdd26": -8.4,
-      "dip13": -4.1,
-      "dip26": -8.4,
-      "dip52": -15.0,
+      "ret13": 7.8,
+      "ret26": -7.4,
+      "mdd26": -8.1,
+      "dip13": -4.0,
+      "dip26": -8.1,
+      "dip52": -14.8,
       "w5": 23,
       "w10": 27,
-      "weeks_left": 439,
+      "weeks_left": 440,
       "confirm": "2018-07-27",
       "confirm_pending": false
      },
@@ -1505,19 +1523,19 @@
       "h2_val": 57.1,
       "i1": "2019-05-03",
       "i2": "2019-07-26",
-      "i1_lvl": 220.09,
-      "i2_lvl": 229.54,
+      "i1_lvl": 236.96,
+      "i2_lvl": 247.23,
       "idx_chg": 4.3,
       "complete": true,
-      "ret13": 0.5,
+      "ret13": 0.4,
       "ret26": 15.9,
       "mdd26": -4.2,
       "dip13": -4.2,
       "dip26": -4.2,
-      "dip52": -10.1,
+      "dip52": -10.0,
       "w5": 37,
       "w10": 37,
-      "weeks_left": 384,
+      "weeks_left": 385,
       "confirm": "2019-08-16",
       "confirm_pending": false
      },
@@ -1529,19 +1547,19 @@
       "h2_val": 61.9,
       "i1": "2019-07-26",
       "i2": "2019-09-13",
-      "i1_lvl": 229.54,
-      "i2_lvl": 223.4,
+      "i1_lvl": 247.23,
+      "i2_lvl": 240.54,
       "idx_chg": -2.7,
       "complete": true,
       "ret13": 10.7,
-      "ret26": 4.1,
+      "ret26": 4.2,
       "mdd26": -1.5,
       "dip13": -1.5,
       "dip26": -1.5,
-      "dip52": -10.7,
+      "dip52": -10.6,
       "w5": 27,
       "w10": 27,
-      "weeks_left": 374,
+      "weeks_left": 375,
       "confirm": "2019-10-25",
       "confirm_pending": false
      },
@@ -1553,8 +1571,8 @@
       "h2_val": 57.1,
       "i1": "2021-04-16",
       "i2": "2021-08-20",
-      "i1_lvl": 422.87,
-      "i2_lvl": 464.24,
+      "i1_lvl": 454.52,
+      "i2_lvl": 499.15,
       "idx_chg": 9.8,
       "complete": true,
       "ret13": 8.6,
@@ -1562,10 +1580,10 @@
       "mdd26": 0.0,
       "dip13": 0.0,
       "dip26": 0.0,
-      "dip52": -17.7,
+      "dip52": -17.6,
       "w5": 39,
       "w10": 42,
-      "weeks_left": 276,
+      "weeks_left": 277,
       "confirm": "2021-09-10",
       "confirm_pending": false
      },
@@ -1577,19 +1595,19 @@
       "h2_val": 61.9,
       "i1": "2024-07-12",
       "i2": "2024-10-18",
-      "i1_lvl": 804.31,
-      "i2_lvl": 811.01,
+      "i1_lvl": 848.56,
+      "i2_lvl": 855.69,
       "idx_chg": 0.8,
       "complete": true,
-      "ret13": 7.7,
-      "ret26": -7.6,
-      "mdd26": -7.6,
+      "ret13": 7.6,
+      "ret26": -7.4,
+      "mdd26": -7.4,
       "dip13": 0.0,
-      "dip26": -7.6,
-      "dip52": -18.0,
+      "dip26": -7.4,
+      "dip52": -17.8,
       "w5": 26,
       "w10": 27,
-      "weeks_left": 111,
+      "weeks_left": 112,
       "confirm": "2024-11-08",
       "confirm_pending": false
      },
@@ -1601,19 +1619,19 @@
       "h2_val": 68.2,
       "i1": "2026-05-15",
       "i2": "2026-10-02",
-      "i1_lvl": 1208.45,
-      "i2_lvl": 1351.68,
-      "idx_chg": 11.9,
+      "i1_lvl": 1253.22,
+      "i2_lvl": 1403.86,
+      "idx_chg": 12.0,
       "complete": false,
       "ret13": null,
       "ret26": null,
-      "mdd26": -14.3,
+      "mdd26": -16.5,
       "dip13": null,
       "dip26": null,
       "dip52": null,
       "w5": 2,
       "w10": 5,
-      "weeks_left": 6,
+      "weeks_left": 7,
       "confirm": "2026-11-13",
       "confirm_pending": false
      }
@@ -1624,45 +1642,45 @@
       "n_done": 1,
       "hits": 0,
       "med_ret13": 10.7,
-      "med_ret26": 4.1,
+      "med_ret26": 4.2,
       "med_mdd26": -1.5
      },
      "B": {
       "n": 8,
       "n_done": 7,
       "hits": 0,
-      "med_ret13": 7.5,
-      "med_ret26": 10.3,
+      "med_ret13": 7.6,
+      "med_ret26": 10.4,
       "med_mdd26": -3.8
      },
      "all_highs": {
       "n": 31,
       "n_done": 30,
       "hits": 5,
-      "med_ret13": 6.8,
-      "med_ret26": 12.6,
+      "med_ret13": 6.7,
+      "med_ret26": 12.5,
       "med_mdd26": -2.5
      }
     },
     "horizons": {
      "at_high": {
       "13": {
-       "n": 226,
-       "median": -2.2,
-       "p5": 33.6,
-       "p10": 13.3
+       "n": 234,
+       "median": -2.0,
+       "p5": 32.1,
+       "p10": 12.0
       },
       "26": {
-       "n": 222,
+       "n": 231,
        "median": -3.3,
-       "p5": 44.1,
-       "p10": 25.7
+       "p5": 44.6,
+       "p10": 24.2
       },
       "52": {
-       "n": 217,
-       "median": -6.0,
-       "p5": 53.9,
-       "p10": 38.7
+       "n": 225,
+       "median": -6.2,
+       "p5": 53.8,
+       "p10": 36.9
       }
      },
      "A": {
@@ -1680,7 +1698,7 @@
       },
       "52": {
        "n": 1,
-       "median": -10.7,
+       "median": -10.6,
        "p5": 100.0,
        "p10": 100.0
       }
@@ -1688,7 +1706,7 @@
      "B": {
       "13": {
        "n": 7,
-       "median": -0.4,
+       "median": -0.3,
        "p5": 0.0,
        "p10": 0.0
       },
@@ -1700,13 +1718,13 @@
       },
       "52": {
        "n": 7,
-       "median": -10.1,
+       "median": -10.0,
        "p5": 57.1,
        "p10": 57.1
       }
      }
     },
-    "n_at_high": 232
+    "n_at_high": 240
    },
    "semi": {
     "rows": [
@@ -1718,19 +1736,19 @@
       "h2_val": 94.7,
       "i1": "2016-12-23",
       "i2": "2017-03-03",
-      "i1_lvl": 150.96,
-      "i2_lvl": 156.16,
+      "i1_lvl": 164.09,
+      "i2_lvl": 169.69,
       "idx_chg": 3.4,
       "complete": true,
-      "ret13": 8.2,
-      "ret26": 12.2,
-      "mdd26": -0.1,
-      "dip13": -0.1,
-      "dip26": -0.1,
-      "dip52": -0.1,
+      "ret13": 8.1,
+      "ret26": 12.0,
+      "mdd26": -0.0,
+      "dip13": -0.0,
+      "dip26": -0.0,
+      "dip52": -0.0,
       "w5": null,
       "w10": null,
-      "weeks_left": 509,
+      "weeks_left": 510,
       "confirm": "2017-03-24",
       "confirm_pending": false
      },
@@ -1742,19 +1760,19 @@
       "h2_val": 80.0,
       "i1": "2017-03-03",
       "i2": "2017-07-21",
-      "i1_lvl": 156.16,
-      "i2_lvl": 176.91,
-      "idx_chg": 13.3,
+      "i1_lvl": 169.69,
+      "i2_lvl": 191.45,
+      "idx_chg": 12.8,
       "complete": true,
       "ret13": 11.3,
-      "ret26": 21.6,
-      "mdd26": -2.3,
-      "dip13": -2.3,
-      "dip26": -2.3,
-      "dip52": -2.3,
+      "ret26": 21.5,
+      "mdd26": -2.2,
+      "dip13": -2.2,
+      "dip26": -2.2,
+      "dip52": -2.2,
       "w5": null,
       "w10": null,
-      "weeks_left": 487,
+      "weeks_left": 488,
       "confirm": "2017-08-25",
       "confirm_pending": false
      },
@@ -1766,19 +1784,19 @@
       "h2_val": 60.0,
       "i1": "2017-11-03",
       "i2": "2018-01-26",
-      "i1_lvl": 213.47,
-      "i2_lvl": 227.52,
+      "i1_lvl": 231.08,
+      "i2_lvl": 246.3,
       "idx_chg": 6.6,
       "complete": true,
       "ret13": -2.6,
-      "ret26": 6.0,
+      "ret26": 5.9,
       "mdd26": -4.5,
       "dip13": -4.5,
       "dip26": -4.5,
-      "dip52": -16.6,
+      "dip52": -16.4,
       "w5": 41,
       "w10": 42,
-      "weeks_left": 462,
+      "weeks_left": 463,
       "confirm": "2018-02-16",
       "confirm_pending": false
      },
@@ -1790,19 +1808,19 @@
       "h2_val": 40.0,
       "i1": "2018-03-09",
       "i2": "2018-06-15",
-      "i1_lvl": 235.53,
-      "i2_lvl": 243.54,
-      "idx_chg": 3.4,
+      "i1_lvl": 254.89,
+      "i2_lvl": 263.34,
+      "idx_chg": 3.3,
       "complete": true,
-      "ret13": -6.1,
-      "ret26": -20.4,
-      "mdd26": -22.4,
+      "ret13": -6.3,
+      "ret26": -20.2,
+      "mdd26": -22.2,
       "dip13": -10.2,
-      "dip26": -22.4,
-      "dip52": -25.9,
+      "dip26": -22.2,
+      "dip52": -25.6,
       "w5": 2,
       "w10": 9,
-      "weeks_left": 439,
+      "weeks_left": 440,
       "confirm": "2018-07-27",
       "confirm_pending": false
      },
@@ -1814,19 +1832,19 @@
       "h2_val": 57.1,
       "i1": "2021-04-09",
       "i2": "2021-08-06",
-      "i1_lvl": 490.03,
-      "i2_lvl": 522.09,
-      "idx_chg": 6.5,
+      "i1_lvl": 527.8,
+      "i2_lvl": 560.09,
+      "idx_chg": 6.1,
       "complete": true,
-      "ret13": 7.3,
-      "ret26": 3.7,
-      "mdd26": -1.2,
-      "dip13": -1.2,
-      "dip26": -1.2,
+      "ret13": 7.0,
+      "ret26": 3.5,
+      "mdd26": -1.3,
+      "dip13": -1.3,
+      "dip26": -1.3,
       "dip52": -23.4,
       "w5": 38,
       "w10": 42,
-      "weeks_left": 276,
+      "weeks_left": 277,
       "confirm": "2021-09-10",
       "confirm_pending": false
      },
@@ -1838,19 +1856,19 @@
       "h2_val": 85.7,
       "i1": "2024-06-14",
       "i2": "2024-07-12",
-      "i1_lvl": 1477.8,
-      "i2_lvl": 1476.13,
+      "i1_lvl": 1554.74,
+      "i2_lvl": 1553.78,
       "idx_chg": -0.1,
       "complete": true,
-      "ret13": -0.7,
-      "ret26": -0.9,
+      "ret13": -0.8,
+      "ret26": -1.2,
       "mdd26": -21.3,
       "dip13": -21.3,
       "dip26": -21.3,
-      "dip52": -30.0,
+      "dip52": -30.1,
       "w5": 1,
       "w10": 2,
-      "weeks_left": 122,
+      "weeks_left": 123,
       "confirm": "2024-08-23",
       "confirm_pending": false
      },
@@ -1862,19 +1880,19 @@
       "h2_val": 77.3,
       "i1": "2025-10-24",
       "i2": "2026-01-16",
-      "i1_lvl": 2123.85,
-      "i2_lvl": 2240.11,
-      "idx_chg": 5.5,
+      "i1_lvl": 2228.18,
+      "i2_lvl": 2352.66,
+      "idx_chg": 5.6,
       "complete": true,
-      "ret13": -2.0,
-      "ret26": 32.6,
-      "mdd26": -7.1,
-      "dip13": -7.1,
-      "dip26": -7.1,
+      "ret13": -1.9,
+      "ret26": 33.0,
+      "mdd26": -7.0,
+      "dip13": -7.0,
+      "dip26": -7.0,
       "dip52": null,
       "w5": 12,
       "w10": null,
-      "weeks_left": 45,
+      "weeks_left": 46,
       "confirm": "2026-02-13",
       "confirm_pending": false
      },
@@ -1886,19 +1904,19 @@
       "h2_val": 68.2,
       "i1": "2026-05-15",
       "i2": "2026-10-02",
-      "i1_lvl": 2977.66,
-      "i2_lvl": 3196.84,
-      "idx_chg": 7.4,
+      "i1_lvl": 3132.36,
+      "i2_lvl": 3361.11,
+      "idx_chg": 7.3,
       "complete": false,
       "ret13": null,
       "ret26": null,
-      "mdd26": -24.9,
+      "mdd26": -30.0,
       "dip13": null,
       "dip26": null,
       "dip52": null,
       "w5": 2,
       "w10": 2,
-      "weeks_left": 6,
+      "weeks_left": 7,
       "confirm": "2026-11-13",
       "confirm_pending": false
      }
@@ -1908,46 +1926,46 @@
       "n": 1,
       "n_done": 1,
       "hits": 1,
-      "med_ret13": -0.7,
-      "med_ret26": -0.9,
+      "med_ret13": -0.8,
+      "med_ret26": -1.2,
       "med_mdd26": -21.3
      },
      "B": {
       "n": 7,
       "n_done": 6,
       "hits": 1,
-      "med_ret13": 2.6,
-      "med_ret26": 9.1,
+      "med_ret13": 2.5,
+      "med_ret26": 8.9,
       "med_mdd26": -3.4
      },
      "all_highs": {
       "n": 31,
       "n_done": 30,
       "hits": 7,
-      "med_ret13": 7.1,
-      "med_ret26": 12.9,
+      "med_ret13": 6.8,
+      "med_ret26": 12.7,
       "med_mdd26": -4.4
      }
     },
     "horizons": {
      "at_high": {
       "13": {
-       "n": 184,
-       "median": -3.4,
-       "p5": 38.6,
-       "p10": 19.6
+       "n": 191,
+       "median": -3.0,
+       "p5": 36.1,
+       "p10": 18.8
       },
       "26": {
-       "n": 181,
-       "median": -3.9,
-       "p5": 44.8,
-       "p10": 27.6
+       "n": 189,
+       "median": -3.8,
+       "p5": 43.9,
+       "p10": 26.5
       },
       "52": {
-       "n": 173,
-       "median": -4.9,
-       "p5": 49.7,
-       "p10": 36.4
+       "n": 179,
+       "median": -4.6,
+       "p5": 48.6,
+       "p10": 34.6
       }
      },
      "A": {
@@ -1965,7 +1983,7 @@
       },
       "52": {
        "n": 1,
-       "median": -30.0,
+       "median": -30.1,
        "p5": 100.0,
        "p10": 100.0
       }
@@ -1985,13 +2003,13 @@
       },
       "52": {
        "n": 5,
-       "median": -16.6,
+       "median": -16.4,
        "p5": 60.0,
        "p10": 60.0
       }
      }
     },
-    "n_at_high": 185
+    "n_at_high": 192
    }
   },
   "horizons": [
@@ -2008,242 +2026,242 @@
     "name": "NVIDIA Corporation",
     "group": "AI Compute Chips",
     "industry": "semiconductors",
-    "cap_bn": 4013.0,
-    "weight": 40.13,
+    "cap_bn": 3031.2,
+    "weight": 39.05,
     "state": "neither",
-    "ret_1m": -24.9,
-    "from_high": -30.5
+    "ret_1m": -34.2,
+    "from_high": -39.0
    },
    {
     "ticker": "AVGO",
     "name": "Broadcom Inc.",
     "group": "AI Compute Chips",
     "industry": "semiconductors",
-    "cap_bn": 1739.3,
-    "weight": 17.39,
+    "cap_bn": 1453.1,
+    "weight": 18.72,
     "state": "neither",
-    "ret_1m": 5.2,
-    "from_high": -24.1
+    "ret_1m": 2.6,
+    "from_high": -27.8
    },
    {
     "ticker": "AMD",
     "name": "Advanced Micro Devices, Inc.",
     "group": "AI Compute Chips",
     "industry": "semiconductors",
-    "cap_bn": 959.9,
-    "weight": 9.6,
-    "state": "bull",
-    "ret_1m": 2.5,
-    "from_high": -9.9
+    "cap_bn": 702.4,
+    "weight": 9.05,
+    "state": "neither",
+    "ret_1m": -11.5,
+    "from_high": -24.7
    },
    {
     "ticker": "MU",
     "name": "Micron Technology, Inc.",
     "group": "Memory and Storage",
     "industry": "semiconductors",
-    "cap_bn": 903.4,
-    "weight": 9.03,
+    "cap_bn": 672.6,
+    "weight": 8.67,
     "state": "neither",
-    "ret_1m": -12.7,
-    "from_high": -34.2
+    "ret_1m": -24.4,
+    "from_high": -43.1
    },
    {
     "ticker": "AMAT",
     "name": "Applied Materials, Inc.",
     "group": "Semiconductor Equipment",
     "industry": "semiconductor-equipment-materials",
-    "cap_bn": 302.3,
-    "weight": 3.02,
+    "cap_bn": 240.2,
+    "weight": 3.09,
     "state": "bear",
-    "ret_1m": -14.7,
-    "from_high": -47.3
+    "ret_1m": -17.0,
+    "from_high": -53.0
    },
    {
     "ticker": "LRCX",
     "name": "Lam Research Corporation",
     "group": "Semiconductor Equipment",
     "industry": "semiconductor-equipment-materials",
-    "cap_bn": 292.0,
-    "weight": 2.92,
+    "cap_bn": 228.9,
+    "weight": 2.95,
     "state": "bear",
-    "ret_1m": -18.5,
-    "from_high": -46.0
+    "ret_1m": -21.9,
+    "from_high": -52.9
    },
    {
     "ticker": "ANET",
     "name": "Arista Networks, Inc.",
     "group": "AI Servers and Networking",
     "industry": "computer-hardware",
-    "cap_bn": 261.1,
-    "weight": 2.61,
-    "state": "bull",
-    "ret_1m": 5.7,
-    "from_high": -4.7
+    "cap_bn": 211.8,
+    "weight": 2.73,
+    "state": "neither",
+    "ret_1m": 2.9,
+    "from_high": -12.5
    },
    {
     "ticker": "DELL",
     "name": "Dell Technologies Inc.",
     "group": "AI Servers and Networking",
     "industry": "computer-hardware",
-    "cap_bn": 236.0,
-    "weight": 2.36,
+    "cap_bn": 176.8,
+    "weight": 2.28,
     "state": "neither",
-    "ret_1m": -26.8,
-    "from_high": -36.8
-   },
-   {
-    "ticker": "KLAC",
-    "name": "KLA Corporation",
-    "group": "Semiconductor Equipment",
-    "industry": "semiconductor-equipment-materials",
-    "cap_bn": 205.0,
-    "weight": 2.05,
-    "state": "bear",
-    "ret_1m": -12.0,
-    "from_high": -47.8
+    "ret_1m": -35.7,
+    "from_high": -46.8
    },
    {
     "ticker": "APH",
     "name": "Amphenol Corporation",
     "group": "Connectors and Components",
     "industry": "electronic-components",
-    "cap_bn": 196.6,
-    "weight": 1.97,
+    "cap_bn": 172.2,
+    "weight": 2.22,
     "state": "neither",
-    "ret_1m": -3.7,
-    "from_high": -10.2
+    "ret_1m": -4.5,
+    "from_high": -14.7
    },
    {
-    "ticker": "SNDK",
-    "name": "Sandisk Corporation",
-    "group": "Memory and Storage",
-    "industry": "computer-hardware",
-    "cap_bn": 133.4,
-    "weight": 1.33,
-    "state": "neither",
-    "ret_1m": -33.2,
-    "from_high": -59.9
+    "ticker": "KLAC",
+    "name": "KLA Corporation",
+    "group": "Semiconductor Equipment",
+    "industry": "semiconductor-equipment-materials",
+    "cap_bn": 165.3,
+    "weight": 2.13,
+    "state": "bear",
+    "ret_1m": -13.3,
+    "from_high": -53.0
    },
    {
     "ticker": "STX",
     "name": "Seagate Technology Holdings PLC",
     "group": "Memory and Storage",
     "industry": "computer-hardware",
-    "cap_bn": 125.1,
-    "weight": 1.25,
+    "cap_bn": 104.9,
+    "weight": 1.35,
     "state": "neither",
-    "ret_1m": -23.6,
-    "from_high": -50.1
+    "ret_1m": -25.2,
+    "from_high": -52.3
    },
    {
     "ticker": "WDC",
     "name": "Western Digital Corporation",
     "group": "Memory and Storage",
     "industry": "computer-hardware",
-    "cap_bn": 116.5,
-    "weight": 1.17,
+    "cap_bn": 97.7,
+    "weight": 1.26,
     "state": "bear",
-    "ret_1m": -14.5,
-    "from_high": -58.3
+    "ret_1m": -21.6,
+    "from_high": -60.2
+   },
+   {
+    "ticker": "SNDK",
+    "name": "Sandisk Corporation",
+    "group": "Memory and Storage",
+    "industry": "computer-hardware",
+    "cap_bn": 90.2,
+    "weight": 1.16,
+    "state": "neither",
+    "ret_1m": -45.2,
+    "from_high": -67.7
    },
    {
     "ticker": "GLW",
     "name": "Corning Incorporated",
     "group": "Optical Communication",
     "industry": "electronic-components",
-    "cap_bn": 102.9,
-    "weight": 1.03,
+    "cap_bn": 81.3,
+    "weight": 1.05,
     "state": "bear",
-    "ret_1m": -15.2,
-    "from_high": -53.2
+    "ret_1m": -21.3,
+    "from_high": -58.4
    },
    {
     "ticker": "VRT",
     "name": "Vertiv Holdings, LLC",
     "group": "Data Center Power and Cooling",
     "industry": "electrical-equipment-parts",
-    "cap_bn": 80.7,
-    "weight": 0.81,
+    "cap_bn": 64.0,
+    "weight": 0.82,
     "state": "bear",
-    "ret_1m": -5.9,
-    "from_high": -44.3
-   },
-   {
-    "ticker": "HPE",
-    "name": "Hewlett Packard Enterprise Comp",
-    "group": "AI Servers and Networking",
-    "industry": "communication-equipment",
-    "cap_bn": 66.6,
-    "weight": 0.67,
-    "state": "neither",
-    "ret_1m": -20.5,
-    "from_high": -31.7
+    "ret_1m": -12.8,
+    "from_high": -50.8
    },
    {
     "ticker": "TEL",
     "name": "TE Connectivity plc",
     "group": "Connectors and Components",
     "industry": "electronic-components",
-    "cap_bn": 62.4,
-    "weight": 0.62,
-    "state": "bull",
-    "ret_1m": 3.6,
-    "from_high": -11.4
+    "cap_bn": 57.3,
+    "weight": 0.74,
+    "state": "neither",
+    "ret_1m": -1.3,
+    "from_high": -14.1
+   },
+   {
+    "ticker": "HPE",
+    "name": "Hewlett Packard Enterprise Comp",
+    "group": "AI Servers and Networking",
+    "industry": "communication-equipment",
+    "cap_bn": 54.3,
+    "weight": 0.7,
+    "state": "neither",
+    "ret_1m": -21.8,
+    "from_high": -38.1
    },
    {
     "ticker": "LITE",
     "name": "Lumentum Holdings Inc.",
     "group": "Optical Communication",
     "industry": "communication-equipment",
-    "cap_bn": 56.6,
-    "weight": 0.57,
+    "cap_bn": 41.8,
+    "weight": 0.54,
     "state": "neither",
-    "ret_1m": -30.3,
-    "from_high": -44.9
+    "ret_1m": -37.1,
+    "from_high": -52.8
    },
    {
     "ticker": "COHR",
     "name": "Coherent Corp.",
     "group": "Optical Communication",
     "industry": "scientific-technical-instruments",
-    "cap_bn": 45.7,
-    "weight": 0.46,
+    "cap_bn": 36.9,
+    "weight": 0.48,
     "state": "bear",
-    "ret_1m": -11.9,
-    "from_high": -45.6
+    "ret_1m": -9.5,
+    "from_high": -49.6
    },
    {
     "ticker": "CIEN",
     "name": "Ciena Corporation",
     "group": "Optical Communication",
     "industry": "communication-equipment",
-    "cap_bn": 41.7,
-    "weight": 0.42,
+    "cap_bn": 33.2,
+    "weight": 0.43,
     "state": "bear",
-    "ret_1m": -18.2,
-    "from_high": -53.1
+    "ret_1m": -27.3,
+    "from_high": -58.1
    },
    {
     "ticker": "TER",
     "name": "Teradyne, Inc.",
     "group": "Semiconductor Equipment",
     "industry": "semiconductor-equipment-materials",
-    "cap_bn": 41.2,
+    "cap_bn": 32.0,
     "weight": 0.41,
     "state": "bear",
-    "ret_1m": -26.6,
-    "from_high": -45.5
+    "ret_1m": -34.2,
+    "from_high": -53.0
    },
    {
     "ticker": "SMCI",
     "name": "Super Micro Computer, Inc.",
     "group": "AI Servers and Networking",
     "industry": "computer-hardware",
-    "cap_bn": 17.8,
+    "cap_bn": 14.3,
     "weight": 0.18,
     "state": "neither",
-    "ret_1m": -24.6,
-    "from_high": -46.2
+    "ret_1m": -33.0,
+    "from_high": -52.5
    }
   ],
   "tech": [
@@ -2252,913 +2270,913 @@
     "name": "Apple Inc.",
     "group": null,
     "industry": "consumer-electronics",
-    "cap_bn": 5157.2,
-    "weight": 21.23,
+    "cap_bn": 4978.1,
+    "weight": 23.69,
     "state": "bull",
-    "ret_1m": 3.6,
-    "from_high": -0.1
-   },
-   {
-    "ticker": "NVDA",
-    "name": "NVIDIA Corporation",
-    "group": "AI Compute Chips",
-    "industry": "semiconductors",
-    "cap_bn": 4013.0,
-    "weight": 16.52,
-    "state": "neither",
-    "ret_1m": -24.9,
-    "from_high": -30.5
+    "ret_1m": 1.6,
+    "from_high": -2.0
    },
    {
     "ticker": "MSFT",
     "name": "Microsoft Corporation",
     "group": null,
     "industry": "software-infrastructure",
-    "cap_bn": 3883.9,
-    "weight": 15.99,
-    "state": "bull",
-    "ret_1m": -2.0,
-    "from_high": -5.9
+    "cap_bn": 3598.1,
+    "weight": 17.13,
+    "state": "neither",
+    "ret_1m": -6.3,
+    "from_high": -10.2
+   },
+   {
+    "ticker": "NVDA",
+    "name": "NVIDIA Corporation",
+    "group": "AI Compute Chips",
+    "industry": "semiconductors",
+    "cap_bn": 3031.2,
+    "weight": 14.43,
+    "state": "neither",
+    "ret_1m": -34.2,
+    "from_high": -39.0
    },
    {
     "ticker": "AVGO",
     "name": "Broadcom Inc.",
     "group": "AI Compute Chips",
     "industry": "semiconductors",
-    "cap_bn": 1739.3,
-    "weight": 7.16,
+    "cap_bn": 1453.1,
+    "weight": 6.92,
     "state": "neither",
-    "ret_1m": 5.2,
-    "from_high": -24.1
+    "ret_1m": 2.6,
+    "from_high": -27.8
    },
    {
     "ticker": "AMD",
     "name": "Advanced Micro Devices, Inc.",
     "group": "AI Compute Chips",
     "industry": "semiconductors",
-    "cap_bn": 959.9,
-    "weight": 3.95,
-    "state": "bull",
-    "ret_1m": 2.5,
-    "from_high": -9.9
+    "cap_bn": 702.4,
+    "weight": 3.34,
+    "state": "neither",
+    "ret_1m": -11.5,
+    "from_high": -24.7
    },
    {
     "ticker": "MU",
     "name": "Micron Technology, Inc.",
     "group": "Memory and Storage",
     "industry": "semiconductors",
-    "cap_bn": 903.4,
-    "weight": 3.72,
+    "cap_bn": 672.6,
+    "weight": 3.2,
     "state": "neither",
-    "ret_1m": -12.7,
-    "from_high": -34.2
-   },
-   {
-    "ticker": "PLTR",
-    "name": "Palantir Technologies Inc.",
-    "group": null,
-    "industry": "software-infrastructure",
-    "cap_bn": 413.4,
-    "weight": 1.7,
-    "state": "neither",
-    "ret_1m": -14.6,
-    "from_high": -17.9
+    "ret_1m": -24.4,
+    "from_high": -43.1
    },
    {
     "ticker": "CSCO",
     "name": "Cisco Systems, Inc.",
     "group": null,
     "industry": "communication-equipment",
-    "cap_bn": 402.2,
-    "weight": 1.66,
+    "cap_bn": 357.3,
+    "weight": 1.7,
     "state": "neither",
-    "ret_1m": -10.2,
-    "from_high": -20.9
+    "ret_1m": -11.7,
+    "from_high": -26.6
+   },
+   {
+    "ticker": "PLTR",
+    "name": "Palantir Technologies Inc.",
+    "group": null,
+    "industry": "software-infrastructure",
+    "cap_bn": 345.7,
+    "weight": 1.65,
+    "state": "neither",
+    "ret_1m": -23.8,
+    "from_high": -26.5
    },
    {
     "ticker": "ORCL",
     "name": "Oracle Corporation",
     "group": null,
     "industry": "software-infrastructure",
-    "cap_bn": 396.3,
-    "weight": 1.63,
+    "cap_bn": 315.5,
+    "weight": 1.5,
     "state": "bear",
-    "ret_1m": -2.6,
-    "from_high": -48.4
-   },
-   {
-    "ticker": "INTC",
-    "name": "Intel Corporation",
-    "group": null,
-    "industry": "semiconductors",
-    "cap_bn": 325.3,
-    "weight": 1.34,
-    "state": "neither",
-    "ret_1m": -37.6,
-    "from_high": -56.6
-   },
-   {
-    "ticker": "AMAT",
-    "name": "Applied Materials, Inc.",
-    "group": "Semiconductor Equipment",
-    "industry": "semiconductor-equipment-materials",
-    "cap_bn": 302.3,
-    "weight": 1.24,
-    "state": "bear",
-    "ret_1m": -14.7,
-    "from_high": -47.3
-   },
-   {
-    "ticker": "LRCX",
-    "name": "Lam Research Corporation",
-    "group": "Semiconductor Equipment",
-    "industry": "semiconductor-equipment-materials",
-    "cap_bn": 292.0,
-    "weight": 1.2,
-    "state": "bear",
-    "ret_1m": -18.5,
-    "from_high": -46.0
-   },
-   {
-    "ticker": "TXN",
-    "name": "Texas Instruments Incorporated",
-    "group": null,
-    "industry": "semiconductors",
-    "cap_bn": 285.5,
-    "weight": 1.18,
-    "state": "bull",
-    "ret_1m": 11.9,
-    "from_high": -5.0
+    "ret_1m": -14.4,
+    "from_high": -55.1
    },
    {
     "ticker": "PANW",
     "name": "Palo Alto Networks, Inc.",
     "group": null,
     "industry": "software-infrastructure",
-    "cap_bn": 264.1,
-    "weight": 1.09,
+    "cap_bn": 281.9,
+    "weight": 1.34,
     "state": "neither",
-    "ret_1m": -14.0,
-    "from_high": -23.2
+    "ret_1m": 4.2,
+    "from_high": -13.9
    },
    {
-    "ticker": "ANET",
-    "name": "Arista Networks, Inc.",
-    "group": "AI Servers and Networking",
-    "industry": "computer-hardware",
-    "cap_bn": 261.1,
-    "weight": 1.07,
+    "ticker": "INTC",
+    "name": "Intel Corporation",
+    "group": null,
+    "industry": "semiconductors",
+    "cap_bn": 272.6,
+    "weight": 1.3,
+    "state": "neither",
+    "ret_1m": -40.1,
+    "from_high": -60.5
+   },
+   {
+    "ticker": "TXN",
+    "name": "Texas Instruments Incorporated",
+    "group": null,
+    "industry": "semiconductors",
+    "cap_bn": 241.0,
+    "weight": 1.15,
     "state": "bull",
-    "ret_1m": 5.7,
-    "from_high": -4.7
+    "ret_1m": 0.9,
+    "from_high": -13.1
    },
    {
-    "ticker": "DELL",
-    "name": "Dell Technologies Inc.",
-    "group": "AI Servers and Networking",
-    "industry": "computer-hardware",
-    "cap_bn": 236.0,
-    "weight": 0.97,
-    "state": "neither",
-    "ret_1m": -26.8,
-    "from_high": -36.8
+    "ticker": "AMAT",
+    "name": "Applied Materials, Inc.",
+    "group": "Semiconductor Equipment",
+    "industry": "semiconductor-equipment-materials",
+    "cap_bn": 240.2,
+    "weight": 1.14,
+    "state": "bear",
+    "ret_1m": -17.0,
+    "from_high": -53.0
    },
    {
     "ticker": "CRWD",
     "name": "CrowdStrike Holdings, Inc.",
     "group": null,
     "industry": "software-infrastructure",
-    "cap_bn": 235.4,
-    "weight": 0.97,
+    "cap_bn": 234.9,
+    "weight": 1.12,
     "state": "neither",
-    "ret_1m": -7.8,
-    "from_high": -17.6
+    "ret_1m": 1.7,
+    "from_high": -12.7
+   },
+   {
+    "ticker": "LRCX",
+    "name": "Lam Research Corporation",
+    "group": "Semiconductor Equipment",
+    "industry": "semiconductor-equipment-materials",
+    "cap_bn": 228.9,
+    "weight": 1.09,
+    "state": "bear",
+    "ret_1m": -21.9,
+    "from_high": -52.9
    },
    {
     "ticker": "IBM",
     "name": "International Business Machines",
     "group": null,
     "industry": "information-technology-services",
-    "cap_bn": 231.2,
-    "weight": 0.95,
-    "state": "neither",
-    "ret_1m": 8.1,
-    "from_high": -24.6
-   },
-   {
-    "ticker": "KLAC",
-    "name": "KLA Corporation",
-    "group": "Semiconductor Equipment",
-    "industry": "semiconductor-equipment-materials",
-    "cap_bn": 205.0,
-    "weight": 0.84,
+    "cap_bn": 212.1,
+    "weight": 1.01,
     "state": "bear",
-    "ret_1m": -12.0,
-    "from_high": -47.8
+    "ret_1m": -10.4,
+    "from_high": -31.0
    },
    {
-    "ticker": "ADI",
-    "name": "Analog Devices, Inc.",
-    "group": null,
-    "industry": "semiconductors",
-    "cap_bn": 198.3,
-    "weight": 0.82,
-    "state": "bull",
-    "ret_1m": 1.4,
-    "from_high": -7.8
+    "ticker": "ANET",
+    "name": "Arista Networks, Inc.",
+    "group": "AI Servers and Networking",
+    "industry": "computer-hardware",
+    "cap_bn": 211.8,
+    "weight": 1.01,
+    "state": "neither",
+    "ret_1m": 2.9,
+    "from_high": -12.5
+   },
+   {
+    "ticker": "DELL",
+    "name": "Dell Technologies Inc.",
+    "group": "AI Servers and Networking",
+    "industry": "computer-hardware",
+    "cap_bn": 176.8,
+    "weight": 0.84,
+    "state": "neither",
+    "ret_1m": -35.7,
+    "from_high": -46.8
    },
    {
     "ticker": "APH",
     "name": "Amphenol Corporation",
     "group": "Connectors and Components",
     "industry": "electronic-components",
-    "cap_bn": 196.6,
-    "weight": 0.81,
+    "cap_bn": 172.2,
+    "weight": 0.82,
     "state": "neither",
-    "ret_1m": -3.7,
-    "from_high": -10.2
+    "ret_1m": -4.5,
+    "from_high": -14.7
+   },
+   {
+    "ticker": "ADI",
+    "name": "Analog Devices, Inc.",
+    "group": null,
+    "industry": "semiconductors",
+    "cap_bn": 167.6,
+    "weight": 0.8,
+    "state": "neither",
+    "ret_1m": -7.0,
+    "from_high": -15.0
+   },
+   {
+    "ticker": "KLAC",
+    "name": "KLA Corporation",
+    "group": "Semiconductor Equipment",
+    "industry": "semiconductor-equipment-materials",
+    "cap_bn": 165.3,
+    "weight": 0.79,
+    "state": "bear",
+    "ret_1m": -13.3,
+    "from_high": -53.0
    },
    {
     "ticker": "QCOM",
     "name": "QUALCOMM Incorporated",
     "group": null,
     "industry": "semiconductors",
-    "cap_bn": 189.5,
-    "weight": 0.78,
+    "cap_bn": 160.4,
+    "weight": 0.76,
     "state": "neither",
-    "ret_1m": 2.6,
-    "from_high": -28.8
+    "ret_1m": -9.0,
+    "from_high": -34.9
    },
    {
     "ticker": "CRM",
     "name": "Salesforce, Inc.",
     "group": null,
     "industry": "software-application",
-    "cap_bn": 179.1,
-    "weight": 0.74,
+    "cap_bn": 148.7,
+    "weight": 0.71,
     "state": "neither",
-    "ret_1m": -7.8,
-    "from_high": -17.7
+    "ret_1m": -24.2,
+    "from_high": -30.7
    },
    {
     "ticker": "ACN",
     "name": "Accenture plc",
     "group": null,
     "industry": "information-technology-services",
-    "cap_bn": 147.7,
-    "weight": 0.61,
-    "state": "bull",
-    "ret_1m": 16.3,
-    "from_high": -10.9
+    "cap_bn": 130.7,
+    "weight": 0.62,
+    "state": "neither",
+    "ret_1m": -9.0,
+    "from_high": -22.1
    },
    {
     "ticker": "UBER",
     "name": "Uber Technologies, Inc.",
     "group": null,
     "industry": "software-application",
-    "cap_bn": 141.1,
-    "weight": 0.58,
+    "cap_bn": 129.6,
+    "weight": 0.62,
     "state": "bear",
-    "ret_1m": -0.2,
-    "from_high": -26.1
-   },
-   {
-    "ticker": "SNDK",
-    "name": "Sandisk Corporation",
-    "group": "Memory and Storage",
-    "industry": "computer-hardware",
-    "cap_bn": 133.4,
-    "weight": 0.55,
-    "state": "neither",
-    "ret_1m": -33.2,
-    "from_high": -59.9
-   },
-   {
-    "ticker": "STX",
-    "name": "Seagate Technology Holdings PLC",
-    "group": "Memory and Storage",
-    "industry": "computer-hardware",
-    "cap_bn": 125.1,
-    "weight": 0.52,
-    "state": "neither",
-    "ret_1m": -23.6,
-    "from_high": -50.1
+    "ret_1m": -3.0,
+    "from_high": -29.1
    },
    {
     "ticker": "ADP",
     "name": "Automatic Data Processing, Inc.",
     "group": null,
     "industry": "software-application",
-    "cap_bn": 121.6,
-    "weight": 0.5,
+    "cap_bn": 119.1,
+    "weight": 0.57,
     "state": "bull",
-    "ret_1m": 9.8,
-    "from_high": -0.0
+    "ret_1m": 2.3,
+    "from_high": -3.9
+   },
+   {
+    "ticker": "STX",
+    "name": "Seagate Technology Holdings PLC",
+    "group": "Memory and Storage",
+    "industry": "computer-hardware",
+    "cap_bn": 104.9,
+    "weight": 0.5,
+    "state": "neither",
+    "ret_1m": -25.2,
+    "from_high": -52.3
    },
    {
     "ticker": "WDC",
     "name": "Western Digital Corporation",
     "group": "Memory and Storage",
     "industry": "computer-hardware",
-    "cap_bn": 116.5,
-    "weight": 0.48,
+    "cap_bn": 97.7,
+    "weight": 0.47,
     "state": "bear",
-    "ret_1m": -14.5,
-    "from_high": -58.3
-   },
-   {
-    "ticker": "NOW",
-    "name": "ServiceNow, Inc.",
-    "group": null,
-    "industry": "software-application",
-    "cap_bn": 104.5,
-    "weight": 0.43,
-    "state": "neither",
-    "ret_1m": -28.1,
-    "from_high": -42.0
-   },
-   {
-    "ticker": "GLW",
-    "name": "Corning Incorporated",
-    "group": "Optical Communication",
-    "industry": "electronic-components",
-    "cap_bn": 102.9,
-    "weight": 0.42,
-    "state": "bear",
-    "ret_1m": -15.2,
-    "from_high": -53.2
+    "ret_1m": -21.6,
+    "from_high": -60.2
    },
    {
     "ticker": "FTNT",
     "name": "Fortinet, Inc.",
     "group": null,
     "industry": "software-infrastructure",
-    "cap_bn": 95.2,
-    "weight": 0.39,
-    "state": "neither",
-    "ret_1m": -29.6,
-    "from_high": -33.5
-   },
-   {
-    "ticker": "ADBE",
-    "name": "Adobe Inc.",
-    "group": null,
-    "industry": "software-application",
-    "cap_bn": 92.8,
-    "weight": 0.38,
-    "state": "bear",
-    "ret_1m": -0.9,
-    "from_high": -33.3
-   },
-   {
-    "ticker": "CDNS",
-    "name": "Cadence Design Systems, Inc.",
-    "group": null,
-    "industry": "software-application",
     "cap_bn": 91.5,
-    "weight": 0.38,
+    "weight": 0.44,
     "state": "neither",
-    "ret_1m": 1.2,
-    "from_high": -20.0
+    "ret_1m": -24.5,
+    "from_high": -32.5
    },
    {
-    "ticker": "INTU",
-    "name": "Intuit Inc.",
+    "ticker": "NOW",
+    "name": "ServiceNow, Inc.",
     "group": null,
     "industry": "software-application",
     "cap_bn": 90.9,
-    "weight": 0.37,
+    "weight": 0.43,
     "state": "neither",
-    "ret_1m": 9.6,
-    "from_high": -49.0
+    "ret_1m": -42.0,
+    "from_high": -48.8
    },
    {
-    "ticker": "SNPS",
-    "name": "Synopsys, Inc.",
-    "group": null,
-    "industry": "software-infrastructure",
-    "cap_bn": 88.7,
-    "weight": 0.36,
-    "state": "bull",
-    "ret_1m": -3.6,
-    "from_high": -13.4
+    "ticker": "SNDK",
+    "name": "Sandisk Corporation",
+    "group": "Memory and Storage",
+    "industry": "computer-hardware",
+    "cap_bn": 90.2,
+    "weight": 0.43,
+    "state": "neither",
+    "ret_1m": -45.2,
+    "from_high": -67.7
    },
    {
     "ticker": "MSI",
     "name": "Motorola Solutions, Inc.",
     "group": null,
     "industry": "communication-equipment",
-    "cap_bn": 87.7,
-    "weight": 0.36,
+    "cap_bn": 86.0,
+    "weight": 0.41,
     "state": "bull",
-    "ret_1m": 17.4,
-    "from_high": -0.9
+    "ret_1m": 11.6,
+    "from_high": -2.5
    },
    {
-    "ticker": "MPWR",
-    "name": "Monolithic Power Systems, Inc.",
+    "ticker": "ADBE",
+    "name": "Adobe Inc.",
     "group": null,
-    "industry": "semiconductors",
-    "cap_bn": 70.6,
-    "weight": 0.29,
+    "industry": "software-application",
+    "cap_bn": 84.7,
+    "weight": 0.4,
+    "state": "bear",
+    "ret_1m": -13.1,
+    "from_high": -38.0
+   },
+   {
+    "ticker": "GLW",
+    "name": "Corning Incorporated",
+    "group": "Optical Communication",
+    "industry": "electronic-components",
+    "cap_bn": 81.3,
+    "weight": 0.39,
+    "state": "bear",
+    "ret_1m": -21.3,
+    "from_high": -58.4
+   },
+   {
+    "ticker": "CDNS",
+    "name": "Cadence Design Systems, Inc.",
+    "group": null,
+    "industry": "software-application",
+    "cap_bn": 77.3,
+    "weight": 0.37,
+    "state": "bear",
+    "ret_1m": -6.5,
+    "from_high": -26.8
+   },
+   {
+    "ticker": "SNPS",
+    "name": "Synopsys, Inc.",
+    "group": null,
+    "industry": "software-infrastructure",
+    "cap_bn": 75.9,
+    "weight": 0.36,
     "state": "neither",
-    "ret_1m": 16.4,
-    "from_high": -14.1
+    "ret_1m": -4.5,
+    "from_high": -19.4
+   },
+   {
+    "ticker": "INTU",
+    "name": "Intuit Inc.",
+    "group": null,
+    "industry": "software-application",
+    "cap_bn": 72.3,
+    "weight": 0.34,
+    "state": "bear",
+    "ret_1m": -7.6,
+    "from_high": -53.5
    },
    {
     "ticker": "NXPI",
     "name": "NXP Semiconductors N.V.",
     "group": null,
     "industry": "semiconductors",
-    "cap_bn": 67.4,
+    "cap_bn": 59.3,
     "weight": 0.28,
     "state": "neither",
-    "ret_1m": 21.0,
-    "from_high": -19.0
-   },
-   {
-    "ticker": "DDOG",
-    "name": "Datadog, Inc.",
-    "group": null,
-    "industry": "software-application",
-    "cap_bn": 66.6,
-    "weight": 0.27,
-    "state": "neither",
-    "ret_1m": -31.5,
-    "from_high": -37.1
-   },
-   {
-    "ticker": "HPE",
-    "name": "Hewlett Packard Enterprise Comp",
-    "group": "AI Servers and Networking",
-    "industry": "communication-equipment",
-    "cap_bn": 66.6,
-    "weight": 0.27,
-    "state": "neither",
-    "ret_1m": -20.5,
-    "from_high": -31.7
+    "ret_1m": 3.9,
+    "from_high": -23.7
    },
    {
     "ticker": "TEL",
     "name": "TE Connectivity plc",
     "group": "Connectors and Components",
     "industry": "electronic-components",
-    "cap_bn": 62.4,
-    "weight": 0.26,
-    "state": "bull",
-    "ret_1m": 3.6,
-    "from_high": -11.4
+    "cap_bn": 57.3,
+    "weight": 0.27,
+    "state": "neither",
+    "ret_1m": -1.3,
+    "from_high": -14.1
    },
    {
-    "ticker": "LITE",
-    "name": "Lumentum Holdings Inc.",
-    "group": "Optical Communication",
-    "industry": "communication-equipment",
-    "cap_bn": 56.6,
-    "weight": 0.23,
+    "ticker": "DDOG",
+    "name": "Datadog, Inc.",
+    "group": null,
+    "industry": "software-application",
+    "cap_bn": 56.8,
+    "weight": 0.27,
     "state": "neither",
-    "ret_1m": -30.3,
-    "from_high": -44.9
+    "ret_1m": -39.0,
+    "from_high": -43.2
+   },
+   {
+    "ticker": "MPWR",
+    "name": "Monolithic Power Systems, Inc.",
+    "group": null,
+    "industry": "semiconductors",
+    "cap_bn": 55.7,
+    "weight": 0.27,
+    "state": "neither",
+    "ret_1m": 1.0,
+    "from_high": -23.1
+   },
+   {
+    "ticker": "HPE",
+    "name": "Hewlett Packard Enterprise Comp",
+    "group": "AI Servers and Networking",
+    "industry": "communication-equipment",
+    "cap_bn": 54.3,
+    "weight": 0.26,
+    "state": "neither",
+    "ret_1m": -21.8,
+    "from_high": -38.1
    },
    {
     "ticker": "GRMN",
     "name": "Garmin Ltd.",
     "group": null,
     "industry": "scientific-technical-instruments",
-    "cap_bn": 55.1,
-    "weight": 0.23,
-    "state": "bull",
-    "ret_1m": 2.3,
-    "from_high": -8.3
+    "cap_bn": 51.7,
+    "weight": 0.25,
+    "state": "neither",
+    "ret_1m": -6.6,
+    "from_high": -12.9
    },
    {
     "ticker": "ADSK",
     "name": "Autodesk, Inc.",
     "group": null,
     "industry": "software-application",
-    "cap_bn": 54.2,
-    "weight": 0.22,
-    "state": "neither",
-    "ret_1m": 12.3,
-    "from_high": -16.4
-   },
-   {
-    "ticker": "KEYS",
-    "name": "Keysight Technologies Inc.",
-    "group": null,
-    "industry": "scientific-technical-instruments",
-    "cap_bn": 51.8,
-    "weight": 0.21,
-    "state": "neither",
-    "ret_1m": -14.9,
-    "from_high": -21.6
-   },
-   {
-    "ticker": "XYZ",
-    "name": "Block, Inc.",
-    "group": null,
-    "industry": "software-infrastructure",
-    "cap_bn": 49.7,
-    "weight": 0.2,
+    "cap_bn": 51.1,
+    "weight": 0.24,
     "state": "bull",
-    "ret_1m": 8.5,
-    "from_high": -7.1
+    "ret_1m": -0.6,
+    "from_high": -21.5
    },
    {
     "ticker": "ROP",
     "name": "Roper Technologies, Inc.",
     "group": null,
     "industry": "software-application",
-    "cap_bn": 47.3,
-    "weight": 0.19,
+    "cap_bn": 45.5,
+    "weight": 0.22,
     "state": "bull",
-    "ret_1m": 28.2,
-    "from_high": -2.9
+    "ret_1m": 16.5,
+    "from_high": -5.9
+   },
+   {
+    "ticker": "KEYS",
+    "name": "Keysight Technologies Inc.",
+    "group": null,
+    "industry": "scientific-technical-instruments",
+    "cap_bn": 44.5,
+    "weight": 0.21,
+    "state": "neither",
+    "ret_1m": -17.6,
+    "from_high": -27.5
    },
    {
     "ticker": "WDAY",
     "name": "Workday, Inc.",
     "group": null,
     "industry": "software-application",
-    "cap_bn": 45.9,
-    "weight": 0.19,
+    "cap_bn": 42.1,
+    "weight": 0.2,
     "state": "neither",
-    "ret_1m": 1.0,
-    "from_high": -18.4
+    "ret_1m": -14.6,
+    "from_high": -25.8
    },
    {
-    "ticker": "COHR",
-    "name": "Coherent Corp.",
-    "group": "Optical Communication",
-    "industry": "scientific-technical-instruments",
-    "cap_bn": 45.7,
-    "weight": 0.19,
-    "state": "bear",
-    "ret_1m": -11.9,
-    "from_high": -45.6
+    "ticker": "XYZ",
+    "name": "Block, Inc.",
+    "group": null,
+    "industry": "software-infrastructure",
+    "cap_bn": 42.1,
+    "weight": 0.2,
+    "state": "neither",
+    "ret_1m": -5.1,
+    "from_high": -16.2
    },
    {
-    "ticker": "CIEN",
-    "name": "Ciena Corporation",
+    "ticker": "LITE",
+    "name": "Lumentum Holdings Inc.",
     "group": "Optical Communication",
     "industry": "communication-equipment",
-    "cap_bn": 41.7,
-    "weight": 0.17,
-    "state": "bear",
-    "ret_1m": -18.2,
-    "from_high": -53.1
-   },
-   {
-    "ticker": "TER",
-    "name": "Teradyne, Inc.",
-    "group": "Semiconductor Equipment",
-    "industry": "semiconductor-equipment-materials",
-    "cap_bn": 41.2,
-    "weight": 0.17,
-    "state": "bear",
-    "ret_1m": -26.6,
-    "from_high": -45.5
+    "cap_bn": 41.8,
+    "weight": 0.2,
+    "state": "neither",
+    "ret_1m": -37.1,
+    "from_high": -52.8
    },
    {
     "ticker": "PAYX",
     "name": "Paychex, Inc.",
     "group": null,
     "industry": "software-application",
-    "cap_bn": 41.0,
-    "weight": 0.17,
+    "cap_bn": 40.1,
+    "weight": 0.19,
     "state": "bull",
-    "ret_1m": 7.4,
-    "from_high": -8.6
+    "ret_1m": 0.0,
+    "from_high": -11.6
+   },
+   {
+    "ticker": "COHR",
+    "name": "Coherent Corp.",
+    "group": "Optical Communication",
+    "industry": "scientific-technical-instruments",
+    "cap_bn": 36.9,
+    "weight": 0.18,
+    "state": "bear",
+    "ret_1m": -9.5,
+    "from_high": -49.6
+   },
+   {
+    "ticker": "CIEN",
+    "name": "Ciena Corporation",
+    "group": "Optical Communication",
+    "industry": "communication-equipment",
+    "cap_bn": 33.2,
+    "weight": 0.16,
+    "state": "bear",
+    "ret_1m": -27.3,
+    "from_high": -58.1
+   },
+   {
+    "ticker": "TER",
+    "name": "Teradyne, Inc.",
+    "group": "Semiconductor Equipment",
+    "industry": "semiconductor-equipment-materials",
+    "cap_bn": 32.0,
+    "weight": 0.15,
+    "state": "bear",
+    "ret_1m": -34.2,
+    "from_high": -53.0
    },
    {
     "ticker": "NTAP",
     "name": "NetApp, Inc.",
     "group": null,
     "industry": "software-infrastructure",
-    "cap_bn": 36.5,
+    "cap_bn": 31.0,
     "weight": 0.15,
     "state": "neither",
-    "ret_1m": -16.3,
-    "from_high": -22.2
+    "ret_1m": -21.7,
+    "from_high": -28.8
    },
    {
     "ticker": "MCHP",
     "name": "Microchip Technology Incorporat",
     "group": null,
     "industry": "semiconductors",
-    "cap_bn": 33.8,
+    "cap_bn": 30.2,
     "weight": 0.14,
     "state": "bear",
-    "ret_1m": -12.9,
-    "from_high": -39.2
+    "ret_1m": -24.2,
+    "from_high": -42.7
    },
    {
     "ticker": "TDY",
     "name": "Teledyne Technologies Incorpora",
     "group": null,
     "industry": "scientific-technical-instruments",
-    "cap_bn": 30.0,
-    "weight": 0.12,
-    "state": "neither",
-    "ret_1m": 6.4,
-    "from_high": -6.3
+    "cap_bn": 27.6,
+    "weight": 0.13,
+    "state": "bear",
+    "ret_1m": -1.3,
+    "from_high": -10.0
    },
    {
     "ticker": "CPAY",
     "name": "Corpay, Inc.",
     "group": null,
     "industry": "software-infrastructure",
-    "cap_bn": 29.2,
-    "weight": 0.12,
+    "cap_bn": 27.5,
+    "weight": 0.13,
     "state": "bull",
-    "ret_1m": 16.0,
-    "from_high": -1.3
-   },
-   {
-    "ticker": "ON",
-    "name": "ON Semiconductor Corporation",
-    "group": null,
-    "industry": "semiconductors",
-    "cap_bn": 28.7,
-    "weight": 0.12,
-    "state": "bear",
-    "ret_1m": 0.5,
-    "from_high": -44.9
-   },
-   {
-    "ticker": "CTSH",
-    "name": "Cognizant Technology Solutions ",
-    "group": null,
-    "industry": "information-technology-services",
-    "cap_bn": 28.5,
-    "weight": 0.12,
-    "state": "bull",
-    "ret_1m": 2.0,
-    "from_high": -25.1
+    "ret_1m": 6.6,
+    "from_high": -6.0
    },
    {
     "ticker": "VRSN",
     "name": "VeriSign, Inc.",
     "group": null,
     "industry": "software-infrastructure",
-    "cap_bn": 28.0,
-    "weight": 0.12,
+    "cap_bn": 27.5,
+    "weight": 0.13,
     "state": "bull",
-    "ret_1m": 3.7,
-    "from_high": -1.7
+    "ret_1m": 0.0,
+    "from_high": -3.4
    },
    {
-    "ticker": "JBL",
-    "name": "Jabil Inc.",
+    "ticker": "CTSH",
+    "name": "Cognizant Technology Solutions ",
     "group": null,
-    "industry": "electronic-components",
-    "cap_bn": 26.8,
-    "weight": 0.11,
-    "state": "bear",
-    "ret_1m": -11.6,
-    "from_high": -32.6
+    "industry": "information-technology-services",
+    "cap_bn": 26.0,
+    "weight": 0.12,
+    "state": "neither",
+    "ret_1m": -18.6,
+    "from_high": -33.5
    },
    {
     "ticker": "HPQ",
     "name": "HP Inc.",
     "group": null,
     "industry": "computer-hardware",
-    "cap_bn": 26.0,
-    "weight": 0.11,
+    "cap_bn": 25.2,
+    "weight": 0.12,
     "state": "neither",
-    "ret_1m": -5.2,
-    "from_high": -18.6
+    "ret_1m": -11.2,
+    "from_high": -21.6
+   },
+   {
+    "ticker": "ON",
+    "name": "ON Semiconductor Corporation",
+    "group": null,
+    "industry": "semiconductors",
+    "cap_bn": 23.7,
+    "weight": 0.11,
+    "state": "bear",
+    "ret_1m": -14.6,
+    "from_high": -50.9
+   },
+   {
+    "ticker": "JBL",
+    "name": "Jabil Inc.",
+    "group": null,
+    "industry": "electronic-components",
+    "cap_bn": 23.2,
+    "weight": 0.11,
+    "state": "bear",
+    "ret_1m": -12.3,
+    "from_high": -36.1
    },
    {
     "ticker": "Q",
     "name": "Qnity Electronics, Inc.",
     "group": null,
     "industry": "semiconductor-equipment-materials",
-    "cap_bn": 25.6,
-    "weight": 0.11,
-    "state": "neither",
-    "ret_1m": 0.9,
-    "from_high": -30.1
-   },
-   {
-    "ticker": "BR",
-    "name": "Broadridge Financial Solutions,",
-    "group": null,
-    "industry": "information-technology-services",
-    "cap_bn": 21.7,
-    "weight": 0.09,
-    "state": "bull",
-    "ret_1m": 13.8,
-    "from_high": -15.6
-   },
-   {
-    "ticker": "CDW",
-    "name": "CDW Corporation",
-    "group": null,
-    "industry": "information-technology-services",
     "cap_bn": 21.6,
-    "weight": 0.09,
-    "state": "bull",
-    "ret_1m": 15.1,
-    "from_high": -0.2
+    "weight": 0.1,
+    "state": "bear",
+    "ret_1m": -5.4,
+    "from_high": -35.3
    },
    {
     "ticker": "PTC",
     "name": "PTC Inc.",
     "group": null,
     "industry": "software-application",
-    "cap_bn": 21.3,
-    "weight": 0.09,
+    "cap_bn": 21.2,
+    "weight": 0.1,
     "state": "bull",
-    "ret_1m": 1.3,
-    "from_high": -0.2
+    "ret_1m": 0.6,
+    "from_high": -0.5
    },
    {
-    "ticker": "SWKS",
-    "name": "Skyworks Solutions, Inc.",
+    "ticker": "BR",
+    "name": "Broadridge Financial Solutions,",
     "group": null,
-    "industry": "semiconductors",
-    "cap_bn": 21.1,
-    "weight": 0.09,
+    "industry": "information-technology-services",
+    "cap_bn": 20.5,
+    "weight": 0.1,
     "state": "bull",
-    "ret_1m": 17.1,
-    "from_high": -1.6
+    "ret_1m": 2.0,
+    "from_high": -19.8
+   },
+   {
+    "ticker": "CDW",
+    "name": "CDW Corporation",
+    "group": null,
+    "industry": "information-technology-services",
+    "cap_bn": 20.2,
+    "weight": 0.1,
+    "state": "bull",
+    "ret_1m": 5.9,
+    "from_high": -3.2
    },
    {
     "ticker": "FTV",
     "name": "Fortive Corporation",
     "group": null,
     "industry": "scientific-technical-instruments",
-    "cap_bn": 20.2,
-    "weight": 0.08,
+    "cap_bn": 19.1,
+    "weight": 0.09,
     "state": "bull",
-    "ret_1m": 18.5,
-    "from_high": -0.7
+    "ret_1m": 11.5,
+    "from_high": -4.3
    },
    {
-    "ticker": "FSLR",
-    "name": "First Solar, Inc.",
+    "ticker": "SWKS",
+    "name": "Skyworks Solutions, Inc.",
     "group": null,
-    "industry": "solar",
-    "cap_bn": 18.5,
+    "industry": "semiconductors",
+    "cap_bn": 17.4,
     "weight": 0.08,
-    "state": "bear",
-    "ret_1m": -3.8,
-    "from_high": -45.9
+    "state": "neither",
+    "ret_1m": -4.3,
+    "from_high": -14.0
    },
    {
     "ticker": "FFIV",
     "name": "F5, Inc.",
     "group": null,
     "industry": "software-infrastructure",
-    "cap_bn": 18.0,
-    "weight": 0.07,
+    "cap_bn": 17.3,
+    "weight": 0.08,
     "state": "neither",
-    "ret_1m": -30.5,
-    "from_high": -33.8
-   },
-   {
-    "ticker": "SMCI",
-    "name": "Super Micro Computer, Inc.",
-    "group": "AI Servers and Networking",
-    "industry": "computer-hardware",
-    "cap_bn": 17.8,
-    "weight": 0.07,
-    "state": "neither",
-    "ret_1m": -24.6,
-    "from_high": -46.2
+    "ret_1m": -30.6,
+    "from_high": -33.7
    },
    {
     "ticker": "GEN",
     "name": "Gen Digital Inc.",
     "group": null,
     "industry": "software-infrastructure",
-    "cap_bn": 17.6,
-    "weight": 0.07,
+    "cap_bn": 17.3,
+    "weight": 0.08,
     "state": "bull",
-    "ret_1m": 24.7,
-    "from_high": -5.5
+    "ret_1m": 25.5,
+    "from_high": -3.6
    },
    {
     "ticker": "TYL",
     "name": "Tyler Technologies, Inc.",
     "group": null,
     "industry": "software-application",
-    "cap_bn": 16.8,
-    "weight": 0.07,
+    "cap_bn": 16.1,
+    "weight": 0.08,
     "state": "bull",
-    "ret_1m": 21.0,
-    "from_high": -10.4
+    "ret_1m": 7.6,
+    "from_high": -14.5
    },
    {
     "ticker": "LDOS",
     "name": "Leidos Holdings, Inc.",
     "group": null,
     "industry": "information-technology-services",
-    "cap_bn": 16.0,
+    "cap_bn": 14.9,
     "weight": 0.07,
-    "state": "neither",
-    "ret_1m": 8.7,
-    "from_high": -33.3
+    "state": "bear",
+    "ret_1m": -3.5,
+    "from_high": -36.5
    },
    {
     "ticker": "FICO",
     "name": "Fair Isaac Corporation",
     "group": null,
     "industry": "software-application",
-    "cap_bn": 15.3,
-    "weight": 0.06,
+    "cap_bn": 14.8,
+    "weight": 0.07,
     "state": "bear",
-    "ret_1m": -0.3,
-    "from_high": -61.1
+    "ret_1m": -14.8,
+    "from_high": -63.3
+   },
+   {
+    "ticker": "FSLR",
+    "name": "First Solar, Inc.",
+    "group": null,
+    "industry": "solar",
+    "cap_bn": 14.8,
+    "weight": 0.07,
+    "state": "bear",
+    "ret_1m": -13.1,
+    "from_high": -52.3
+   },
+   {
+    "ticker": "SMCI",
+    "name": "Super Micro Computer, Inc.",
+    "group": "AI Servers and Networking",
+    "industry": "computer-hardware",
+    "cap_bn": 14.3,
+    "weight": 0.07,
+    "state": "neither",
+    "ret_1m": -33.0,
+    "from_high": -52.5
    },
    {
     "ticker": "ZBRA",
     "name": "Zebra Technologies Corporation",
     "group": null,
     "industry": "communication-equipment",
-    "cap_bn": 15.0,
-    "weight": 0.06,
+    "cap_bn": 14.2,
+    "weight": 0.07,
     "state": "neither",
-    "ret_1m": -15.7,
-    "from_high": -18.7
+    "ret_1m": -20.1,
+    "from_high": -20.1
    },
    {
     "ticker": "FIS",
     "name": "Fidelity National Information S",
     "group": null,
     "industry": "information-technology-services",
-    "cap_bn": 14.6,
+    "cap_bn": 13.3,
     "weight": 0.06,
     "state": "bear",
-    "ret_1m": -20.0,
-    "from_high": -56.7
-   },
-   {
-    "ticker": "GDDY",
-    "name": "GoDaddy Inc.",
-    "group": null,
-    "industry": "software-infrastructure",
-    "cap_bn": 13.6,
-    "weight": 0.06,
-    "state": "bull",
-    "ret_1m": 8.7,
-    "from_high": -15.2
-   },
-   {
-    "ticker": "TRMB",
-    "name": "Trimble Inc.",
-    "group": null,
-    "industry": "scientific-technical-instruments",
-    "cap_bn": 12.8,
-    "weight": 0.05,
-    "state": "bear",
-    "ret_1m": -5.5,
-    "from_high": -33.2
+    "ret_1m": -28.8,
+    "from_high": -60.4
    },
    {
     "ticker": "AKAM",
     "name": "Akamai Technologies, Inc.",
     "group": null,
     "industry": "software-infrastructure",
-    "cap_bn": 12.5,
-    "weight": 0.05,
+    "cap_bn": 12.3,
+    "weight": 0.06,
     "state": "bear",
+    "ret_1m": 1.6,
+    "from_high": -43.1
+   },
+   {
+    "ticker": "GDDY",
+    "name": "GoDaddy Inc.",
+    "group": null,
+    "industry": "software-infrastructure",
+    "cap_bn": 12.1,
+    "weight": 0.06,
+    "state": "neither",
     "ret_1m": -5.6,
-    "from_high": -46.3
+    "from_high": -21.6
    },
    {
     "ticker": "JKHY",
     "name": "Jack Henry & Associates, Inc.",
     "group": null,
     "industry": "information-technology-services",
-    "cap_bn": 12.3,
-    "weight": 0.05,
+    "cap_bn": 11.9,
+    "weight": 0.06,
     "state": "bull",
-    "ret_1m": 13.4,
-    "from_high": -7.5
+    "ret_1m": 11.0,
+    "from_high": -10.5
+   },
+   {
+    "ticker": "TRMB",
+    "name": "Trimble Inc.",
+    "group": null,
+    "industry": "scientific-technical-instruments",
+    "cap_bn": 11.6,
+    "weight": 0.06,
+    "state": "bear",
+    "ret_1m": -16.9,
+    "from_high": -37.8
    },
    {
     "ticker": "IT",
     "name": "Gartner, Inc.",
     "group": null,
     "industry": "information-technology-services",
-    "cap_bn": 12.0,
+    "cap_bn": 11.0,
     "weight": 0.05,
     "state": "neither",
-    "ret_1m": -2.5,
-    "from_high": -25.0
+    "ret_1m": -21.5,
+    "from_high": -32.3
    },
    {
     "ticker": "EPAM",
     "name": "EPAM Systems, Inc.",
     "group": null,
     "industry": "information-technology-services",
-    "cap_bn": 8.4,
-    "weight": 0.03,
+    "cap_bn": 7.8,
+    "weight": 0.04,
     "state": "bull",
-    "ret_1m": 42.9,
-    "from_high": -26.0
+    "ret_1m": 12.3,
+    "from_high": -32.1
    }
   ],
   "semi": [
@@ -3167,198 +3185,198 @@
     "name": "NVIDIA Corporation",
     "group": "AI Compute Chips",
     "industry": "semiconductors",
-    "cap_bn": 4013.0,
-    "weight": 41.36,
+    "cap_bn": 3031.2,
+    "weight": 40.01,
     "state": "neither",
-    "ret_1m": -24.9,
-    "from_high": -30.5
+    "ret_1m": -34.2,
+    "from_high": -39.0
    },
    {
     "ticker": "AVGO",
     "name": "Broadcom Inc.",
     "group": "AI Compute Chips",
     "industry": "semiconductors",
-    "cap_bn": 1739.3,
-    "weight": 17.93,
+    "cap_bn": 1453.1,
+    "weight": 19.18,
     "state": "neither",
-    "ret_1m": 5.2,
-    "from_high": -24.1
+    "ret_1m": 2.6,
+    "from_high": -27.8
    },
    {
     "ticker": "AMD",
     "name": "Advanced Micro Devices, Inc.",
     "group": "AI Compute Chips",
     "industry": "semiconductors",
-    "cap_bn": 959.9,
-    "weight": 9.89,
-    "state": "bull",
-    "ret_1m": 2.5,
-    "from_high": -9.9
+    "cap_bn": 702.4,
+    "weight": 9.27,
+    "state": "neither",
+    "ret_1m": -11.5,
+    "from_high": -24.7
    },
    {
     "ticker": "MU",
     "name": "Micron Technology, Inc.",
     "group": "Memory and Storage",
     "industry": "semiconductors",
-    "cap_bn": 903.4,
-    "weight": 9.31,
+    "cap_bn": 672.6,
+    "weight": 8.88,
     "state": "neither",
-    "ret_1m": -12.7,
-    "from_high": -34.2
+    "ret_1m": -24.4,
+    "from_high": -43.1
    },
    {
     "ticker": "INTC",
     "name": "Intel Corporation",
     "group": null,
     "industry": "semiconductors",
-    "cap_bn": 325.3,
-    "weight": 3.35,
+    "cap_bn": 272.6,
+    "weight": 3.6,
     "state": "neither",
-    "ret_1m": -37.6,
-    "from_high": -56.6
-   },
-   {
-    "ticker": "AMAT",
-    "name": "Applied Materials, Inc.",
-    "group": "Semiconductor Equipment",
-    "industry": "semiconductor-equipment-materials",
-    "cap_bn": 302.3,
-    "weight": 3.12,
-    "state": "bear",
-    "ret_1m": -14.7,
-    "from_high": -47.3
-   },
-   {
-    "ticker": "LRCX",
-    "name": "Lam Research Corporation",
-    "group": "Semiconductor Equipment",
-    "industry": "semiconductor-equipment-materials",
-    "cap_bn": 292.0,
-    "weight": 3.01,
-    "state": "bear",
-    "ret_1m": -18.5,
-    "from_high": -46.0
+    "ret_1m": -40.1,
+    "from_high": -60.5
    },
    {
     "ticker": "TXN",
     "name": "Texas Instruments Incorporated",
     "group": null,
     "industry": "semiconductors",
-    "cap_bn": 285.5,
-    "weight": 2.94,
+    "cap_bn": 241.0,
+    "weight": 3.18,
     "state": "bull",
-    "ret_1m": 11.9,
-    "from_high": -5.0
+    "ret_1m": 0.9,
+    "from_high": -13.1
    },
    {
-    "ticker": "KLAC",
-    "name": "KLA Corporation",
+    "ticker": "AMAT",
+    "name": "Applied Materials, Inc.",
     "group": "Semiconductor Equipment",
     "industry": "semiconductor-equipment-materials",
-    "cap_bn": 205.0,
-    "weight": 2.11,
+    "cap_bn": 240.2,
+    "weight": 3.17,
     "state": "bear",
-    "ret_1m": -12.0,
-    "from_high": -47.8
+    "ret_1m": -17.0,
+    "from_high": -53.0
+   },
+   {
+    "ticker": "LRCX",
+    "name": "Lam Research Corporation",
+    "group": "Semiconductor Equipment",
+    "industry": "semiconductor-equipment-materials",
+    "cap_bn": 228.9,
+    "weight": 3.02,
+    "state": "bear",
+    "ret_1m": -21.9,
+    "from_high": -52.9
    },
    {
     "ticker": "ADI",
     "name": "Analog Devices, Inc.",
     "group": null,
     "industry": "semiconductors",
-    "cap_bn": 198.3,
-    "weight": 2.04,
-    "state": "bull",
-    "ret_1m": 1.4,
-    "from_high": -7.8
+    "cap_bn": 167.6,
+    "weight": 2.21,
+    "state": "neither",
+    "ret_1m": -7.0,
+    "from_high": -15.0
+   },
+   {
+    "ticker": "KLAC",
+    "name": "KLA Corporation",
+    "group": "Semiconductor Equipment",
+    "industry": "semiconductor-equipment-materials",
+    "cap_bn": 165.3,
+    "weight": 2.18,
+    "state": "bear",
+    "ret_1m": -13.3,
+    "from_high": -53.0
    },
    {
     "ticker": "QCOM",
     "name": "QUALCOMM Incorporated",
     "group": null,
     "industry": "semiconductors",
-    "cap_bn": 189.5,
-    "weight": 1.95,
+    "cap_bn": 160.4,
+    "weight": 2.12,
     "state": "neither",
-    "ret_1m": 2.6,
-    "from_high": -28.8
-   },
-   {
-    "ticker": "MPWR",
-    "name": "Monolithic Power Systems, Inc.",
-    "group": null,
-    "industry": "semiconductors",
-    "cap_bn": 70.6,
-    "weight": 0.73,
-    "state": "neither",
-    "ret_1m": 16.4,
-    "from_high": -14.1
+    "ret_1m": -9.0,
+    "from_high": -34.9
    },
    {
     "ticker": "NXPI",
     "name": "NXP Semiconductors N.V.",
     "group": null,
     "industry": "semiconductors",
-    "cap_bn": 67.4,
-    "weight": 0.69,
+    "cap_bn": 59.3,
+    "weight": 0.78,
     "state": "neither",
-    "ret_1m": 21.0,
-    "from_high": -19.0
+    "ret_1m": 3.9,
+    "from_high": -23.7
+   },
+   {
+    "ticker": "MPWR",
+    "name": "Monolithic Power Systems, Inc.",
+    "group": null,
+    "industry": "semiconductors",
+    "cap_bn": 55.7,
+    "weight": 0.74,
+    "state": "neither",
+    "ret_1m": 1.0,
+    "from_high": -23.1
    },
    {
     "ticker": "TER",
     "name": "Teradyne, Inc.",
     "group": "Semiconductor Equipment",
     "industry": "semiconductor-equipment-materials",
-    "cap_bn": 41.2,
+    "cap_bn": 32.0,
     "weight": 0.42,
     "state": "bear",
-    "ret_1m": -26.6,
-    "from_high": -45.5
+    "ret_1m": -34.2,
+    "from_high": -53.0
    },
    {
     "ticker": "MCHP",
     "name": "Microchip Technology Incorporat",
     "group": null,
     "industry": "semiconductors",
-    "cap_bn": 33.8,
-    "weight": 0.35,
+    "cap_bn": 30.2,
+    "weight": 0.4,
     "state": "bear",
-    "ret_1m": -12.9,
-    "from_high": -39.2
+    "ret_1m": -24.2,
+    "from_high": -42.7
    },
    {
     "ticker": "ON",
     "name": "ON Semiconductor Corporation",
     "group": null,
     "industry": "semiconductors",
-    "cap_bn": 28.7,
-    "weight": 0.3,
+    "cap_bn": 23.7,
+    "weight": 0.31,
     "state": "bear",
-    "ret_1m": 0.5,
-    "from_high": -44.9
+    "ret_1m": -14.6,
+    "from_high": -50.9
    },
    {
     "ticker": "Q",
     "name": "Qnity Electronics, Inc.",
     "group": null,
     "industry": "semiconductor-equipment-materials",
-    "cap_bn": 25.6,
-    "weight": 0.26,
-    "state": "neither",
-    "ret_1m": 0.9,
-    "from_high": -30.1
+    "cap_bn": 21.6,
+    "weight": 0.29,
+    "state": "bear",
+    "ret_1m": -5.4,
+    "from_high": -35.3
    },
    {
     "ticker": "SWKS",
     "name": "Skyworks Solutions, Inc.",
     "group": null,
     "industry": "semiconductors",
-    "cap_bn": 21.1,
-    "weight": 0.22,
-    "state": "bull",
-    "ret_1m": 17.1,
-    "from_high": -1.6
+    "cap_bn": 17.4,
+    "weight": 0.23,
+    "state": "neither",
+    "ret_1m": -4.3,
+    "from_high": -14.0
    }
   ]
  },
@@ -3366,19 +3384,24 @@
   "label": "AI 硬體股等權重",
   "n": 22,
   "n_start": 18,
-  "dd_now": -24.7,
+  "dd_now": -32.7,
   "peak": "2026-10-02",
-  "ret_1y": 88.3,
-  "tech_ret_1y": 15.6,
-  "semi_ret_1y": 18.0
+  "ret_1y": 80.8,
+  "tech_ret_1y": 13.1,
+  "semi_ret_1y": 11.5
  },
  "official": {
   "tech": {
    "symbol": "^SP500-45",
    "label": "S&P 500 資訊科技（官方）",
-   "available": false
+   "available": false,
+   "short": {
+    "bars": 1,
+    "first": "2026-11-20",
+    "last": "2026-11-20"
+   }
   }
  },
- "net_now": -27.3,
- "d4_now": -4.5
+ "net_now": -54.5,
+ "d4_now": -22.7
 }

@@ -67,8 +67,12 @@ INDICES = {
 OFFICIAL = {"tech": ("^SP500-45", "S&P 500 資訊科技（官方）")}
 
 
-def official_weekly(data_dir: Path, sym: str):
-    """Weekly (W-FRI) closes of an official index from index_ohlc.csv, or None if absent."""
+MIN_OFFICIAL_WEEKS = 52   # fewer weeks than this is not a comparison (2026-11-21: Yahoo gave ^SP500-45 one bar)
+
+
+def official_weekly(data_dir: Path, sym: str, last=None):
+    """Weekly (W-FRI) closes of an official index from index_ohlc.csv, or None if absent.
+    A series too short to compare comes back as (None, reason)."""
     p = data_dir / "index_ohlc.csv"
     if not p.exists():
         return None
@@ -77,7 +81,13 @@ def official_weekly(data_dir: Path, sym: str):
     s = io[io["Ticker"] == sym].set_index("Date")["Close"].dropna().sort_index()
     if s.empty:
         return None
-    return s, s.resample("W-FRI").last().dropna()
+    raw = {"bars": int(len(s)), "first": s.index[0].date().isoformat(), "last": s.index[-1].date().isoformat()}
+    if last is not None:
+        s = s[s.index <= last]           # never past our own data date
+    wk = s.resample("W-FRI").last().dropna()
+    if len(wk) < MIN_OFFICIAL_WEEKS:
+        return None, raw
+    return s, wk
 
 
 def compare_official(df: pd.DataFrame, key: str, daily_last, off_daily: pd.Series) -> dict:
@@ -385,10 +395,12 @@ def main() -> None:
     ew_cols = [t for t in reg["group_of"] if t in w.columns]
     ew_ret = w[ew_cols].pct_change(fill_method=None).mean(axis=1)
     df["aihw"] = 100 * (1 + ew_ret.fillna(0)).cumprod()
-    off_daily = {}
+    off_daily, off_short = {}, {}
     for key, (sym, _) in OFFICIAL.items():
-        got = official_weekly(Path(args.data_dir), sym)
-        if got is not None:
+        got = official_weekly(Path(args.data_dir), sym, daily.index[-1])
+        if got is not None and got[0] is None:
+            off_short[key] = got[1]
+        elif got is not None:
             off_daily[key], df[key + "_off"] = got[0], got[1]
     df = df.dropna(subset=["net", "tech", "semi"])
     for key in off_daily:
@@ -469,7 +481,7 @@ def main() -> None:
                  "ret_1y": round(float(100 * (df["aihw"].iloc[-1] / df["aihw"].iloc[-53] - 1)), 1),
                  "tech_ret_1y": round(float(100 * (df["tech"].iloc[-1] / df["tech"].iloc[-53] - 1)), 1),
                  "semi_ret_1y": round(float(100 * (df["semi"].iloc[-1] / df["semi"].iloc[-53] - 1)), 1)}
-    res["official"] = {key: {"symbol": sym, "label": label, "available": key in off_daily,
+    res["official"] = {key: {"symbol": sym, "label": label, "available": key in off_daily, "short": off_short.get(key),
                              **(compare_official(df, key, daily.index[-1], off_daily[key]) if key in off_daily else {})}
                        for key, (sym, label) in OFFICIAL.items()}
     res["net_now"] = round(float(df["net"].iloc[-1]), 1)
@@ -491,7 +503,8 @@ def main() -> None:
     for k, o in res["official"].items():
         print(f"  official {k} {o['symbol']}: " + (f"{o['weeks']}w, corr {o['corr_wk']}, TE {o['te_ann']}%, beta {o['beta']}, "
               f"1y rebuilt {o['rebuilt']['ret_1y']}% vs official {o['official']['ret_1y']}%, dd {o['rebuilt']['dd_now']} vs "
-              f"{o['official']['dd_now']}" if o["available"] else "index_ohlc.csv missing -- not compared"))
+              f"{o['official']['dd_now']}" if o["available"] else
+              f"too short to compare: {o['short']}" if o["short"] else "index_ohlc.csv missing -- not compared"))
     for k, v in res["divergence"]["by_index"].items():
         print(f"  divergence {k}: " + ", ".join(f"{t} {s['n']} ({s['hits']}/{s['n_done']} fell ≥{-round(100*BIG_DROP)}% in 26w, "
               f"median 26w {s['med_ret26']}%)" for t, s in v["summary"].items()))

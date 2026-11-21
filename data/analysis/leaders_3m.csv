@@ -1,16 +1,16 @@
 ﻿Ticker,ret_3m,ret_12m,Short Name,Sector,Industry,Market Cap
-MRNA,265.366404324898,775.9939698605693,"Moderna, Inc.",healthcare,biotechnology,93609058304
-EPAM,63.01492719507928,-9.064166018602915,"EPAM Systems, Inc.",technology,information-technology-services,8359153152
-ACN,42.4360533389911,6.013790762865634,Accenture plc,technology,information-technology-services,147654836224
-RVTY,34.44871972426839,66.90375990165936,"Revvity, Inc.",healthcare,diagnostics-research,17529518080
-PTC,31.0517529215359,10.25280898876404,PTC Inc.,technology,software-application,21319073792
-SWKS,29.31628156782409,35.001728648219974,"Skyworks Solutions, Inc.",technology,semiconductors,21143961600
-TYL,28.891789635241416,-9.874468864278585,"Tyler Technologies, Inc.",technology,software-application,16841736192
-EL,28.786740042651005,23.384020264437044,"Estee Lauder Companies, Inc. (T",consumer-defensive,household-personal-products,40041140224
-VTRS,28.311928343505976,91.09643560473542,Viatris Inc.,healthcare,drug-manufacturers-specialty-generic,23697219584
-ULTA,27.453738757342137,24.508912920977433,"Ulta Beauty, Inc.",consumer-cyclical,specialty-retail,27833829376
-IDXX,26.691591348508446,-2.0281488015017057,"IDEXX Laboratories, Inc.",healthcare,diagnostics-research,54994391040
-HAS,26.568285599048536,59.886569554948025,"Hasbro, Inc.",consumer-cyclical,leisure,16990508032
-CBOE,24.91211666715236,43.33864419755275,"Cboe Global Markets, Inc.",financial-services,financial-data-stock-exchanges,38486380544
-APP,24.803445862548234,-33.82528274069829,Applovin Corporation,communication-services,advertising-agencies,130434834432
-CDW,24.526919407389023,23.57779783334406,CDW Corporation,technology,information-technology-services,21565802496
+MRNA,37.345824519200434,699.8796196661115,"Moderna, Inc.",healthcare,biotechnology,78901084160
+EPAM,36.342221709631616,-15.818926311006232,"EPAM Systems, Inc.",technology,information-technology-services,7818816512
+CRWD,26.835118824989745,89.58476439254946,"CrowdStrike Holdings, Inc.",technology,software-infrastructure,234931617792
+PTC,26.474020006494946,13.035186111901664,PTC Inc.,technology,software-application,21194328064
+APP,23.95591543705251,-27.94433908538122,Applovin Corporation,communication-services,advertising-agencies,115396132864
+IDXX,23.83064900143468,2.900583668413037,"IDEXX Laboratories, Inc.",healthcare,diagnostics-research,53276061696
+MCK,23.796593038609103,23.885180169036936,McKesson Corporation,healthcare,medical-distribution,123472830464
+HAS,23.361673875147915,56.64802968747429,"Hasbro, Inc.",consumer-cyclical,leisure,15721954304
+CDW,22.703601666255025,22.325272741810508,CDW Corporation,technology,information-technology-services,20191651840
+MTD,22.24762832321716,22.14258253568837,"Mettler-Toledo International, I",healthcare,diagnostics-research,33154916352
+VTRS,21.813722625689834,92.20162089432155,Viatris Inc.,healthcare,drug-manufacturers-specialty-generic,22504906752
+RVTY,21.569108290660076,63.296294463861244,"Revvity, Inc.",healthcare,diagnostics-research,16212180992
+WMT,21.542916706579373,25.358711057778184,Walmart Inc.,consumer-defensive,discount-stores,1015122821120
+ULTA,20.68806818108664,24.039661965053693,"Ulta Beauty, Inc.",consumer-cyclical,specialty-retail,26327484416
+CBOE,19.26701697477111,39.06176384221345,"Cboe Global Markets, Inc.",financial-services,financial-data-stock-exchanges,37319966720

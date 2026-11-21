@@ -197,10 +197,21 @@ every page label says 多空排列差 — don't reintroduce 淨值.
   Corteva -24.3% on earnings (real, under the -60% cliff threshold), E27 Nvidia Q3 on
   11-18 (previewed, rewrite with the outcome next refresh). SMCI -11.3% and GPN -12% on
   11-12 found no source — data moves only.
-- **Heads-up, unverified:** a search summary reported a Sandisk (SNDK) 8-for-1 split
-  effective 2026-11-19. If true it is a cliff the -60% rule catches (-87.5%) and drops
-  SNDK's pre-split bars until Yahoo back-adjusts — check the printed exclusions and the
-  AI-hardware member count (22) after the next refresh.
+- **SNDK 8-for-1 split, confirmed by our own data (2026-11-21 refresh):** the 11-12 close
+  was 937.46 unadjusted and 117.18 after Yahoo back-adjusted the whole history (exactly 8×),
+  so no cliff reached the analysis and all 22 names stayed in. Market cap ÷ close (~955M
+  shares) fits the post-split price.
+- As of 2026-11-19: AI hardware bull 0%, neither 59%, bear 41%, net -40.9 daily (1y
+  percentile ~1) / -54.5 weekly vs market +4.7; tech -16.5% / semi -30.0% from their highs.
+  The 11-20 crash (^GSPC -3.70%, ^SOX -10.73%) is **not** in this report: the constituent
+  data end 11-19, so no event row was added for it (a row dated after the data date would
+  render as 「即將」). Add it next refresh. Events: E27 rewritten with the outcome (Q3 revenue
+  $115.8B, Q4 guide $130B ±3% excluding China data-center compute; NVDA -2.9% on 11-18),
+  E28 11-13 tech-led fall, E29 11-16 chip slide (source's own attribution, labelled),
+  E30 11-19 six-day losing streak (WSM -15.2%), E31 11-25 GDP + PCE preview. nvidianews.
+  nvidia.com does not resolve from these containers — E27 cites StockTitan's copy of the
+  release. Event categories are only macro / industry / stock; a market-wide wrap goes
+  under macro.
 
 ## Official index (`index_ohlc.csv`, asked 2026-11-13: 「加抓 ^SP500-45 官方指數並列比較」)
 
@@ -223,7 +234,17 @@ every page label says 多空排列差 — don't reintroduce 淨值.
   change is on main. Pushed to main on 2026-11-13 at the user's request (469a898 with the
   first three symbols, then 9c0834e adding ^SOX — that file only each time); the first scheduled run after that should commit `index_ohlc.csv` — bring it in
   with the usual `git checkout origin/main -- data/weekly_reutin` and check the official
-  lines/table replaced the "not in yet" note. Our 83-name "technology" uses Yahoo's sector, not GICS, so expect a
+  lines/table replaced the "not in yet" note. **First data (2026-11-21):** ^GSPC, ^SPXEW and
+  ^SOX came back with daily history from 2014-11; ^SP500-45 with **one bar** (11-20) — Yahoo
+  gave no history for it. Series with fewer than 52 weekly bars are not drawn or compared
+  (`MIN_OFFICIAL_WEEKS`); the page says how many bars there are instead of 「not in yet」.
+  Official series are **clipped to our data date** (`last=daily.index[-1]`): the index file
+  can run a session ahead (it had 11-20 while members ended 11-19), and an unclipped final
+  week would compare a crash day against a week without it. Rebuilt S&P vs ^GSPC daily:
+  -0.34/-0.40, -1.97/-1.92, -1.06/-1.03, -2.09/-2.02 (11-13..11-19). Survivorship measured:
+  2015-08 → 2026-11 rebuilt cap-weighted +434% vs ^GSPC +264%, rebuilt equal weight +487%
+  vs ^SPXEW +177%; rebuilt semi +2254% vs ^SOX +1528% (different index, so only partly bias —
+  `offProxy` makes the caption say 「有一部分來自」 for ^SOX and ^SP500-45). Our 83-name "technology" uses Yahoo's sector, not GICS, so expect a
   gap; why exactly (which names differ) has not been checked against S&P's list.
 
 ## Share above moving averages, long run (section 03 first chart, asked 2026-11-13)
@@ -355,6 +376,10 @@ net (2015-08 → 2026-11, 587 weeks): **no — it confirms, it doesn't warn.**
   sell signal; single-digit sample. Asked the same day about monthly averages (chat only,
   not in the report): monthly-averaged divergences cut zero-crosses 24→8 and B 8→5, looked
   sharper (tech 3/4 vs 4/14) but flipped with K=3 and confirm ~2 months late.
+- 2026-11-21 wording fixes, same rule: 「新高已重新多於新低」 read off the 10-day average
+  while the latest day had 0 highs vs 18 lows — the caption now says when the day disagrees;
+  「只有 0 檔」 → 「沒有一檔」; the -40 line always names the date it broke and where the
+  spread is now (「剛跌破」 read as new on a break two weeks old).
 - Every read-out clause picks its connective from the numbers (「明顯高於/略高於/對照」,
   「相差不大」 only when the return gap < 3 points, 「各占一半」 only when hits = half).
   The first draft put 「明顯較高」 after the *lower* group's figures — read the sentence
@@ -374,6 +399,12 @@ attribute; and never overwrite an element that renderStatic fills (`#h-dek` hold
 `#st-dek-n` — replacing its text crashed the resize handler).
 
 ## PDF export (`analysis/export_pdf.py`, optional)
+
+Containers differ: on 2026-11-21 the Python `playwright` package was absent while the Node
+one worked; the same steps (760 px viewport, light scheme, open `<details>`, print media,
+A4 with 10/12/8/8 mm margins and the title · page footer) were run from Node rather than
+installing a second Playwright that would not find `/opt/pw-browsers/chromium`. The xlsx
+`recalc.py` lives at `/mnt/skills/public/xlsx/scripts/recalc.py` in these containers.
 
 Asked 2026-11-09 for the spread page. Headless Chromium (Playwright; preinstalled at
 `/opt/pw-browsers/chromium` in the cloud containers, absent in the GitHub Action, so not

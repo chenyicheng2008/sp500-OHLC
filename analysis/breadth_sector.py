@@ -257,7 +257,7 @@ def daily_group(daily: pd.DataFrame, shares: pd.Series) -> pd.DataFrame:
     return out
 
 
-def add_official(lw: pd.DataFrame, data_dir: Path, pairs) -> pd.DataFrame:
+def add_official(lw: pd.DataFrame, data_dir: Path, pairs, last=None) -> pd.DataFrame:
     """Official index closes from index_ohlc.csv (if present), weekly, started on the rebuilt
     line at the first common week -- the gap that opens is the reconstruction's bias."""
     off_p = data_dir / "index_ohlc.csv"
@@ -267,9 +267,14 @@ def add_official(lw: pd.DataFrame, data_dir: Path, pairs) -> pd.DataFrame:
     io["Date"] = pd.to_datetime(io["Date"])
     for sym, col, base in pairs:
         s = io[io["Ticker"] == sym].set_index("Date")["Close"].dropna().sort_index()
-        if s.empty:
+        if last is not None:              # never past our own data date: the index file can run a
+            s = s[s.index <= last]        # session ahead (2026-11-21: ^GSPC had 11-20, members ended 11-19)
+        s = s.resample("W-FRI").last().dropna()
+        if len(s) < 52:                     # a few bars is not a line to compare against
+            if len(s):
+                print(f"official {sym}: only {len(s)} week(s) in index_ohlc.csv -- not drawn")
             continue
-        s = s.resample("W-FRI").last().reindex(lw.index)
+        s = s.reindex(lw.index)
         k0 = s.first_valid_index()
         if k0 is not None:
             lw[col] = s / s[k0] * lw.loc[k0, base]
@@ -643,7 +648,7 @@ def main() -> None:
     long_ratio = long_ratio[~long_ratio.index.duplicated(keep="last")].sort_index()
     long_ratio.rename("ew_cw_ratio").to_frame().to_csv(out_dir / "breadth_ew_cw_long.csv", encoding=ENC)
     lw = add_official(long_weekly(daily, weekly, shares), Path(args.data_dir),
-                      (("^GSPC", "official_cw", "cap_weighted"), ("^SPXEW", "official_ew", "equal_weighted")))
+                      (("^GSPC", "official_cw", "cap_weighted"), ("^SPXEW", "official_ew", "equal_weighted")), last=daily.index[-1])
     lw.index.name = "Date"
     lw.round(3).to_csv(out_dir / "breadth_long_weekly.csv", encoding=ENC)
     print(f"long weekly breadth {lw.index[0].date()} -> {lw.index[-1].date()} ({len(lw)} weeks, "
@@ -652,7 +657,7 @@ def main() -> None:
     # 站上均線比例與指數/等權重比較」) -- the same names as regime_backtest's rebuilt tech index
     tech = [t for t in fund.loc[fund["Sector"] == "technology", "Ticker"] if t in daily.columns and t in shares.index]
     tw = add_official(long_weekly(daily[tech], weekly[[t for t in tech if t in weekly.columns]], shares), Path(args.data_dir),
-                      (("^SP500-45", "official_cw", "cap_weighted"),))
+                      (("^SP500-45", "official_cw", "cap_weighted"),), last=daily.index[-1])
     tw.index.name = "Date"
     tw.round(3).to_csv(out_dir / "breadth_long_weekly_tech.csv", encoding=ENC)
     td = daily_group(daily[tech], shares)
@@ -661,7 +666,7 @@ def main() -> None:
     semi_n = [t for t in fund.loc[fund["Industry"].isin(SEMI_INDUSTRIES), "Ticker"] if t in daily.columns and t in shares.index]
     # official reference: PHLX Semiconductor (^SOX), a different membership -- see the caption
     sw = add_official(long_weekly(daily[semi_n], weekly[[t for t in semi_n if t in weekly.columns]], shares),
-                      Path(args.data_dir), (("^SOX", "official_cw", "cap_weighted"),))
+                      Path(args.data_dir), (("^SOX", "official_cw", "cap_weighted"),), last=daily.index[-1])
     sw.index.name = "Date"
     sw.round(3).to_csv(out_dir / "breadth_long_weekly_semi.csv", encoding=ENC)
     sd = daily_group(daily[semi_n], shares)

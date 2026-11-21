@@ -8,7 +8,7 @@
   "missing": {},
   "n_priced": 22
  },
- "asof": "2026-11-12",
+ "asof": "2026-11-19",
  "ma_daily": [
   50,
   200
@@ -18,54 +18,46 @@
   40
  ],
  "n_members": 22,
- "daily_start": "2025-08-29",
- "weekly_start": "2015-08-14",
- "then_date": "2026-10-14",
+ "daily_start": "2025-09-08",
+ "weekly_start": "2015-08-21",
+ "then_date": "2026-10-21",
  "transitions": {
   "bull": {
-   "bull": 1,
-   "neither": 2,
+   "bull": 0,
+   "neither": 1,
    "bear": 0
   },
   "neither": {
-   "bull": 1,
-   "neither": 8,
-   "bear": 7
+   "bull": 0,
+   "neither": 11,
+   "bear": 5
   },
   "bear": {
-   "bull": 1,
-   "neither": 0,
-   "bear": 2
+   "bull": 0,
+   "neither": 1,
+   "bear": 4
   }
  },
  "moved": {
+  "bear->neither": [
+   "AVGO"
+  ],
+  "bull->neither": [
+   "AMD"
+  ],
   "neither->bear": [
    "AMAT",
-   "COHR",
-   "GLW",
    "KLAC",
    "LRCX",
    "TER",
    "WDC"
-  ],
-  "neither->bull": [
-   "ANET"
-  ],
-  "bull->neither": [
-   "APH",
-   "HPE"
-  ],
-  "bear->bull": [
-   "TEL"
   ]
  },
  "names_now": {
-  "bull": [
+  "bull": [],
+  "neither": [
    "AMD",
    "ANET",
-   "TEL"
-  ],
-  "neither": [
    "APH",
    "AVGO",
    "DELL",
@@ -75,7 +67,8 @@
    "NVDA",
    "SMCI",
    "SNDK",
-   "STX"
+   "STX",
+   "TEL"
   ],
   "bear": [
    "AMAT",
@@ -115,26 +108,26 @@
  },
  "lookback": {
   "1M": {
-   "date": "2026-10-14",
-   "sec_bull": 13.6,
-   "sec_bear": 13.6,
-   "sec_net": 0.0,
-   "mkt_bull": 25.4,
-   "mkt_bear": 29.0,
-   "mkt_net": -3.7
+   "date": "2026-10-21",
+   "sec_bull": 4.5,
+   "sec_bear": 22.7,
+   "sec_net": -18.2,
+   "mkt_bull": 36.1,
+   "mkt_bear": 21.5,
+   "mkt_net": 14.6
   },
   "3M": {
-   "date": "2026-08-14",
-   "sec_bull": 54.5,
-   "sec_bear": 0.0,
-   "sec_net": 54.5,
-   "mkt_bull": 46.9,
-   "mkt_bear": 8.3,
-   "mkt_net": 38.5
+   "date": "2026-08-21",
+   "sec_bull": 27.3,
+   "sec_bear": 4.5,
+   "sec_net": 22.7,
+   "mkt_bull": 36.7,
+   "mkt_bear": 9.5,
+   "mkt_net": 27.2
   }
  },
- "pctile_daily": 3.3,
- "pctile_weekly": 11.9,
+ "pctile_daily": 0.7,
+ "pctile_weekly": 6.1,
  "weekly_extremes": {
   "max": {
    "date": "2016-12-23",
