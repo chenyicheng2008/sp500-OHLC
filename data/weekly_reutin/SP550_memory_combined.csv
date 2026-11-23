@@ -206,7 +206,7 @@ GILD,"Gilead Sciences, Inc.",206429536256,healthcare,drug-manufacturers-general,
 GIS,"General Mills, Inc.",19109720064,consumer-defensive,packaged-foods,0.0,0.07076567,11.354936,0.049183015,-0.02650549,-0.1338,0.0235,-0.1398,0.0794,,
 GL,Globe Life Inc.,11440435200,financial-services,insurance-life,10.150602,0.008203659,9.259022,-0.07578053,-0.058626834,0.066700004,0.0575,0.0635,0.1015,,
 GLW,Corning Incorporated,81299030016,technology,electronic-components,38.210526,0.010569029,20.739801,-0.30379644,-0.39676836,0.34,0.3477,0.3513,0.3114,,
-GM,General Motors Company,66395774976,consumer-cyclical,auto-manufacturers,17.223194,0.0080232555,5.3498583,-0.05362058,-0.026365217,0.2628,0.0991,-0.0188,-0.1554,,
+GM,General Motors Company,66395774976,consumer-cyclical,auto-manufacturers,17.223194,0.008440367,5.3498583,-0.05362058,-0.026365217,0.2628,0.0991,-0.0188,-0.1554,,
 GNRC,Generac Holdlings Inc.,11397851136,industrials,specialty-industrial-machinery,38.11045,0.0,13.693194,-0.03048637,-0.122184135,0.5621,0.4248,0.6365,0.3323,,
 GOOG,Alphabet Inc.,3245615874048,communication-services,internet-content-information,13.785901,0.0031731976,17.257856,-0.17312399,-0.21154699,0.21090001,0.16870001,0.15359999,0.2204,,
 GOOGL,Alphabet Inc.,3261475323904,communication-services,internet-content-information,13.853265,0.0031541113,17.342186,-0.1768864,-0.21272726,0.8075,-0.2379,0.1317,-0.3488,,
@@ -499,8 +499,8 @@ YUM,"Yum! Brands, Inc.",43109167104,consumer-cyclical,restaurants,12.938808,0.00
 ZBH,"Zimmer Biomet Holdings, Inc.",19133566976,healthcare,medical-devices,25.530302,0.009460924,11.273881,0.047687925,0.08834137,0.0433,0.0476,0.0311,-0.0075,,
 ZBRA,Zebra Technologies Corporation,14198280192,technology,communication-equipment,24.37591,0.0,13.537915,-0.15758829,0.053784803,0.3455,0.045100003,0.219,0.096599996,,
 ZTS,Zoetis Inc.,32143671296,healthcare,drug-manufacturers-specialty-generic,13.454082,0.025869537,12.413715,0.024910841,-0.12511437,-0.013099999,0.0073,-0.19530001,-0.0344,,
-,SamsungElec,1148704035700736,technology,consumer-electronics,0.0,0.0,2.2600179,-0.24934892,-0.2747568,6.2187,0.637,4.7864003,1.4419999,005930.KS,Memory_concept
-,SK hynix,763702697525248,technology,semiconductors,0.0,0.0,2.0133455,-0.27436215,-0.2965751,4.9658,0.4935,4.5109,1.0901,000660.KS,Memory_concept
+,SamsungElec,1134377769631744,technology,consumer-electronics,0.0,0.0,2.2318318,-0.25871077,-0.28380176,6.2187,0.637,4.7864003,1.4419999,005930.KS,Memory_concept
+,SK hynix,753830245433344,technology,semiconductors,0.0,0.0,1.9873188,-0.2837425,-0.30566832,4.9658,0.4935,4.5109,1.0901,000660.KS,Memory_concept
 ,KIOXIA HOLDINGS CORPORATION,11677859840000,technology,semiconductors,9.791756,0.0,0.0,-0.48708746,-0.5349468,8.8574,0.4994,15.4737,3.5567002,285A.T,NandFlash_concept
 ,NANYA TECHNOLOGY CORPORATION,912579493888,technology,semiconductors,5.2046437,0.0051107327,2.1039042,-0.4079993,-0.29204723,34.584,0.65870005,6.541,2.7382998,2408.TW,Taiwan_Dram_concept
 ,"Micron Technology, Inc.",672642433024,technology,semiconductors,7.998251,0.00081831875,2.846877,-0.34831363,-0.23045032,1.3394,0.18200001,6.995,2.4496,MU,Memory_concept
