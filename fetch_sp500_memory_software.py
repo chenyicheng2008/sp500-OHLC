@@ -203,6 +203,43 @@ def fetch_indices(years=12):
         flatten_and_save_ohlc(out, os.path.join(BASE, "index_ohlc.csv"))
 
 
+# ^SOX members that are not S&P 500 stocks (TSM, ASML, MRVL ...). The member list is a
+# sourced snapshot (SOXQ holdings, data/tableau/sox_members_soxq.csv); `fetch_symbol`
+# is the ticker to price, which differs from the source's `symbol` only where the source
+# gave none (Tower Semiconductor -> TSEM, from a symbol search recorded in the CSV).
+# Same mixed 1wk/1d layout as sp500_ohlc.csv, saved to its own files so the S&P 500
+# breadth is untouched.
+SOX_MEMBERS_FILE = "sox_members_soxq.csv"
+
+
+def sox_extra_symbols():
+    path = os.path.join(TABLEAU, SOX_MEMBERS_FILE)
+    if not os.path.exists(path):
+        print(f"{path} 不存在，略過")
+        return []
+    members = pd.read_csv(path, encoding="utf-8-sig", dtype=str)
+    col = "fetch_symbol" if "fetch_symbol" in members.columns else "symbol"
+    syms = [s.strip() for s in members[col].dropna() if s.strip()]
+    sp500 = set(pd.read_csv(os.path.join(BASE, "SP500.csv"))["A"].astype(str).str.strip())
+    return [s for s in dict.fromkeys(syms) if s not in sp500]
+
+
+def fetch_sox_extra():
+    extra = sox_extra_symbols()
+    if not extra:
+        return
+    print(f"非 S&P 500 的 ^SOX 成分股 {len(extra)} 檔: {', '.join(extra)}")
+    info = pd.DataFrame([get_stock_info(t) for t in extra])
+    info.to_csv(os.path.join(BASE, "sox_extra_stocks.csv"), index=False, encoding="UTF-8-SIG")
+    ohlc = {}
+    for sym in extra:
+        try:
+            ohlc[sym] = download_mixed_ohlc(sym, total_years=12, daily_years=2)
+        except Exception as e:
+            print(f"抓取 {sym} 錯誤: {e}")
+    flatten_and_save_ohlc(ohlc, os.path.join(BASE, "sox_extra_ohlc.csv"))
+
+
 def fetch_sp500():
     sp500_df = pd.read_csv(os.path.join(BASE, "SP500.csv"))
     sp500_data = [get_stock_info(t) for t in sp500_df["A"]]
@@ -275,5 +312,11 @@ if __name__ == "__main__":
         fetch_indices()
     except Exception as e:
         print(f"官方指數抓取失敗，略過: {e}")
+
+    print("== ^SOX members outside the S&P 500 ==")
+    try:
+        fetch_sox_extra()
+    except Exception as e:
+        print(f"^SOX 非 S&P 500 成分股抓取失敗，略過: {e}")
 
     print("All done.")
