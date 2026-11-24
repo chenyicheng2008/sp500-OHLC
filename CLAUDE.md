@@ -26,6 +26,26 @@ analysis/report_template.html    report page; `__REPORT_DATA__` is the data plac
 analysis/reports/                dated standalone reports (one file per data date)
 ```
 
+## Data sources (rule, set by the user 2026-11-24: 「個股及指數資料採用 yfinance 或 Alpha Vantage」)
+
+- **Stock and index prices come only from yfinance or Alpha Vantage.** yfinance runs in the
+  daily GitHub Action (`fetch_sp500_memory_software.py`); this container cannot reach Yahoo
+  directly (proxy 403), so a session gets yfinance data by `git checkout origin/main --
+  data/weekly_reutin data/tableau`. Alpha Vantage is reachable only through its MCP tools.
+  Never take a price, close or index level from an article, a recap site or model knowledge;
+  event rows cite articles for *what happened*, never for the move (that is computed).
+- **Alpha Vantage index data is not available on this account**: `INDEX_DATA` (SPX, …) returned
+  「not yet entitled to index data access」 (premium only) on 2026-11-24. Its catalog would map
+  SPX → ^GSPC and SPEQX (S&P 500 Equal Weight *Reduced Value 1/10th*: same returns, level ÷ 10)
+  → ^SPXEW, and has **no ^SOX and no ^SP500-45** (SIXT is the Technology Select Sector index —
+  not a substitute). Recent US stock prices also need premium. So the indices stay on yfinance
+  (`index_ohlc.csv`). If premium access appears, AV can fill only those two; it cannot run in
+  the Action (no key there), so it would be a committed snapshot, labelled with its source.
+- Alpha Vantage tools that do work here: `ETF_PROFILE` (SOXQ holdings), `SYMBOL_SEARCH`
+  (TSEM), `INDEX_CATALOG`.
+- The project skill `.claude/skills/sp500-refresh/SKILL.md` carries the same rule and the
+  refresh steps.
+
 ## Running the analysis
 
 Always in this order — each step consumes the previous one's output:
@@ -201,6 +221,17 @@ every page label says 多空排列差 — don't reintroduce 淨值.
   was 937.46 unadjusted and 117.18 after Yahoo back-adjusted the whole history (exactly 8×),
   so no cliff reached the analysis and all 22 names stayed in. Market cap ÷ close (~955M
   shares) fits the post-split price.
+- As of 2026-11-23 (refresh asked as 「更新資料日至11-20」; main already had 11-23 and the
+  user chose it): AI hardware bull 0%, neither 48%, bear 52%, net -52.4 (lowest of the daily
+  year), weekly -57.1; market +7.3. 11-20 crash (^GSPC -3.70%, ^SOX -10.73%, NVDA -14.0%) and
+  11-23 rebound (^GSPC +4.73%, ^SOX +14.03%, NVDA +31.5%, 410 of 492 up). Events: E33 (11-20,
+  Reuters via Business Recorder: SEC probing Nvidia's accounting — anonymous sources, labelled),
+  E34 (11-23, CNBC: board reinstates Huang as CEO, Kress stays CFO — no reason given, don't
+  supply one), E35 (11-23, Yahoo Finance: best day since April 2025). fool.com and
+  finance.yahoo.com fail WebFetch DNS here — rows were written from search results that
+  quote the sources; CRWD -8.9% on 11-23 found no source (data move only). ^SOX page: after
+  the rebound the current distance (-34.5%) is no longer the episode's low (-42.5%, 11-20);
+  the episode now ranks by its own low (`ep_low`, `ep_trough`) and the headline names both.
 - As of 2026-11-19: AI hardware bull 0%, neither 59%, bear 41%, net -40.9 daily (1y
   percentile ~1) / -54.5 weekly vs market +4.7; tech -16.5% / semi -30.0% from their highs.
   The 11-20 crash (^GSPC -3.70%, ^SOX -10.73%) is **not** in this report: the constituent

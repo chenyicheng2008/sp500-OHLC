@@ -250,7 +250,9 @@ def main() -> None:
 
     eps = episodes(c, dd_now)
     depths = sorted([e["depth"] for e in eps])
-    rank = depths.index(round(100 * dd_now, 1)) + 1 if eps and eps[-1]["ongoing"] else None
+    # an ongoing episode ranks by its own low so far, which after a rebound is deeper than today's distance
+    cur_ep = eps[-1] if eps and eps[-1]["ongoing"] else None
+    rank = depths.index(cur_ep["depth"]) + 1 if cur_ep else None
 
     big = r[r <= BIG_DAY]
     by_year = {int(y): int(n) for y, n in big.groupby(big.index.year).size().items()}
@@ -405,7 +407,8 @@ def main() -> None:
         "ma50": round(float(ma50.iloc[-1]), 2), "ma200": round(float(ma200.iloc[-1]), 2),
         "vs_ma200": round(float(100 * (c.iloc[-1] / ma200.iloc[-1] - 1)), 1),
         "vs_ma50": round(float(100 * (c.iloc[-1] / ma50.iloc[-1] - 1)), 1),
-        "cross": cross, "episode_thr": round(100 * EPISODE), "episodes": eps, "rank": rank, "n_eps": len(eps),
+        "cross": cross, "episode_thr": round(100 * EPISODE),
+        "ep_low": cur_ep["depth"] if cur_ep else None, "ep_trough": cur_ep["trough"] if cur_ep else None, "episodes": eps, "rank": rank, "n_eps": len(eps),
         "big_day": BIG_DAY, "by_year": [{"year": y, "n": by_year.get(y, 0)} for y in years],
         "worst": worst, "worst_rank_last": int((r < r.iloc[-1]).sum()) + 1 if r.iloc[-1] < 0 else None,
         "long": long, "candles": candles, "events": events, "comp": comp, "breadth": breadth, "mcc": mcc, "spread": spread,
@@ -604,7 +607,7 @@ td.l{text-align:left; white-space:normal; min-width:220px}
     $("m-sym").textContent = D.symbol;
     $("m-asof").textContent = D.asof; $("m-gen").textContent = D.generated; $("m-start").textContent = D.start;
     $("m-h1").textContent = cur
-      ? "費城半導體指數距高點 " + pct(D.dd) + "，" + D.start.slice(0, 4) + " 年以來" + ordinal(D.rank) + "的回檔"
+      ? "費城半導體指數距高點 " + pct(D.dd) + (D.ep_low < D.dd - 1 ? "，這次回檔最深 " + pct(D.ep_low) : "") + "，" + D.start.slice(0, 4) + " 年以來" + ordinal(D.rank) + "的回檔"
       : "費城半導體指數距高點 " + pct(D.dd) + (D.dd > -5 ? "，接近歷史高點" : "");
     var below200 = D.vs_ma200 < 0, below50 = D.vs_ma50 < 0;
     $("m-dek").textContent = "收盤 " + num(D.close) + "（當日 " + pct(D.chg, 2) + "），歷史高點 " + num(D.ath) + " 在 " + D.ath_date + "。" +
@@ -621,12 +624,13 @@ td.l{text-align:left; white-space:normal; min-width:220px}
 
     // episodes
     var done = E.filter(function (e) { return !e.ongoing; });
-    var deeper = done.filter(function (e) { return e.depth <= D.dd; });
+    var deeper = done.filter(function (e) { return e.depth <= (cur ? D.ep_low : D.dd); });
     $("long-sub").textContent = D.start.slice(0, 4) + " 年以來，^SOX 從歷史高點回檔 " + Math.abs(D.episode_thr) + "% 以上共 " + E.length + " 次" +
       (cur ? "（含目前這一次）" : "") + "。" + (cur
-        ? "目前距高點 " + pct(D.dd) + "，在這 " + E.length + " 次裡排" + ordinal(D.rank) + "；已結束的 " + done.length + " 次中，" +
-          (deeper.length ? deeper.length + " 次曾跌得比現在更深（" + deeper.map(function (e) { return e.peak.slice(0, 7) + " 高點起的 " + pct(e.depth); }).join("、") + "）。"
-            : "沒有一次跌得比現在更深。")
+        ? "目前距高點 " + pct(D.dd) + (D.ep_low < D.dd - 1 ? "，這次最深曾到 " + pct(D.ep_low) + "（" + D.ep_trough + "），之後回升" : "") +
+          "；以這次的最深跌幅計，在這 " + E.length + " 次裡排" + ordinal(D.rank) + "；已結束的 " + done.length + " 次中，" +
+          (deeper.length ? deeper.length + " 次跌得比這次更深（" + deeper.map(function (e) { return e.peak.slice(0, 7) + " 高點起的 " + pct(e.depth); }).join("、") + "）。"
+            : "沒有一次跌得比這次更深。")
         : "目前不在 " + Math.abs(D.episode_thr) + "% 以上的回檔中。");
     $("long-def").textContent = "上：週收盤，對數刻度，同樣的漲跌幅在不同年代一樣高。下：距之前歷史高點的跌幅；色塊是跌幅達 " + Math.abs(D.episode_thr) + "% 的期間。" +
       (D.comp ? "虛線是用 S&P 500 半導體成分股重建的指數，從 " + D.comp.start + " 起和 ^SOX 對齊，只到 " + D.comp.member_asof + "。" : "");

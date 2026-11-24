@@ -8,7 +8,7 @@
   "missing": {},
   "n_priced": 22
  },
- "asof": "2026-11-19",
+ "asof": "2026-11-23",
  "ma_daily": [
   50,
   200
@@ -19,38 +19,36 @@
  ],
  "n_members": 22,
  "daily_start": "2025-09-08",
- "weekly_start": "2015-08-21",
- "then_date": "2026-10-21",
+ "weekly_start": "2015-08-28",
+ "then_date": "2026-10-23",
  "transitions": {
   "bull": {
    "bull": 0,
-   "neither": 1,
+   "neither": 0,
    "bear": 0
   },
   "neither": {
    "bull": 0,
-   "neither": 11,
-   "bear": 5
+   "neither": 9,
+   "bear": 6
   },
   "bear": {
    "bull": 0,
    "neither": 1,
-   "bear": 4
+   "bear": 5
   }
  },
  "moved": {
-  "bear->neither": [
-   "AVGO"
-  ],
-  "bull->neither": [
-   "AMD"
-  ],
   "neither->bear": [
    "AMAT",
    "KLAC",
    "LRCX",
+   "STX",
    "TER",
    "WDC"
+  ],
+  "bear->neither": [
+   "TEL"
   ]
  },
  "names_now": {
@@ -59,24 +57,23 @@
    "AMD",
    "ANET",
    "APH",
-   "AVGO",
    "DELL",
    "HPE",
    "LITE",
    "MU",
    "NVDA",
    "SMCI",
-   "SNDK",
-   "STX",
    "TEL"
   ],
   "bear": [
    "AMAT",
+   "AVGO",
    "CIEN",
    "COHR",
    "GLW",
    "KLAC",
    "LRCX",
+   "STX",
    "TER",
    "VRT",
    "WDC"
@@ -108,26 +105,26 @@
  },
  "lookback": {
   "1M": {
-   "date": "2026-10-21",
-   "sec_bull": 4.5,
-   "sec_bear": 22.7,
-   "sec_net": -18.2,
-   "mkt_bull": 36.1,
-   "mkt_bear": 21.5,
-   "mkt_net": 14.6
+   "date": "2026-10-23",
+   "sec_bull": 0.0,
+   "sec_bear": 27.3,
+   "sec_net": -27.3,
+   "mkt_bull": 36.9,
+   "mkt_bear": 19.1,
+   "mkt_net": 17.8
   },
   "3M": {
-   "date": "2026-08-21",
-   "sec_bull": 27.3,
+   "date": "2026-08-25",
+   "sec_bull": 22.7,
    "sec_bear": 4.5,
-   "sec_net": 22.7,
-   "mkt_bull": 36.7,
-   "mkt_bear": 9.5,
-   "mkt_net": 27.2
+   "sec_net": 18.2,
+   "mkt_bull": 38.3,
+   "mkt_bear": 10.3,
+   "mkt_net": 28.0
   }
  },
- "pctile_daily": 0.7,
- "pctile_weekly": 6.1,
+ "pctile_daily": 0.0,
+ "pctile_weekly": 5.8,
  "weekly_extremes": {
   "max": {
    "date": "2016-12-23",

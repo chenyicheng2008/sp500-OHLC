@@ -1,16 +1,16 @@
 ﻿Ticker,ret_3m,ret_12m,Short Name,Sector,Industry,Market Cap
-MRNA,37.345824519200434,699.8796196661115,"Moderna, Inc.",healthcare,biotechnology,78901084160
-EPAM,36.342221709631616,-15.818926311006232,"EPAM Systems, Inc.",technology,information-technology-services,7818816512
-CRWD,26.835118824989745,89.58476439254946,"CrowdStrike Holdings, Inc.",technology,software-infrastructure,234931617792
-PTC,26.474020006494946,13.035186111901664,PTC Inc.,technology,software-application,21194328064
-APP,23.95591543705251,-27.94433908538122,Applovin Corporation,communication-services,advertising-agencies,115396132864
-IDXX,23.83064900143468,2.900583668413037,"IDEXX Laboratories, Inc.",healthcare,diagnostics-research,53276061696
-MCK,23.796593038609103,23.885180169036936,McKesson Corporation,healthcare,medical-distribution,123472830464
-HAS,23.361673875147915,56.64802968747429,"Hasbro, Inc.",consumer-cyclical,leisure,15721954304
-CDW,22.703601666255025,22.325272741810508,CDW Corporation,technology,information-technology-services,20191651840
-MTD,22.24762832321716,22.14258253568837,"Mettler-Toledo International, I",healthcare,diagnostics-research,33154916352
-VTRS,21.813722625689834,92.20162089432155,Viatris Inc.,healthcare,drug-manufacturers-specialty-generic,22504906752
-RVTY,21.569108290660076,63.296294463861244,"Revvity, Inc.",healthcare,diagnostics-research,16212180992
-WMT,21.542916706579373,25.358711057778184,Walmart Inc.,consumer-defensive,discount-stores,1015122821120
-ULTA,20.68806818108664,24.039661965053693,"Ulta Beauty, Inc.",consumer-cyclical,specialty-retail,26327484416
-CBOE,19.26701697477111,39.06176384221345,"Cboe Global Markets, Inc.",financial-services,financial-data-stock-exchanges,37319966720
+EPAM,41.010284642243455,-11.700814280491102,"EPAM Systems, Inc.",technology,information-technology-services,8047400448
+MRNA,33.52641150041747,848.479409847924,"Moderna, Inc.",healthcare,biotechnology,85812011008
+PTC,29.681090903473972,15.00323207363039,PTC Inc.,technology,software-application,21292097536
+IDXX,24.910457506765905,-0.33799320188661053,"IDEXX Laboratories, Inc.",healthcare,diagnostics-research,54127738880
+MTD,23.053665147530754,23.303390527903645,"Mettler-Toledo International, I",healthcare,diagnostics-research,34321291264
+WMT,22.964514337043028,21.99702555074179,Walmart Inc.,consumer-defensive,discount-stores,1031207911424
+RVTY,21.241051082405328,61.30908265020605,"Revvity, Inc.",healthcare,diagnostics-research,16889827328
+APP,20.409610078839215,-28.205520492809487,Applovin Corporation,communication-services,advertising-agencies,123887919104
+ACN,19.870132434800848,-5.024874908320431,Accenture plc,technology,information-technology-services,131315032064
+CDW,19.68470824236659,26.992713762949183,CDW Corporation,technology,information-technology-services,21225072640
+VLTO,19.407346583163744,21.74240418075053,Veralto Corp,industrials,pollution-treatment-controls,28637243392
+ALLE,18.433785857622897,20.06091449175409,Allegion plc,industrials,security-protection-services,15958673408
+VTRS,18.246780174753386,100.90071538123277,Viatris Inc.,healthcare,drug-manufacturers-specialty-generic,22527836160
+HAS,18.05405624968117,52.16856975326583,"Hasbro, Inc.",consumer-cyclical,leisure,15878599680
+PG,17.415935975606867,17.769583106983887,Procter & Gamble Company (The),consumer-defensive,household-personal-products,393096003584
