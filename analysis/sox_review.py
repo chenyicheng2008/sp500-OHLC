@@ -24,7 +24,10 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from breadth_sector import pivot, drop_empty_sessions
 from mcclellan import study as mcclellan_study
+from regime_backtest import BIG_DROP, H, declustered, fwd_max_dd, rank_corr
+from trend_regime import DAILY_MA, WEEKLY_MA, classify, shares as state_shares
 
 REPO = Path(__file__).resolve().parent.parent
 ENC = "utf-8-sig"
@@ -32,6 +35,8 @@ SYM = "^SOX"
 EPISODE = -0.20          # a drawdown this deep from the running high counts as an episode
 BIG_DAY = -5.0           # a "large" one-day fall, percent
 CANDLE_DAYS = 130        # about six months of daily bars in the K-line chart
+SPREAD_LOW = 20          # the bull-bear spread split used in regime_backtest's buckets (<= +20 vs above)
+EXTRA_OHLC = "sox_extra_ohlc.csv"   # ^SOX members outside the S&P 500, saved by the fetch step
 
 
 def load_sox(data_dir: Path) -> pd.DataFrame:
@@ -83,6 +88,136 @@ def last_as_low(x: pd.Series, skip: int = 13):
     cur, past = x.iloc[-1], x.iloc[:-skip]
     hit = past[past <= cur]
     return hit.index[-1].date().isoformat() if len(hit) else None
+
+
+def members_file() -> pd.DataFrame | None:
+    """^SOX members from the SOXQ holdings snapshot; `t` is the ticker we price (the source's
+    symbol, or `fetch_symbol` where the source gave none and a symbol search supplied one)."""
+    p = REPO / "data" / "tableau" / "sox_members_soxq.csv"
+    if not p.exists():
+        return None
+    sq = pd.read_csv(p, encoding=ENC, keep_default_na=False, dtype=str)
+    sq["weight"] = sq["weight"].astype(float)
+    sq["t"] = sq["fetch_symbol"] if "fetch_symbol" in sq.columns else sq["symbol"]
+    sq["searched"] = (sq["symbol"] == "") & (sq["t"] != "")
+    return sq
+
+
+def member_closes(data_dir: Path, tickers: list, last) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Daily closes and spliced weekly closes (older 1wk bars + daily resampled W-FRI) for the
+    tickers, from sp500_ohlc.csv plus the non-S&P 500 file when the fetch has written it.
+    Cut at `last`, the members' data date."""
+    frames = []
+    for f in ("sp500_ohlc.csv", EXTRA_OHLC):
+        if (data_dir / f).exists():
+            o = pd.read_csv(data_dir / f, encoding=ENC, usecols=["Ticker", "Date", "Close", "Interval"])
+            frames.append(o[o["Ticker"].isin(tickers)])
+    o = pd.concat(frames)
+    o["Date"] = pd.to_datetime(o["Date"])
+    o = o[o["Date"] <= last].drop_duplicates(["Ticker", "Date", "Interval"])
+    daily, _ = drop_empty_sessions(pivot(o, "1d", "Close"))
+    wh, _ = drop_empty_sessions(pivot(o, "1wk", "Close"))
+    w = pd.concat([wh[wh.index < daily.index[0]].resample("W-FRI").last(), daily.resample("W-FRI").last()])
+    return daily, w[~w.index.duplicated(keep="last")].dropna(how="all")
+
+
+def spread_study(data_dir: Path, A: Path, sq: pd.DataFrame, c: pd.Series, last) -> dict | None:
+    """多空排列差 of ^SOX's own members: close > MA50 > MA200 bull, the mirror bear, net = bull% - bear%
+    (the same rule as trend_regime.py), daily and on weekly 10/40-week averages, against ^SOX."""
+    tick = [t for t in sq["t"] if t]
+    daily, weekly = member_closes(data_dir, tick, last)
+    priced = [t for t in tick if t in daily.columns and daily[t].notna().sum() >= DAILY_MA[1]]
+    if len(priced) < 5:
+        return None
+    need = max(5, int(0.6 * len(priced)))
+    ds = classify(daily[priced], *DAILY_MA)
+    d = state_shares(ds)
+    d = d[d["n"] >= need]
+    ws = classify(weekly[priced], *WEEKLY_MA)
+    wk = state_shares(ws)
+    wk = wk[wk["n"] >= need]
+    r1 = lambda v: None if v is None or pd.isna(v) else round(float(v), 1)
+    lst = lambda s: [r1(v) for v in s]
+
+    # the AI-hardware list and the whole market, from trend_regime (same rule)
+    others = {}
+    td_p, tw_p, tb_p = A / "trend_regime_daily.csv", A / "trend_regime_weekly.csv", A / "trend_regime_bundle.json"
+    if td_p.exists() and tw_p.exists():
+        td = pd.read_csv(td_p, index_col=0, parse_dates=True).reindex(d.index)
+        tw = pd.read_csv(tw_p, index_col=0, parse_dates=True).reindex(wk.index)
+        label = json.load(open(tb_p, encoding="utf-8"))["universe"]["label"] if tb_p.exists() else "AI 硬體股"
+        for k, pre, lab in (("ai", "sec_", label), ("mkt", "mkt_", "S&P 500 全體")):
+            row = td.iloc[-1]
+            others[k] = {"label": lab, "d": lst(td[pre + "net"]), "w": lst(tw[pre + "net"]),
+                         "now": {s_: r1(row[pre + s_]) for s_ in ("bull", "neither", "bear", "net")},
+                         "m1": r1(td[pre + "net"].iloc[-22]) if len(td) > 21 else None,
+                         "m3": r1(td[pre + "net"].iloc[-64]) if len(td) > 63 else None}
+
+    # members now and a month ago
+    now_s, then_s = ds.iloc[-1], ds.iloc[-22] if len(ds) > 21 else None
+    name = {"1": "bull", "0": "neither", "-1": "bear"}
+    st = lambda v: None if pd.isna(v) else name[str(int(v))]
+    rows, trans = [], {}
+    for _, h in sq.iterrows():
+        t = h["t"] or None
+        a, b = (st(now_s[t]), st(then_s[t]) if then_s is not None else None) if t in priced else (None, None)
+        rows.append({"ticker": t, "desc": h["description"], "w": round(100 * h["weight"], 2), "searched": bool(h["searched"]),
+                     "priced": t in priced, "now": a, "m1": b})
+        if a and b:
+            trans[b + ">" + a] = trans.get(b + ">" + a, 0) + 1
+    cls = [r for r in rows if r["now"]]
+    wsum = sum(r["w"] for r in cls)
+    wnet = 100 * (sum(r["w"] for r in cls if r["now"] == "bull") - sum(r["w"] for r in cls if r["now"] == "bear")) / wsum if wsum else None
+
+    y1 = d["net"].tail(252)
+    net = d["net"]
+    # where the latest fall through zero sits against the ^SOX high
+    xs = net.index[(net < 0) & (net.shift(1) >= 0)]
+    peak = c[c.index <= last].idxmax()
+    cross = None
+    if len(xs):
+        x = xs[-1]
+        cross = {"date": x.date().isoformat(), "sox_dd": round(float(100 * (c[x] / c[:x].max() - 1)), 1),
+                 "after_peak": bool(x > peak), "sox_peak": peak.date().isoformat()}
+    hi_d = y1.idxmax()
+
+    # does the weekly spread warn of ^SOX falls? the same test as regime_backtest's 預警檢驗
+    lvl = c[c.index <= last].resample("W-FRI").last().reindex(wk.index)
+    mdd, fr, past = fwd_max_dd(lvl, H), lvl.shift(-H) / lvl - 1, lvl / lvl.shift(H) - 1
+    base = mdd.notna() & wk["net"].notna()
+    low = wk["net"] <= SPREAD_LOW
+    side = lambda m: {"weeks": int(m.sum()), "p_big": round(100 * float((mdd[m] <= BIG_DROP).mean()), 0) if m.any() else None,
+                      "med_fwd": round(100 * float(fr[m].median()), 1) if m.any() else None}
+    sig = declustered((wk["net"] < 0) & (wk["net"].shift(1) >= 0), H)
+    done = [t for t in sig if base[t]]
+    test = {"h": H, "big": round(100 * BIG_DROP), "thr": SPREAD_LOW, "windows": int(base.sum()) // H,
+            "corr_past": rank_corr(wk["net"], past), "corr_fwd_mdd": rank_corr(wk["net"], mdd), "corr_fwd_ret": rank_corr(wk["net"], fr),
+            "low": side(base & low), "high": side(base & ~low), "all": side(base),
+            "cross0": {"n": len(sig), "done": len(done), "hits": int(sum(mdd[t] <= BIG_DROP for t in done)),
+                       "dates": [t.date().isoformat() for t in sig], "pending": [t.date().isoformat() for t in sig if not base[t]]}}
+
+    unpriced = [r for r in rows if not r["priced"]]
+    return {
+        "asof": d.index[-1].date().isoformat(), "n_list": len(rows), "n": len(priced),
+        "w_priced": round(sum(r["w"] for r in rows if r["priced"]), 1),
+        "w_missing": round(sum(r["w"] for r in unpriced), 1), "n_missing": len(unpriced),
+        "extra_file": (data_dir / EXTRA_OHLC).exists(), "etf": sq["etf"].iloc[0], "as_of": sq["as_of"].iloc[0],
+        "now": {k: r1(d[k].iloc[-1]) for k in ("bull", "neither", "bear", "net")},
+        "counts": {k: sum(r["now"] == k for r in rows) for k in ("bull", "neither", "bear")},
+        "wnet": r1(wnet), "m1": r1(net.iloc[-22]) if len(net) > 21 else None, "m3": r1(net.iloc[-64]) if len(net) > 63 else None,
+        "pctile_1y": round(float(100 * (y1 < y1.iloc[-1]).mean()), 0), "y1_hi": r1(y1.max()), "y1_hi_date": hi_d.date().isoformat(),
+        "y1_lo": r1(y1.min()), "y1_lo_date": y1.idxmin().date().isoformat(), "cross": cross,
+        "rows": rows, "trans": trans,
+        "daily": {"dates": [t.date().isoformat() for t in d.index], "net": lst(net), "sox": [r1(v) for v in c.reindex(d.index)],
+                  "ai": others.get("ai", {}).get("d"), "mkt": others.get("mkt", {}).get("d")},
+        "weekly": {"dates": [t.date().isoformat() for t in wk.index], "net": lst(wk["net"]), "sox": lst(lvl),
+                   "ai": others.get("ai", {}).get("w"), "mkt": others.get("mkt", {}).get("w")},
+        "w_now": r1(wk["net"].iloc[-1]), "w_pctile": round(float(100 * (wk["net"] < wk["net"].iloc[-1]).mean()), 0),
+        "w_median": r1(wk["net"].median()), "w_last_as_low": last_as_low(wk["net"]), "skip": 13,
+        "w_start": wk.index[0].date().isoformat(), "w_n_start": int(wk["n"].iloc[0]),
+        "others": {k: {kk: v for kk, v in o.items() if kk not in ("d", "w")} for k, o in others.items()},
+        "test": test,
+    }
 
 
 def main() -> None:
@@ -148,15 +283,10 @@ def main() -> None:
         tick = [m["ticker"] for m in cons]
         # ^SOX's own members, from the SOXQ holdings snapshot (Alpha Vantage ETF_PROFILE; asked
         # 2026-11-24: 「費城半導體指數, 成份股比較」 / 「SOXQ 持股 查alpha vantage」)
-        sq_p = REPO / "data" / "tableau" / "sox_members_soxq.csv"
-        sq = pd.read_csv(sq_p, encoding=ENC, keep_default_na=False) if sq_p.exists() else None
+        sq = members_file()
         if sq is not None:
-            tick = tick + [t for t in sq["symbol"] if t and t not in tick]
-        o = pd.read_csv(Path(args.data_dir) / "sp500_ohlc.csv", encoding=ENC, usecols=["Ticker", "Date", "Close", "Interval"])
-        o = o[(o["Interval"] == "1d") & o["Ticker"].isin(tick)]
-        o["Date"] = pd.to_datetime(o["Date"])
-        px = o.pivot_table(index="Date", columns="Ticker", values="Close").sort_index()
-        px = px[px.index <= last_member]
+            tick = tick + [t for t in sq["t"] if t and t not in tick]
+        px = member_closes(Path(args.data_dir), tick, last_member)[0]
         at_peak = px[px.index <= ath_d].iloc[-1] if (px.index <= ath_d).any() else None
         rr = lambda t, n: round(float(100 * (px[t].iloc[-1] / px[t].iloc[-1 - n] - 1)), 1) if px[t].notna().sum() > n else None
         members = []
@@ -180,10 +310,10 @@ def main() -> None:
             in18 = {m["ticker"] for m in cons}
             rows = []
             for _, h in sq.iterrows():
-                t = h["symbol"]
+                t = h["t"]
                 col = px[t].dropna() if t and t in px else pd.Series(dtype=float)
                 priced = len(col) > 63
-                rows.append({"ticker": t or None, "desc": h["description"], "w": round(100 * float(h["weight"]), 2),
+                rows.append({"ticker": t or None, "searched": bool(h["searched"]), "desc": h["description"], "w": round(100 * float(h["weight"]), 2),
                              "in_sp": bool(t and t in fund.index), "in18": t in in18,
                              "industry": fund.loc[t, "Industry"] if t and t in fund.index else None, "priced": priced,
                              "r1m": rr(t, 21) if priced else None, "r3m": rr(t, 63) if priced else None,
@@ -197,7 +327,8 @@ def main() -> None:
             sox_members = {
                 "rows": rows, "etf": sq["etf"].iloc[0], "as_of": sq["as_of"].iloc[0], "source": sq["source"].iloc[0],
                 "n": len(rows), "w_total": round(sum(r["w"] for r in rows), 1),
-                "only18": [m["ticker"] for m in cons if m["ticker"] not in set(sq["symbol"])],
+                "only18": [m["ticker"] for m in cons if m["ticker"] not in set(sq["t"])],
+                "extra_file": (Path(args.data_dir) / EXTRA_OHLC).exists(),
                 # the priced members as a buy-and-hold basket from the ^SOX high: today's weights
                 # imply the weights at the high (w / (1 + r)); weighting the returns by today's
                 # weights instead would under-count the names that fell most
@@ -258,6 +389,12 @@ def main() -> None:
         }
         mcc = mcclellan_study(sd["mcclellan_osc"], sd["mcclellan_sum"], c.reindex(sd.index))
 
+    # 多空排列差 of ^SOX's own members (asked 2026-11-24: 「費半分析加入多空排列差分析」)
+    sq_all = members_file()
+    spread = None
+    if sq_all is not None and bj_p.exists():
+        spread = spread_study(Path(args.data_dir), A, sq_all, c, pd.Timestamp(json.load(open(bj_p, encoding="utf-8"))["asof"]))
+
     payload = {
         "asof": asof.date().isoformat(), "generated": date.today().isoformat(), "start": c.index[0].date().isoformat(),
         "n_bars": int(len(c)), "symbol": SYM,
@@ -271,7 +408,7 @@ def main() -> None:
         "cross": cross, "episode_thr": round(100 * EPISODE), "episodes": eps, "rank": rank, "n_eps": len(eps),
         "big_day": BIG_DAY, "by_year": [{"year": y, "n": by_year.get(y, 0)} for y in years],
         "worst": worst, "worst_rank_last": int((r < r.iloc[-1]).sum()) + 1 if r.iloc[-1] < 0 else None,
-        "long": long, "candles": candles, "events": events, "comp": comp, "breadth": breadth, "mcc": mcc,
+        "long": long, "candles": candles, "events": events, "comp": comp, "breadth": breadth, "mcc": mcc, "spread": spread,
     }
 
     tpl = (REPO / "analysis" / "report_template.html").read_text(encoding="utf-8")
@@ -297,6 +434,7 @@ PAGE = r"""<meta charset="utf-8">
 td.l{text-align:left; white-space:normal; min-width:220px}
 .ev-up{color:var(--ink-3)}
 #t-mem th:nth-child(2),#t-mem th:nth-child(3),#t-mem th:nth-child(11),#t-mem th:nth-child(14){text-align:left}
+#t-sps th:nth-child(2),#t-sps th:nth-child(3),#t-sps th:nth-child(5),#t-sps th:nth-child(6){text-align:left}
 #t-soxm th:nth-child(3),#t-soxm th:nth-child(5),#t-soxm th:nth-child(6),#t-soxm th:nth-child(7),#t-soxm th:nth-child(12){text-align:left}
 </style>
 
@@ -358,6 +496,29 @@ td.l{text-align:left; white-space:normal; min-width:220px}
     <figcaption id="mcc-cap"></figcaption>
     <ul class="take" id="mcc-take" style="padding:0 20px 8px; margin-top:0"></ul>
   </figure>
+</section>
+
+<section id="spread">
+  <div class="sec-head"><span class="sec-no"></span><h2>成分股多空排列差</h2></div>
+  <p class="sec-sub" id="sp-sub">—</p>
+  <div class="tw"><table id="t-sp"><caption>目前讀數<small id="sp-cap">—</small></caption></table></div>
+  <figure class="panel">
+    <div class="panel-head"><h3>日線：^SOX 與多空排列差</h3><p id="spd-def">—</p></div>
+    <div class="rb-row" id="spd-rb" style="padding:10px 20px 0"></div>
+    <div class="legend" id="spd-lg"></div>
+    <div class="panel-body"><div id="c-spd"></div></div>
+    <figcaption id="spd-cap"></figcaption>
+  </figure>
+  <figure class="panel">
+    <div class="panel-head"><h3>週線長期：^SOX 與多空排列差（10／40 週均線）</h3><p id="spw-def">—</p></div>
+    <div class="rb-row" id="spw-rb" style="padding:10px 20px 0"></div>
+    <div class="legend" id="spw-lg"></div>
+    <div class="panel-body"><div id="c-spw"></div></div>
+    <figcaption id="spw-cap"></figcaption>
+    <ul class="take" id="sp-take" style="padding:0 20px 8px; margin-top:0"></ul>
+  </figure>
+  <div class="tw"><table id="t-spt"><caption>多空排列差能不能預警 ^SOX 的下跌？<small id="spt-cap">—</small></caption></table></div>
+  <div class="tw"><table id="t-sps"><caption>成分股的排列狀態<small id="sps-cap">—</small></caption></table></div>
 </section>
 
 <section id="days">
@@ -554,6 +715,7 @@ td.l{text-align:left; white-space:normal; min-width:220px}
     } else {
       $("mcc").style.display = "none";
     }
+    renderSpread();
     // section numbers follow the visible sections, never typed
     var k = 0;
     document.querySelectorAll(".wrap > section").forEach(function (sec) {
@@ -565,6 +727,8 @@ td.l{text-align:left; white-space:normal; min-width:220px}
       ["資料", D.symbol + " 日線（" + D.start + " 至 " + D.asof + "，" + D.n_bars + " 個交易日），由每日抓取程式從 Yahoo Finance 取得，存在 data/weekly_reutin/index_ohlc.csv。報告不自行修正官方數字。"],
       ["回檔", "從歷史高點下跌達 " + Math.abs(D.episode_thr) + "% 算一次，直到收盤重新站上舊高點才結束；資料起點之前的高點看不到，所以最早一次的高點是資料期間內的高點。"],
       ["均線", "50 日與 200 日簡單移動平均，以收盤價計算。"],
+      ["多空排列差", "收盤 > 50 日均線 > 200 日均線為多頭排列，收盤 < 50 日 < 200 日為空頭排列，其餘為整理；多空排列差 = 多頭占比 − 空頭占比，-100 到 +100。週線版用 10 週與 40 週均線。定義和 AI 硬體報告的 trend_regime.py 相同。" +
+        (D.spread ? "名單是 ^SOX 自己的成分股（" + D.spread.etf + " 持股），只算有價格的；名單用今天的成分往回推，長期序列有存活者偏差。" : "")],
       ["事件", "事件取自報告共用的事件表（data/events/market_events.csv），每一列都有來源；漲跌幅由本資料計算。"],
       ["限制", "樣本期間約 " + Math.round(D.n_bars / 252) + " 年，20% 以上的回檔只有個位數次，任何「通常」的說法都只是少數案例。這份檢視描述走勢，不預測後市，也不是投資建議。"]
     ].map(function (x, i) { return "<li data-i='" + String(i + 1).padStart(2, "0") + "'><span><b>" + x[0] + "</b>　" + x[1] + "</span></li>"; }).join("");
@@ -633,15 +797,19 @@ td.l{text-align:left; white-space:normal; min-width:220px}
     var R = S.rows, sum = function (a) { return a.reduce(function (x, r) { return x + r.w; }, 0); };
     var in18 = R.filter(function (r) { return r.in18; }), spOnly = R.filter(function (r) { return r.in_sp && !r.in18; }), out = R.filter(function (r) { return !r.in_sp; });
     var nm = function (r) { return r.ticker || r.desc; };
+    var outP = out.filter(function (r) { return r.priced; });
     var gap = S.priced_since_peak - S.sox_since_peak;
     $("soxm-sub").textContent = "^SOX 自己的成分股（以追蹤 ^SOX 的 ETF " + S.etf + " 持股為準，" + S.as_of + " 更新）共 " + S.n + " 檔：" +
       in18.length + " 檔就在重建指數的 " + C.n + " 檔裡（權重合計 " + sum(in18).toFixed(1) + "%）" +
       (spOnly.length ? "；" + spOnly.map(function (r) { return nm(r) + "（" + r.w.toFixed(1) + "%）"; }).join("、") + "是 S&P 500 成分股，但 Yahoo 的產業分類不是半導體，所以不在 " + C.n + " 檔裡" : "") +
-      "；其餘 " + out.length + " 檔不在 S&P 500（權重合計 " + sum(out).toFixed(1) + "%），我們的資料沒有它們的價格，權重最大的是 " +
+      "；其餘 " + out.length + " 檔不在 S&P 500（權重合計 " + sum(out).toFixed(1) + "%），" +
+      (outP.length === out.length ? "價格來自每日另外抓取的非 S&P 500 成分股檔案" : outP.length ? "其中 " + outP.length + " 檔有價格、" + (out.length - outP.length) + " 檔沒有" :
+        S.extra_file ? "我們的資料沒有它們的價格" : "每日抓取程式已加入這些股票，但價格資料還沒進來") + "，權重最大的是 " +
       out.slice().sort(function (a, b) { return b.w - a.w; }).slice(0, 3).map(function (r) { return nm(r) + " " + r.w.toFixed(1) + "%"; }).join("、") + "。" +
       (S.only18.length ? "反過來，" + S.only18.join("、") + " 在 " + C.n + " 檔裡、但不是 ^SOX 成分股。" : "") +
       "把有價格的 " + S.priced_n + " 檔（權重 " + S.priced_w.toFixed(1) + "%）當成一籃股票，從 ^SOX 高點起持有（高點時的權重由 " + S.etf + " 今天的權重和各檔漲跌回推），到 " + C.member_asof + " " + pct(S.priced_since_peak) +
-      "，^SOX 本身同期 " + pct(S.sox_since_peak) + "，" + (Math.abs(gap) < 3 ? "相差不大：缺價格的成分股和有價格的走勢相近。" :
+      "，^SOX 本身同期 " + pct(S.sox_since_peak) + "，" + (S.priced_n === S.n ? (Math.abs(gap) < 3 ? "相差不大。" : "相差 " + Math.abs(gap).toFixed(1) + " 個百分點，來自權重回推的近似。") :
+        Math.abs(gap) < 3 ? "相差不大：缺價格的成分股和有價格的走勢相近。" :
         gap < 0 ? "有價格的這些跌得較多：缺價格的成分股（多為不在 S&P 500 的公司）相對抗跌，撐住了 ^SOX。" : "有價格的這些跌得較少：缺價格的成分股跌得更多，拖累了 ^SOX。") +
       "^SOX 期間有成分調整、權重也有上限，這只是近似，看方向就好。";
     var neg = css("--neg"), posc = css("--pos");
@@ -649,17 +817,191 @@ td.l{text-align:left; white-space:normal; min-width:220px}
     var yes = function (b, t) { return { html: b ? t : "—", cls: "l" }; };
     fillTable("t-soxm", ["#", "代號", "公司", "權重", "在 " + C.n + " 檔裡", "S&amp;P 500", "Yahoo 產業", "近 1 月", "近 3 月", "^SOX 高點以來", "距 52 週高", "均線排列"],
       R.map(function (r, i) {
-        return [{ html: String(i + 1), cls: "n" }, "<b>" + (r.ticker || "—") + "</b>", { html: r.desc, cls: "l" }, { html: r.w.toFixed(2) + "%", cls: "n" },
+        return [{ html: String(i + 1), cls: "n" }, "<b>" + (r.ticker || "—") + (r.searched ? "*" : "") + "</b>", { html: r.desc, cls: "l" }, { html: r.w.toFixed(2) + "%", cls: "n" },
           yes(r.in18, "是"), yes(r.in_sp, "是"), { html: r.industry ? (IND[r.industry] || r.industry) : "—", cls: "l" },
           r.priced ? sg(r.r1m) : { html: "無價格資料", cls: "l ev-up" }, sg(r.r3m), sg(r.since_peak), sg(r.from_high),
           { html: r.state ? STATE[r.state] : "—", cls: "l", color: r.state === "bear" ? neg : r.state === "bull" ? posc : null }];
       }));
     $("soxm-cap").textContent = "成分與權重取自 " + S.etf + "（Invesco PHLX Semiconductor ETF）的持股，來源 " + S.source + "，" + S.as_of +
       " 更新；ETF 權重會因現金與追蹤誤差和指數略有出入，現金與借券部位不列入。報酬與均線由本資料收盤計算，到 " + C.member_asof +
-      "；不在 S&P 500 的公司，每日抓取程式沒有抓價格。來源沒有給代號的列以「—」表示，不自行補上。";
+      "；" + (S.extra_file ? "不在 S&P 500 的公司，價格來自每日抓取的 sox_extra_ohlc.csv。" : "不在 S&P 500 的公司已加入每日抓取，價格資料進來前顯示「無價格資料」。") +
+      (R.some(function (r) { return r.searched; }) ? "標 * 的代號來源沒有給，由 Alpha Vantage 代號搜尋補上（記在 data/tableau/sox_members_soxq.csv），不是自行推斷。" : "來源沒有給代號的列以「—」表示，不自行補上。");
+  }
+
+  // 多空排列差 of ^SOX's own members
+  var sgn = function (v, d) {
+    if (v === null || v === undefined) return "—";
+    var t = v.toFixed(d === undefined ? 1 : d).replace(/\.0$/, "");
+    return (v > 0 && t !== "0" ? "+" : "") + (t === "-0" ? "0" : t);
+  };
+  var sp = function (lab) { return /^[A-Za-z0-9^]/.test(lab) ? " " + lab + " " : lab; };   // space between CJK and Latin
+  var pctTxt = function (p, span) { return p <= 0 ? "為" + span + "最低" : p >= 100 ? "為" + span + "最高" : "在" + span + "第 " + p.toFixed(0) + " 百分位"; };
+  var MOVE = { bull: "多頭", neither: "整理", bear: "空頭" };
+  function renderSpread() {
+    var S = D.spread;
+    if (!S) { $("spread").style.display = "none"; return; }
+    var N = S.now, O = S.others || {}, AI = O.ai, MK = O.mkt;
+    var cmp = function (a, b, lab) {
+      var dlt = a - b;
+      lab = sp(lab).replace(/ $/, "");
+      return Math.abs(dlt) < 5 ? "和" + lab + "（" + sgn(b) + "）差不多" : (dlt > 0 ? "比" + lab + "（" + sgn(b) + "）高 " : "比" + lab + "（" + sgn(b) + "）低 ") + Math.abs(dlt).toFixed(0) + " 點";
+    };
+    var chg = function (a, b, lab) {
+      if (b === null) return "";
+      var dlt = a - b;
+      return Math.abs(dlt) < 5 ? "和" + lab + "（" + sgn(b) + "）差不多" : (dlt > 0 ? "比" + lab + "（" + sgn(b) + "）上升 " : "比" + lab + "（" + sgn(b) + "）下降 ") + Math.abs(dlt).toFixed(0) + " 點";
+    };
+    var wgap = S.wnet - N.net;
+    $("sp-sub").textContent = "多空排列差（Bull–Bear Spread）= 多頭排列占比 − 空頭排列占比，和 AI 硬體報告用的是同一個定義（見方法）。這裡的名單是 ^SOX 自己的成分股：" +
+      S.etf + " 持股（" + S.as_of + "）共 " + S.n_list + " 檔，有價格的 " + S.n + " 檔、權重合計 " + S.w_priced.toFixed(1) + "%" +
+      (S.n_missing ? "；另 " + S.n_missing + " 檔（權重 " + S.w_missing.toFixed(1) + "%）目前沒有價格" +
+        (S.extra_file ? "" : "，不在 S&P 500 的成分股已加入每日抓取，資料進來後本節會自動納入") : "") + "。" +
+      "到 " + S.asof + "，多頭排列 " + S.counts.bull + " 檔、整理 " + S.counts.neither + " 檔、空頭排列 " + S.counts.bear + " 檔，多空排列差 " + sgn(N.net) +
+      (AI && MK ? "，" + cmp(N.net, AI.now.net, AI.label) + "，" + cmp(N.net, MK.now.net, MK.label) : "") + "；" + chg(N.net, S.m1, "一個月前") + "。" +
+      "按 " + S.etf + " 權重計是 " + sgn(S.wnet) + "，" + (Math.abs(wgap) < 5 ? "和等權計算相近。" : wgap > 0 ? "高於等權計算：權重大的成分股排列比小的好。" : "低於等權計算：權重大的成分股排列比小的差。");
+    var hd = ["項目", "^SOX 成分股（" + S.n + " 檔）"].concat(AI && MK ? [AI.label, MK.label] : []);
+    var row = function (lab, a, f) { return [lab, { html: a, cls: "n" }].concat(AI && MK ? [{ html: f(AI), cls: "n" }, { html: f(MK), cls: "n" }] : []); };
+    var p0 = function (v) { return v === null || v === undefined ? "—" : v.toFixed(0) + "%"; };
+    fillTable("t-sp", hd, [
+      row("多頭排列", p0(N.bull), function (o) { return p0(o.now.bull); }),
+      row("整理", p0(N.neither), function (o) { return p0(o.now.neither); }),
+      row("空頭排列", p0(N.bear), function (o) { return p0(o.now.bear); }),
+      row("<b>多空排列差</b>", "<b>" + sgn(N.net) + "</b>", function (o) { return "<b>" + sgn(o.now.net) + "</b>"; }),
+      row("一個月前", sgn(S.m1), function (o) { return sgn(o.m1); }),
+      row("三個月前", sgn(S.m3), function (o) { return sgn(o.m3); }),
+      row("按 " + S.etf + " 權重計", sgn(S.wnet), function () { return "—"; })]);
+    $("sp-cap").textContent = "資料到 " + S.asof + (S.asof < D.asof ? "（成分股資料比 ^SOX 少最後一個交易日）" : "") + "。占比以 200 日均線已算得出的成分股為分母；" +
+      (AI ? sp(AI.label).trim() + " 與 S&P 500 全體取自 trend_regime.py 的同一定義。" : "") + "「按權重計」用 " + S.etf + " 今天的權重，把多頭與空頭的權重相減。";
+
+    // read-out
+    var T = S.test, take = [];
+    take.push(T.corr_past >= 0.5 && Math.abs(T.corr_fwd_mdd) < 0.2 && Math.abs(T.corr_fwd_ret) < 0.2
+      ? "週線多空排列差和 ^SOX 過去 " + T.h + " 週報酬的等級相關 " + T.corr_past.toFixed(2) + "，和未來 " + T.h + " 週最大跌幅只有 " + T.corr_fwd_mdd.toFixed(2) + "、和未來報酬 " + T.corr_fwd_ret.toFixed(2) +
+        "：它反映已經發生的漲跌，對接下來會不會大跌幾乎沒有預示。"
+      : "週線多空排列差和 ^SOX 過去 " + T.h + " 週報酬的等級相關 " + T.corr_past.toFixed(2) + "，和未來 " + T.h + " 週最大跌幅 " + T.corr_fwd_mdd.toFixed(2) + "、和未來報酬 " + T.corr_fwd_ret.toFixed(2) + "。");
+    var dp = T.low.p_big - T.high.p_big, dr = T.low.med_fwd - T.high.med_fwd;
+    take.push("多空排列差 ≤ +" + T.thr + " 的週，之後 " + T.h + " 週內跌 " + Math.abs(T.big) + "% 以上的比例 " + T.low.p_big.toFixed(0) + "%，" +
+      (Math.abs(dp) < 3 ? "和 > +" + T.thr + " 的 " + T.high.p_big.toFixed(0) + "% 差不多" : (dp >= 10 ? "明顯高於" : dp > 0 ? "略高於" : "低於") + " > +" + T.thr + " 的 " + T.high.p_big.toFixed(0) + "%") +
+      "；" + T.h + " 週後報酬中位數 " + pct(T.low.med_fwd) + " 對 " + pct(T.high.med_fwd) + "，" +
+      (Math.abs(dr) < 3 ? "相差不大" + (dp >= 3 ? "：讀數低時之後大跌的機會較高，但 " + T.h + " 週後的報酬中位數不見得較差。" : "。") : dr < 0 ? "讀數低之後的報酬較差。" : "讀數低之後的報酬反而較好。"));
+    var X0 = T.cross0, rate = X0.done ? 100 * X0.hits / X0.done : null;
+    if (X0.done) take.push("由正轉負（" + T.h + " 週內不重複計）共 " + X0.n + " 次，已有結果的 " + X0.done + " 次中 " + (X0.hits ? X0.hits + " 次" : "沒有一次") + "在 " + T.h + " 週內跌 " + Math.abs(T.big) + "% 以上（" +
+      rate.toFixed(0) + "%），" + (Math.abs(rate - T.all.p_big) < 5 ? "和任意一週的 " + T.all.p_big.toFixed(0) + "% 差不多" : rate > T.all.p_big ? "高於任意一週的 " + T.all.p_big.toFixed(0) + "%" : "低於任意一週的 " + T.all.p_big.toFixed(0) + "%") +
+      (X0.pending.length ? "；" + X0.pending.join("、") + " 那次還沒有 " + T.h + " 週結果，不計入。" : "。"));
+    var wkGap = function (a, b) { return Math.round((new Date(b) - new Date(a)) / 6048e5); };
+    if (S.cross) {
+      var lag = wkGap(S.cross.sox_peak, S.cross.date);
+      take.push("日線多空排列差最近一次由正轉負在 " + S.cross.date + "，" + (S.cross.after_peak ? "比 ^SOX 的高點（" + S.cross.sox_peak + "）晚了約 " + lag + " 週，當時 ^SOX 已距高點 " + pct(S.cross.sox_dd) + "。"
+        : "早於 ^SOX 的高點（" + S.cross.sox_peak + "）。") +
+        "多空排列差的近一年高點 " + sgn(S.y1_hi) + " 在 " + S.y1_hi_date + (S.y1_hi_date < S.cross.sox_peak ? "，比 ^SOX 高點早約 " + wkGap(S.y1_hi_date, S.cross.sox_peak) + " 週——這只能事後對照，當時看不出那就是高點。" : "。"));
+    }
+    var mv = [], keep = 0;
+    Object.keys(S.trans).forEach(function (k) { var a = k.split(">"); if (a[0] === a[1]) keep += S.trans[k]; else mv.push([MOVE[a[0]] + "→" + MOVE[a[1]], S.trans[k]]); });
+    mv.sort(function (a, b) { return b[1] - a[1]; });
+    take.push("和一個月前比，" + (mv.length ? mv.map(function (x) { return x[0] + " " + x[1] + " 檔"; }).join("、") + "，" : "沒有一檔換狀態，") + (keep ? "維持原狀態 " + keep + " 檔。" : "沒有一檔維持原狀態。") +
+      (T.windows ? "以上的歷史比例只有約 " + T.windows + " 個不重疊的 " + T.h + " 週區間，看方向就好。" : ""));
+    $("sp-take").innerHTML = take.map(function (t) { return "<li><span>" + t + "</span></li>"; }).join("");
+
+    $("spd-def").textContent = "上：^SOX 日收盤（對數刻度），只畫到成分股資料的最後一天。下：多空排列差，-100 是全部空頭排列、+100 是全部多頭排列" + (AI ? "；另畫" + sp(AI.label) + "與 S&P 500 全體作對照" : "") + "。";
+    $("spd-cap").textContent = "目前 " + sgn(N.net) + "，" + pctTxt(S.pctile_1y, "近一年") + "；近一年最高 " + sgn(S.y1_hi) + "（" + S.y1_hi_date + "）、最低 " + sgn(S.y1_lo) + "（" + S.y1_lo_date + "）。日線從 200 日均線算得出、且至少六成成分股有讀數的那天開始。按鈕只改變畫面範圍，文字是全期數字。";
+    $("spw-def").textContent = "週線用 10 週與 40 週均線（約當 50 與 200 日），從 " + S.w_start + " 那週開始（今天的成分股至少六成已有 40 週均線，當時 " + S.w_n_start + " 檔）。名單是今天的成分股往回推，有存活者偏差，早年偏多頭" +
+      (S.n_missing ? "；沒有價格的 " + S.n_missing + " 檔不在內" : "") + "。點線是 +" + T.thr + "，下表的分界；圓點是由正轉負的週。";
+    $("spw-cap").textContent = "目前 " + sgn(S.w_now) + "，" + pctTxt(S.w_pctile, " " + S.w_start.slice(0, 4) + " 年以來") + "（中位 " + sgn(S.w_median) + "）" +
+      (S.w_last_as_low ? "；不算最近 " + S.skip + " 週，上一次這麼低是 " + S.w_last_as_low + " 那週。" : "；不算最近 " + S.skip + " 週，期間沒有這麼低的時候。");
+
+    fillTable("t-spt", ["起點", "週數", T.h + " 週內跌 ≥" + Math.abs(T.big) + "%", T.h + " 週後報酬中位數"], [
+      ["多空排列差 ≤ +" + T.thr, { html: String(T.low.weeks), cls: "n" }, { html: T.low.p_big.toFixed(0) + "%", cls: "n" }, { html: pct(T.low.med_fwd), cls: "n" }],
+      ["多空排列差 > +" + T.thr, { html: String(T.high.weeks), cls: "n" }, { html: T.high.p_big.toFixed(0) + "%", cls: "n" }, { html: pct(T.high.med_fwd), cls: "n" }],
+      ["全部週", { html: String(T.all.weeks), cls: "n" }, { html: T.all.p_big.toFixed(0) + "%", cls: "n" }, { html: pct(T.all.med_fwd), cls: "n" }],
+      ["由正轉負的週（不重複計）", { html: String(X0.done), cls: "n" }, { html: rate === null ? "—" : rate.toFixed(0) + "%", cls: "n" }, { html: "—", cls: "n" }]]);
+    $("spt-cap").textContent = "以 ^SOX 週收盤計，起點是 " + S.w_start + " 起的每一週，未來 " + T.h + " 週彼此重疊；不重疊的區間只有約 " + T.windows + " 個。最後 " + T.h + " 週還沒有結果，不計入。分界 +" + T.thr + " 和 AI 硬體報告「預警檢驗」一節的分組相同。";
+
+    var neg = css("--neg"), posc = css("--pos");
+    var stc = function (v) { return v ? { html: STATE[v], cls: "l", color: v === "bear" ? neg : v === "bull" ? posc : null } : { html: "—", cls: "l" }; };
+    var anyS = S.rows.some(function (r) { return r.searched; });
+    fillTable("t-sps", ["#", "代號", "公司", "權重", "目前", "一個月前"], S.rows.map(function (r, i) {
+      return [{ html: String(i + 1), cls: "n" }, "<b>" + (r.ticker || "—") + (r.searched ? "*" : "") + "</b>", { html: r.desc, cls: "l" }, { html: r.w.toFixed(2) + "%", cls: "n" },
+        r.priced ? stc(r.now) : { html: "無價格資料", cls: "l ev-up" }, r.priced ? stc(r.m1) : { html: "", cls: "l" }];
+    }));
+    $("sps-cap").textContent = "依 " + S.etf + " 權重排序（" + S.as_of + "）。排列狀態用日線 50／200 日均線，資料到 " + S.asof + "。" +
+      (anyS ? "標 * 的代號來源沒有給，由 Alpha Vantage 代號搜尋補上（記在 data/tableau/sox_members_soxq.csv）。" : "");
   }
 
   /* ---------------- charts ---------------- */
+  var SP_N = { spd: Infinity, spw: Infinity };
+  function drawSpread(key) {
+    var S = D.spread; if (!S) return;
+    var daily = key === "spd", P = daily ? S.daily : S.weekly, T = S.test;
+    var presets = daily ? [["3 個月", 63], ["6 個月", 126], ["全部", Infinity]] : [["1 年", 52], ["3 年", 156], ["5 年", 260], ["全部", Infinity]];
+    var rb = $(key + "-rb"); rb.innerHTML = "";
+    presets.forEach(function (p) {
+      var b = document.createElement("button"); b.type = "button"; b.textContent = p[0];
+      if (SP_N[key] === p[1]) b.className = "on";
+      b.setAttribute("aria-pressed", SP_N[key] === p[1] ? "true" : "false");
+      b.addEventListener("click", function () { SP_N[key] = p[1]; drawSpread(key); });
+      rb.appendChild(b);
+    });
+    var Nn = P.dates.length, a = Math.max(0, Nn - Math.min(Nn, SP_N[key]));
+    var cut = function (x) { return x ? x.slice(a) : null; };
+    var dates = cut(P.dates), sox = cut(P.sox), n = dates.length;
+    var cS = css("--s2"), cN = css("--s1"), cA = css("--s4"), cM = css("--ink-3");
+    var lines = [{ arr: cut(P.net), col: cN, wd: 2, lab: "^SOX 成分股" }];
+    if (P.ai) lines.push({ arr: cut(P.ai), col: cA, wd: 1.3, lab: S.others.ai.label, op: 0.85 });
+    if (P.mkt) lines.push({ arr: cut(P.mkt), col: cM, wd: 1.3, lab: S.others.mkt.label, op: 0.85 });
+    var host = $("c-" + key), w = Math.max(320, host.clientWidth), small = w < 520;
+    var m = { l: small ? 46 : 54, r: small ? 50 : 60 }, Tp = { y: 10, h: small ? 150 : 190 }, B = { y: 0, h: small ? 150 : 180 };
+    B.y = Tp.y + Tp.h + 22;
+    var h = B.y + B.h + 26, iw = w - m.l - m.r, sv = svg(w, h), ink3 = css("--ink-3"), rule = css("--rule");
+    var X = function (i) { return m.l + iw * i / Math.max(1, n - 1); };
+    var v = sox.filter(function (x) { return x; }), lo = Math.min.apply(null, v) * 0.95, hi = Math.max.apply(null, v) * 1.05;
+    var LY = function (x) { return Tp.y + Tp.h * (1 - (Math.log(x) - Math.log(lo)) / (Math.log(hi) - Math.log(lo))); };
+    logTicks(lo, hi).forEach(function (t) {
+      sv.appendChild(el("line", { x1: m.l, x2: m.l + iw, y1: LY(t), y2: LY(t), stroke: rule }));
+      sv.appendChild(el("text", { x: m.l - 6, y: LY(t) + 4, "text-anchor": "end", fill: ink3, "font-size": 10.5, "font-family": MONO }, t >= 1000 ? (t / 1000) + "k" : t));
+    });
+    var NY = function (x) { return B.y + B.h * (1 - (x + 100) / 200); };
+    [-100, -50, 0, 50, 100].forEach(function (t) {
+      sv.appendChild(el("line", { x1: m.l, x2: m.l + iw, y1: NY(t), y2: NY(t), stroke: t === 0 ? css("--axis") : rule }));
+      sv.appendChild(el("text", { x: m.l - 6, y: NY(t) + 4, "text-anchor": "end", fill: ink3, "font-size": 10.5, "font-family": MONO }, t > 0 ? "+" + t : t));
+    });
+    if (!daily) sv.appendChild(el("line", { x1: m.l, x2: m.l + iw, y1: NY(T.thr), y2: NY(T.thr), stroke: ink3, "stroke-dasharray": "2 3" }));
+    var path = function (arr, Y, col, wd, op) {
+      var d = "", pen = false;
+      arr.forEach(function (x, i) { if (x === null || x === undefined) { pen = false; return; } d += (pen ? "L" : "M") + X(i).toFixed(1) + " " + Y(x).toFixed(1); pen = true; });
+      sv.appendChild(el("path", { d: d, fill: "none", stroke: col, "stroke-width": wd, opacity: op || 1, "stroke-linejoin": "round" }));
+    };
+    path(sox, LY, cS, 1.8);
+    lines.slice().reverse().forEach(function (L) { path(L.arr, NY, L.col, L.wd, L.op); });
+    if (!daily) {
+      var di = {}; dates.forEach(function (d, i) { di[d] = i; });
+      T.cross0.dates.forEach(function (d) { var i = di[d]; if (i === undefined) return; sv.appendChild(el("circle", { cx: X(i), cy: NY(lines[0].arr[i]), r: 3.2, fill: cN, stroke: css("--bg"), "stroke-width": 1 })); });
+    }
+    var endL = function (y, col, t) {
+      sv.appendChild(el("line", { x1: m.l + iw + 4, x2: m.l + iw + 10, y1: y, y2: y, stroke: col, "stroke-width": 2 }));
+      sv.appendChild(el("text", { x: m.l + iw + 13, y: y + 4, fill: css("--ink-2"), "font-size": 10.5, "font-weight": 600, "font-family": MONO }, t));
+    };
+    var j = n - 1; while (j > 0 && !sox[j]) j--;
+    endL(LY(sox[j]), cS, (sox[j] / 1000).toFixed(1) + "k");
+    var ends = lines.map(function (L) { var k = n - 1; while (k > 0 && (L.arr[k] === null || L.arr[k] === undefined)) k--; return { y: NY(L.arr[k]), col: L.col, t: sgn(L.arr[k], 0) }; })
+      .sort(function (p, q) { return p.y - q.y; });
+    for (var z = 1; z < ends.length; z++) if (ends[z].y - ends[z - 1].y < 12) ends[z].y = ends[z - 1].y + 12;
+    ends.forEach(function (e) { endL(e.y, e.col, e.t); });
+    yearTicks(sv, dates, X, h - 8, ink3);
+    var cross = el("line", { y1: Tp.y, y2: B.y + B.h, stroke: css("--ink"), opacity: 0 }); sv.appendChild(cross);
+    var hit = el("rect", { x: m.l, y: Tp.y, width: iw, height: B.y + B.h - Tp.y, fill: "transparent" });
+    hit.addEventListener("mousemove", function (ev) {
+      var bb = sv.getBoundingClientRect(), i = Math.max(0, Math.min(n - 1, Math.round((ev.clientX - bb.left - m.l) / (iw / Math.max(1, n - 1)))));
+      cross.setAttribute("x1", X(i)); cross.setAttribute("x2", X(i)); cross.setAttribute("opacity", 0.3);
+      showTip("<div class='tt-h'>" + dates[i] + "</div>" + (sox[i] ? "<div class='tt-r'><span>^SOX</span><b>" + num(sox[i]) + "</b></div>" : "") +
+        lines.map(function (L) { return "<div class='tt-r'><span>" + L.lab + "</span><b>" + sgn(L.arr[i]) + "</b></div>"; }).join(""), ev);
+    });
+    hit.addEventListener("mouseleave", function () { hideTip(); cross.setAttribute("opacity", 0); });
+    sv.appendChild(hit);
+    host.innerHTML = ""; host.appendChild(sv);
+    $(key + "-lg").innerHTML = "<span><i class='swatch' style='background:" + cS + "'></i>^SOX " + (daily ? "日" : "週") + "收盤</span>" +
+      lines.map(function (L) { return "<span><i class='swatch' style='background:" + L.col + "'></i>" + L.lab + "多空排列差</span>"; }).join("") +
+      (daily ? "" : "<span><i class='swatch' style='background:repeating-linear-gradient(90deg," + ink3 + " 0 2px,transparent 2px 5px)'></i>+" + T.thr + "</span>");
+  }
   var LONG_N = Infinity;
   function rangeButtons() {
     var host = $("long-rb"); host.innerHTML = "";
@@ -921,7 +1263,7 @@ td.l{text-align:left; white-space:normal; min-width:220px}
       "'></i>站上 40 週均線</span><span><i class='swatch' style='background:" + c10 + "'></i>站上 10 週均線</span>";
   }
   function renderCharts() {
-    rangeButtons(); drawLong(); drawK(); drawBreadth(); drawYears();
+    rangeButtons(); drawLong(); drawK(); drawBreadth(); drawSpread("spd"); drawSpread("spw"); drawYears();
     if (D.mcc && window.MCC) MCC.render(D.mcc, { key: "sox", idxName: "^SOX",
       groupName: "S&P 500 半導體成分股 " + (D.breadth ? D.breadth.n : "") + " 檔（不是 ^SOX 自己的成分股）",
       ids: { chart: "c-mcc", rb: "mcc-rb", lg: "mcc-lg", def: "mcc-def", cap: "mcc-cap", take: "mcc-take" } });

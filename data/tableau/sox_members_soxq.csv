@@ -1,31 +1,31 @@
-﻿symbol,description,weight,etf,as_of,source
-AVGO,BROADCOM INC,0.1081,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings)
-NVDA,NVIDIA CORP,0.1019,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings)
-MU,MICRON TECHNOLOGY INC,0.0721,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings)
-TXN,TEXAS INSTRUMENTS INC,0.0542,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings)
-AMD,ADVANCED MICRO DEVICES INC,0.0515,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings)
-ADI,ANALOG DEVICES INC,0.0508,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings)
-QCOM,QUALCOMM INC,0.0475,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings)
-TSM,TAIWAN SEMICONDUCTOR MANUFACTURING CO LTD ADR,0.0432,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings)
-ASML,ASML HOLDING NV ADR,0.0399,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings)
-KLAC,KLA CORP,0.0394,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings)
-AMAT,APPLIED MATERIALS INC,0.0367,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings)
-MPWR,MONOLITHIC POWER SYSTEMS INC,0.0352,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings)
-NXPI,NXP SEMICONDUCTORS NV,0.0349,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings)
-LRCX,LAM RESEARCH CORP,0.0336,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings)
-MRVL,MARVELL TECHNOLOGY INC,0.033,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings)
-INTC,INTEL CORP,0.0298,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings)
-COHR,COHERENT CORP,0.0217,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings)
-TER,TERADYNE INC,0.0198,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings)
-ALAB,ASTERA LABS INC,0.0191,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings)
-MCHP,MICROCHIP TECHNOLOGY INC,0.0174,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings)
-ON,ON SEMICONDUCTOR CORP,0.0144,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings)
-ARM,ARM HOLDINGS PLC ADR,0.0139,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings)
-Q,QNITY ELECTRONICS INC,0.0131,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings)
-CRDO,CREDO TECHNOLOGY GROUP HOLDING LTD,0.0124,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings)
-GFS,GLOBALFOUNDRIES INC,0.0118,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings)
-ENTG,ENTEGRIS INC,0.0117,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings)
-MTSI,MACOM TECHNOLOGY SOLUTIONS HOLDINGS INC,0.0092,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings)
-LSCC,LATTICE SEMICONDUCTOR CORP,0.0084,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings)
-,TOWER SEMICONDUCTOR LTD,0.0082,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings)
-SITM,SITIME CORP ORDINARY SHARES,0.0069,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings)
+﻿symbol,description,weight,etf,as_of,source,fetch_symbol,fetch_symbol_source
+AVGO,BROADCOM INC,0.1081,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings),AVGO,
+NVDA,NVIDIA CORP,0.1019,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings),NVDA,
+MU,MICRON TECHNOLOGY INC,0.0721,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings),MU,
+TXN,TEXAS INSTRUMENTS INC,0.0542,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings),TXN,
+AMD,ADVANCED MICRO DEVICES INC,0.0515,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings),AMD,
+ADI,ANALOG DEVICES INC,0.0508,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings),ADI,
+QCOM,QUALCOMM INC,0.0475,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings),QCOM,
+TSM,TAIWAN SEMICONDUCTOR MANUFACTURING CO LTD ADR,0.0432,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings),TSM,
+ASML,ASML HOLDING NV ADR,0.0399,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings),ASML,
+KLAC,KLA CORP,0.0394,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings),KLAC,
+AMAT,APPLIED MATERIALS INC,0.0367,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings),AMAT,
+MPWR,MONOLITHIC POWER SYSTEMS INC,0.0352,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings),MPWR,
+NXPI,NXP SEMICONDUCTORS NV,0.0349,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings),NXPI,
+LRCX,LAM RESEARCH CORP,0.0336,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings),LRCX,
+MRVL,MARVELL TECHNOLOGY INC,0.033,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings),MRVL,
+INTC,INTEL CORP,0.0298,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings),INTC,
+COHR,COHERENT CORP,0.0217,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings),COHR,
+TER,TERADYNE INC,0.0198,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings),TER,
+ALAB,ASTERA LABS INC,0.0191,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings),ALAB,
+MCHP,MICROCHIP TECHNOLOGY INC,0.0174,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings),MCHP,
+ON,ON SEMICONDUCTOR CORP,0.0144,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings),ON,
+ARM,ARM HOLDINGS PLC ADR,0.0139,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings),ARM,
+Q,QNITY ELECTRONICS INC,0.0131,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings),Q,
+CRDO,CREDO TECHNOLOGY GROUP HOLDING LTD,0.0124,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings),CRDO,
+GFS,GLOBALFOUNDRIES INC,0.0118,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings),GFS,
+ENTG,ENTEGRIS INC,0.0117,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings),ENTG,
+MTSI,MACOM TECHNOLOGY SOLUTIONS HOLDINGS INC,0.0092,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings),MTSI,
+LSCC,LATTICE SEMICONDUCTOR CORP,0.0084,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings),LSCC,
+,TOWER SEMICONDUCTOR LTD,0.0082,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings),TSEM,"Alpha Vantage SYMBOL_SEARCH 'Tower Semiconductor' (2026-11-24): TSEM, United States, USD; the holdings source gives no ticker"
+SITM,SITIME CORP ORDINARY SHARES,0.0069,SOXQ,2026-11-20,Alpha Vantage ETF_PROFILE (Invesco PHLX Semiconductor ETF holdings),SITM,

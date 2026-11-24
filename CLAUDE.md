@@ -309,6 +309,35 @@ from the ^SOX high** (weights at the high backed out as w / (1 + r)) fell -33.4%
 -35.6% to 11-19 — 相差不大. Weighting since-peak returns by *today's* weights gave -29.5%
 and the wrong conclusion (it under-counts the names that fell most); keep the basket form.
 
+**Non-S&P 500 ^SOX members are fetched** (asked 2026-11-24: 「12 檔非 S&P 500 成分股加入抓取，推到
+main」): `fetch_sox_extra()` (pushed to main as 2a795aa with the members CSV) reads
+`data/tableau/sox_members_soxq.csv`, keeps members not in `SP500.csv` (TSM, ASML, MRVL, ALAB, ARM,
+CRDO, GFS, ENTG, MTSI, LSCC, TSEM, SITM) and writes `sox_extra_stocks.csv` + `sox_extra_ohlc.csv`
+(same mixed 1wk/1d layout), last in the run and in its own try. The CSV now has `fetch_symbol`:
+the source's `symbol`, except Tower Semiconductor (blank in the holdings) → **TSEM, from Alpha
+Vantage SYMBOL_SEARCH**, recorded in `fetch_symbol_source` and marked 「*」 on the page. The S&P
+500 breadth never reads the extra file. Until the first scheduled run after 2a795aa commits it,
+the page says the names were added to the fetch and shows 「無價格資料」; bring it in with
+`git checkout origin/main -- data/weekly_reutin`. Mock-tested with a fake yfinance (an empty
+download is skipped) and with a placeholder extra file (29 of 30 priced; wording switches).
+
+**多空排列差 on the ^SOX page** (asked the same day: 「費半分析加入多空排列差分析」): section
+「成分股多空排列差」, `spread_study()` in `sox_review.py`, on ^SOX's **own** members (SOXQ list,
+priced from `sp500_ohlc.csv` + `sox_extra_ohlc.csv` via `member_closes()`), same rule and
+helpers as `trend_regime.py` (`classify`, `shares`) and the same forward test as
+`regime_backtest.py` (`fwd_max_dd`, `rank_corr`, `declustered`, H=13, -10%, split at +20).
+Daily (MA50/200) and weekly (10/40-week, from the first week ≥60% of priced members are warm)
+against ^SOX, with the AI-hardware and whole-market spreads from `trend_regime_*.csv`; a
+weight-weighted reading (SOXQ weights); state now vs a month ago per member. 2026-11-19, 18
+priced (78.2% of weight): net -38.9 (1 bull / 9 neither / 8 bear; 1y percentile 1), weighted
+-18.1, AI hardware -40.9, market +4.7; weekly -44.4 (10th percentile since 2015-08). Weekly net
+vs ^SOX: rank corr with past 13w 0.77, with forward 13w max drawdown 0.06 — confirms, doesn't
+warn; ≤ +20 → 37% chance of a ≥10% fall in 13w vs 17% above, median forward return 7.2% vs
+8.4%. Latest daily fall through 0 on 2026-10-30, ~19 weeks after the ^SOX high (06-22), ^SOX
+then -27.0%. The member table's wording (「沒有價格」 / 「已加入每日抓取」 / 「價格來自
+sox_extra_ohlc.csv」) follows `extra_file` and each row's `priced` — the old fixed line
+「每日抓取程式沒有抓價格」 went false the moment the fetch change landed.
+
 The ^SOX page's breadth section uses the 18 S&P 500 semiconductor names — ^SOX's own members
 are not in our data (several are not S&P 500 stocks); every caption says so and no member
 count of ^SOX is typed. Its section numbers are generated from the visible sections.
