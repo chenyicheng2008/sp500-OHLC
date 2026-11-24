@@ -1,7 +1,7 @@
 ﻿Ticker,Short Name,Market Cap,Sector,Industry,PE Ratio,Dividend Yield,Forward P/E Ratio,50日均差%,200日均差%,CurrentY成長,NextY成長,CurrentQ成長,NextQ成長
 AAPL,Apple Inc.,5072893771776,technology,consumer-electronics,38.15082,0.0030943484,33.017014,0.021277484,0.15116507,0.05,0.124,0.0253,0.0698
 ABBV,AbbVie Inc.,509868933120,healthcare,drug-manufacturers-general,49.561855,0.024178894,17.786068,0.03386355,0.18972497,0.3984,0.1597,0.43240002,0.299
-ABNB,"Airbnb, Inc.",103809277952,consumer-cyclical,travel-services,32.6379,0.0,27.356073,0.025403477,0.15654883,0.3848,0.1454,0.4429,0.5743
+ABNB,"Airbnb, Inc.",103809277952,consumer-cyclical,travel-services,31.977942,0.0,27.356073,0.025403477,0.15654883,0.3848,0.1454,0.4429,0.5743
 ABT,Abbott Laboratories,178944212992,healthcare,medical-devices,38.40892,0.02446602,17.42239,-0.005505704,0.01845328,0.0714,0.0748,0.0921,0.07
 ACGL,Arch Capital Group Ltd.,35361816576,financial-services,insurance-diversified,8.9040985,0.0,10.885238,0.074004784,0.10983001,0.0396,-0.024500001,-0.1445,0.045700002
 ACN,Accenture plc,131315032064,technology,information-technology-services,16.308876,0.029841298,13.970328,0.0026205236,0.17073786,0.0497,0.085,0.0026,0.075100005
