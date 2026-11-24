@@ -293,6 +293,22 @@ alignment counts, median since the high, worst and most resilient names). 2026-1
 three NVDA/AVGO/AMD 68% of the weight; 1 bull, 7 bear, 10 neither; since 2026-06-22 median
 -35.3%, worst INTC -60.5%, best SWKS +3.3%.
 
+^SOX's own members (asked 2026-11-24: 「費城半導體指數, 成份股比較」, then 「SOXQ 持股 查alpha
+vantage」): `data/tableau/sox_members_soxq.csv` is a **sourced snapshot** — Invesco SOXQ
+(tracks the PHLX Semiconductor Sector Index) holdings from Alpha Vantage `ETF_PROFILE`,
+last_updated 2026-11-20, 30 names + cash/securities lending (dropped); one row has no
+ticker in the source (Tower Semiconductor) and is left blank, never filled in. Invesco and
+Nasdaq's index pages were refused by the network policy; the user approved adding
+www.invesco.com and indexes.nasdaqomx.com to the environment, but the download itself was
+then refused by the permission check — Alpha Vantage is the route that worked. Refresh the
+snapshot by calling ETF_PROFILE for SOXQ again; the page prints its as-of date. Overlap on
+2026-11-20: 17 of the 30 are in our 18 (76.0% of the weight), COHR is S&P 500 but Yahoo
+puts it in scientific instruments (2.2%), 12 are not S&P 500 and unpriced (21.8%: TSM,
+ASML, MRVL …); SWKS is in our 18 but not in ^SOX. The priced 18 as a **buy-and-hold basket
+from the ^SOX high** (weights at the high backed out as w / (1 + r)) fell -33.4% vs ^SOX
+-35.6% to 11-19 — 相差不大. Weighting since-peak returns by *today's* weights gave -29.5%
+and the wrong conclusion (it under-counts the names that fell most); keep the basket form.
+
 The ^SOX page's breadth section uses the 18 S&P 500 semiconductor names — ^SOX's own members
 are not in our data (several are not S&P 500 stocks); every caption says so and no member
 count of ^SOX is typed. Its section numbers are generated from the visible sections.

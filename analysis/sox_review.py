@@ -146,6 +146,12 @@ def main() -> None:
         # the rebuilt index's members, one row each (asked 2026-11-24: 「和 S&P 500 半導體成分股比較..列出個股」)
         cons = bj["constituents"]["semi"]
         tick = [m["ticker"] for m in cons]
+        # ^SOX's own members, from the SOXQ holdings snapshot (Alpha Vantage ETF_PROFILE; asked
+        # 2026-11-24: 「費城半導體指數, 成份股比較」 / 「SOXQ 持股 查alpha vantage」)
+        sq_p = REPO / "data" / "tableau" / "sox_members_soxq.csv"
+        sq = pd.read_csv(sq_p, encoding=ENC, keep_default_na=False) if sq_p.exists() else None
+        if sq is not None:
+            tick = tick + [t for t in sq["symbol"] if t and t not in tick]
         o = pd.read_csv(Path(args.data_dir) / "sp500_ohlc.csv", encoding=ENC, usecols=["Ticker", "Date", "Close", "Interval"])
         o = o[(o["Interval"] == "1d") & o["Ticker"].isin(tick)]
         o["Date"] = pd.to_datetime(o["Date"])
@@ -164,11 +170,46 @@ def main() -> None:
                             "a50": bool(col.iloc[-1] > ma50_t.iloc[-1]) if len(col) >= 50 else None,
                             "a200": bool(col.iloc[-1] > ma200_t.iloc[-1]) if len(col) >= 200 else None})
         comp_members = {"rows": members, "peak_date": ath_d.date().isoformat(), "asof": bj["asof"]}
+
+        sox_members = None
+        if sq is not None:
+            fund = pd.read_csv(Path(args.data_dir) / "sp500_stocks.csv", encoding=ENC).set_index("Ticker")
+            alignment = lambda col: (None if len(col) < 200 else
+                                     "bull" if col.iloc[-1] > col.rolling(50).mean().iloc[-1] > col.rolling(200).mean().iloc[-1] else
+                                     "bear" if col.iloc[-1] < col.rolling(50).mean().iloc[-1] < col.rolling(200).mean().iloc[-1] else "neither")
+            in18 = {m["ticker"] for m in cons}
+            rows = []
+            for _, h in sq.iterrows():
+                t = h["symbol"]
+                col = px[t].dropna() if t and t in px else pd.Series(dtype=float)
+                priced = len(col) > 63
+                rows.append({"ticker": t or None, "desc": h["description"], "w": round(100 * float(h["weight"]), 2),
+                             "in_sp": bool(t and t in fund.index), "in18": t in in18,
+                             "industry": fund.loc[t, "Industry"] if t and t in fund.index else None, "priced": priced,
+                             "r1m": rr(t, 21) if priced else None, "r3m": rr(t, 63) if priced else None,
+                             "since_peak": round(float(100 * (col.iloc[-1] / at_peak[t] - 1)), 1)
+                             if priced and at_peak is not None and t in at_peak and not pd.isna(at_peak[t]) else None,
+                             "from_high": round(float(100 * (col.iloc[-1] / col.tail(252).max() - 1)), 1) if priced else None,
+                             "state": alignment(col) if priced else None})
+            pr = [r for r in rows if r["since_peak"] is not None]
+            wsum = sum(r["w"] for r in pr)
+            soxp = c[c.index <= last_member]
+            sox_members = {
+                "rows": rows, "etf": sq["etf"].iloc[0], "as_of": sq["as_of"].iloc[0], "source": sq["source"].iloc[0],
+                "n": len(rows), "w_total": round(sum(r["w"] for r in rows), 1),
+                "only18": [m["ticker"] for m in cons if m["ticker"] not in set(sq["symbol"])],
+                # the priced members as a buy-and-hold basket from the ^SOX high: today's weights
+                # imply the weights at the high (w / (1 + r)); weighting the returns by today's
+                # weights instead would under-count the names that fell most
+                "priced_n": len(pr), "priced_w": round(wsum, 1),
+                "priced_since_peak": round(100 * (wsum / sum(r["w"] / (1 + r["since_peak"] / 100) for r in pr) - 1), 1) if wsum else None,
+                "sox_since_peak": round(float(100 * (soxp.iloc[-1] / soxp[soxp.index <= ath_d].iloc[-1] - 1)), 1),
+            }
         comp = {"start": k0.date().isoformat(), "end": both[-1].date().isoformat(), "member_asof": bj["asof"],
                 "weeks": int(len(both)), "corr": round(float(a.pct_change().corr(b.pct_change())), 3),
                 "sox": side(b), "rebuilt": side(a), "n": bj["indices"]["semi"]["n"],
                 "net_now": bj["net_now"], "universe": bj["universe_label"], "overlap_n": bj["indices"]["semi"]["overlap_n"],
-                "members": comp_members}
+                "members": comp_members, "sox_members": sox_members}
 
     # events from the hand-kept list, with ^SOX's own move that day (our closes, not the article's)
     ev = pd.read_csv(REPO / "data" / "events" / "market_events.csv", encoding=ENC)
@@ -256,6 +297,7 @@ PAGE = r"""<meta charset="utf-8">
 td.l{text-align:left; white-space:normal; min-width:220px}
 .ev-up{color:var(--ink-3)}
 #t-mem th:nth-child(2),#t-mem th:nth-child(3),#t-mem th:nth-child(11),#t-mem th:nth-child(14){text-align:left}
+#t-soxm th:nth-child(3),#t-soxm th:nth-child(5),#t-soxm th:nth-child(6),#t-soxm th:nth-child(7),#t-soxm th:nth-child(12){text-align:left}
 </style>
 
 <header class="mast"><div class="mast-in">
@@ -332,6 +374,8 @@ td.l{text-align:left; white-space:normal; min-width:220px}
   <div class="sec-head"><span class="sec-no"></span><h2>和 S&amp;P 500 半導體成分股比較</h2></div>
   <p class="sec-sub" id="comp-sub">—</p>
   <div class="tw"><table id="t-comp"><caption>^SOX 與重建的 S&amp;P 500 半導體指數<small id="comp-cap">—</small></caption></table></div>
+  <p class="lead" id="soxm-sub">—</p>
+  <div class="tw"><table id="t-soxm"><caption>^SOX 成分股與我們的資料<small id="soxm-cap">—</small></caption></table></div>
   <p class="lead" id="mem-sub">—</p>
   <div class="tw"><table id="t-mem"><caption>重建指數的成分股<small id="mem-cap">—</small></caption></table></div>
 </section>
@@ -476,6 +520,7 @@ td.l{text-align:left; white-space:normal; min-width:220px}
         (C.member_asof < D.asof ? "，比 ^SOX 少了 " + D.asof + " 那個交易日，所以這張表的 ^SOX 數字和上方不同。" : "。") +
         "重建指數用今天的成分名單往回推，有存活者偏差，長期報酬偏高。";
       renderMembers(C);
+      renderSoxMembers(C);
     } else {
       $("comp-sub").textContent = "資料夾裡沒有重建半導體指數的輸出，這一節略過。";
       $("t-comp").closest(".tw").style.display = "none";
@@ -528,7 +573,8 @@ td.l{text-align:left; white-space:normal; min-width:220px}
 
   // one row per member of the rebuilt index, sortable by any column
   var MEM_SORT = { k: "weight", dir: -1 };
-  var IND = { "semiconductors": "半導體", "semiconductor-equipment-materials": "半導體設備" };
+  var IND = { "semiconductors": "半導體", "semiconductor-equipment-materials": "半導體設備",
+    "scientific-technical-instruments": "科學與技術儀器", "communication-equipment": "通訊設備", "electronic-components": "電子零組件" };
   var GRP = { "AI Compute Chips": "AI 運算晶片", "Memory and Storage": "記憶體與儲存", "Semiconductor Equipment": "半導體設備",
     "AI Servers and Networking": "AI 伺服器與網通", "Optical Communication": "光通訊", "Connectors and Components": "連接器與元件",
     "Data Center Power and Cooling": "資料中心電力與散熱" };
@@ -578,6 +624,39 @@ td.l{text-align:left; white-space:normal; min-width:220px}
     });
     $("mem-cap").textContent = "點欄名可排序。權重＝市值占這 " + n + " 檔合計的比例（重建指數用的固定股數）。報酬與均線位置都由本資料的收盤計算，到 " + M.asof +
       "；「^SOX 高點以來」從 " + M.peak_date + " 的收盤算起。均線排列：收盤 > 50 日 > 200 日為多頭，相反為空頭，其餘為整理。";
+  }
+
+  // ^SOX's own members (ETF holdings snapshot) against what our data cover
+  function renderSoxMembers(C) {
+    var S = C.sox_members;
+    if (!S) { $("soxm-sub").style.display = "none"; $("t-soxm").closest(".tw").style.display = "none"; return; }
+    var R = S.rows, sum = function (a) { return a.reduce(function (x, r) { return x + r.w; }, 0); };
+    var in18 = R.filter(function (r) { return r.in18; }), spOnly = R.filter(function (r) { return r.in_sp && !r.in18; }), out = R.filter(function (r) { return !r.in_sp; });
+    var nm = function (r) { return r.ticker || r.desc; };
+    var gap = S.priced_since_peak - S.sox_since_peak;
+    $("soxm-sub").textContent = "^SOX 自己的成分股（以追蹤 ^SOX 的 ETF " + S.etf + " 持股為準，" + S.as_of + " 更新）共 " + S.n + " 檔：" +
+      in18.length + " 檔就在重建指數的 " + C.n + " 檔裡（權重合計 " + sum(in18).toFixed(1) + "%）" +
+      (spOnly.length ? "；" + spOnly.map(function (r) { return nm(r) + "（" + r.w.toFixed(1) + "%）"; }).join("、") + "是 S&P 500 成分股，但 Yahoo 的產業分類不是半導體，所以不在 " + C.n + " 檔裡" : "") +
+      "；其餘 " + out.length + " 檔不在 S&P 500（權重合計 " + sum(out).toFixed(1) + "%），我們的資料沒有它們的價格，權重最大的是 " +
+      out.slice().sort(function (a, b) { return b.w - a.w; }).slice(0, 3).map(function (r) { return nm(r) + " " + r.w.toFixed(1) + "%"; }).join("、") + "。" +
+      (S.only18.length ? "反過來，" + S.only18.join("、") + " 在 " + C.n + " 檔裡、但不是 ^SOX 成分股。" : "") +
+      "把有價格的 " + S.priced_n + " 檔（權重 " + S.priced_w.toFixed(1) + "%）當成一籃股票，從 ^SOX 高點起持有（高點時的權重由 " + S.etf + " 今天的權重和各檔漲跌回推），到 " + C.member_asof + " " + pct(S.priced_since_peak) +
+      "，^SOX 本身同期 " + pct(S.sox_since_peak) + "，" + (Math.abs(gap) < 3 ? "相差不大：缺價格的成分股和有價格的走勢相近。" :
+        gap < 0 ? "有價格的這些跌得較多：缺價格的成分股（多為不在 S&P 500 的公司）相對抗跌，撐住了 ^SOX。" : "有價格的這些跌得較少：缺價格的成分股跌得更多，拖累了 ^SOX。") +
+      "^SOX 期間有成分調整、權重也有上限，這只是近似，看方向就好。";
+    var neg = css("--neg"), posc = css("--pos");
+    var sg = function (v) { return v === null || v === undefined ? { html: "—", cls: "n" } : { html: pct(v), cls: "n", color: v < 0 ? neg : v > 0 ? posc : null }; };
+    var yes = function (b, t) { return { html: b ? t : "—", cls: "l" }; };
+    fillTable("t-soxm", ["#", "代號", "公司", "權重", "在 " + C.n + " 檔裡", "S&amp;P 500", "Yahoo 產業", "近 1 月", "近 3 月", "^SOX 高點以來", "距 52 週高", "均線排列"],
+      R.map(function (r, i) {
+        return [{ html: String(i + 1), cls: "n" }, "<b>" + (r.ticker || "—") + "</b>", { html: r.desc, cls: "l" }, { html: r.w.toFixed(2) + "%", cls: "n" },
+          yes(r.in18, "是"), yes(r.in_sp, "是"), { html: r.industry ? (IND[r.industry] || r.industry) : "—", cls: "l" },
+          r.priced ? sg(r.r1m) : { html: "無價格資料", cls: "l ev-up" }, sg(r.r3m), sg(r.since_peak), sg(r.from_high),
+          { html: r.state ? STATE[r.state] : "—", cls: "l", color: r.state === "bear" ? neg : r.state === "bull" ? posc : null }];
+      }));
+    $("soxm-cap").textContent = "成分與權重取自 " + S.etf + "（Invesco PHLX Semiconductor ETF）的持股，來源 " + S.source + "，" + S.as_of +
+      " 更新；ETF 權重會因現金與追蹤誤差和指數略有出入，現金與借券部位不列入。報酬與均線由本資料收盤計算，到 " + C.member_asof +
+      "；不在 S&P 500 的公司，每日抓取程式沒有抓價格。來源沒有給代號的列以「—」表示，不自行補上。";
   }
 
   /* ---------------- charts ---------------- */
