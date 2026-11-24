@@ -143,10 +143,32 @@ def main() -> None:
                           "y1": round(float(100 * (x.iloc[-1] / x.iloc[-53] - 1)), 1),
                           "peak": x.idxmax().date().isoformat(),
                           "dd": round(float(100 * (x.iloc[-1] / x.max() - 1)), 1)}
+        # the rebuilt index's members, one row each (asked 2026-11-24: 「和 S&P 500 半導體成分股比較..列出個股」)
+        cons = bj["constituents"]["semi"]
+        tick = [m["ticker"] for m in cons]
+        o = pd.read_csv(Path(args.data_dir) / "sp500_ohlc.csv", encoding=ENC, usecols=["Ticker", "Date", "Close", "Interval"])
+        o = o[(o["Interval"] == "1d") & o["Ticker"].isin(tick)]
+        o["Date"] = pd.to_datetime(o["Date"])
+        px = o.pivot_table(index="Date", columns="Ticker", values="Close").sort_index()
+        px = px[px.index <= last_member]
+        at_peak = px[px.index <= ath_d].iloc[-1] if (px.index <= ath_d).any() else None
+        rr = lambda t, n: round(float(100 * (px[t].iloc[-1] / px[t].iloc[-1 - n] - 1)), 1) if px[t].notna().sum() > n else None
+        members = []
+        for m in cons:
+            t = m["ticker"]
+            col = px[t].dropna() if t in px else pd.Series(dtype=float)
+            ma50_t, ma200_t = col.rolling(50).mean(), col.rolling(200).mean()
+            members.append({**m, "r3m": rr(t, 63) if t in px else None, "r1y": rr(t, 252) if t in px else None,
+                            "since_peak": round(float(100 * (col.iloc[-1] / at_peak[t] - 1)), 1)
+                            if at_peak is not None and t in at_peak and not pd.isna(at_peak[t]) else None,
+                            "a50": bool(col.iloc[-1] > ma50_t.iloc[-1]) if len(col) >= 50 else None,
+                            "a200": bool(col.iloc[-1] > ma200_t.iloc[-1]) if len(col) >= 200 else None})
+        comp_members = {"rows": members, "peak_date": ath_d.date().isoformat(), "asof": bj["asof"]}
         comp = {"start": k0.date().isoformat(), "end": both[-1].date().isoformat(), "member_asof": bj["asof"],
                 "weeks": int(len(both)), "corr": round(float(a.pct_change().corr(b.pct_change())), 3),
                 "sox": side(b), "rebuilt": side(a), "n": bj["indices"]["semi"]["n"],
-                "net_now": bj["net_now"], "universe": bj["universe_label"], "overlap_n": bj["indices"]["semi"]["overlap_n"]}
+                "net_now": bj["net_now"], "universe": bj["universe_label"], "overlap_n": bj["indices"]["semi"]["overlap_n"],
+                "members": comp_members}
 
     # events from the hand-kept list, with ^SOX's own move that day (our closes, not the article's)
     ev = pd.read_csv(REPO / "data" / "events" / "market_events.csv", encoding=ENC)
@@ -233,6 +255,7 @@ PAGE = r"""<meta charset="utf-8">
 .lead{color:var(--ink-2); font-size:14.5px; max-width:70ch; margin:10px 0 0}
 td.l{text-align:left; white-space:normal; min-width:220px}
 .ev-up{color:var(--ink-3)}
+#t-mem th:nth-child(2),#t-mem th:nth-child(3),#t-mem th:nth-child(11),#t-mem th:nth-child(14){text-align:left}
 </style>
 
 <header class="mast"><div class="mast-in">
@@ -309,6 +332,8 @@ td.l{text-align:left; white-space:normal; min-width:220px}
   <div class="sec-head"><span class="sec-no"></span><h2>和 S&amp;P 500 半導體成分股比較</h2></div>
   <p class="sec-sub" id="comp-sub">—</p>
   <div class="tw"><table id="t-comp"><caption>^SOX 與重建的 S&amp;P 500 半導體指數<small id="comp-cap">—</small></caption></table></div>
+  <p class="lead" id="mem-sub">—</p>
+  <div class="tw"><table id="t-mem"><caption>重建指數的成分股<small id="mem-cap">—</small></caption></table></div>
 </section>
 
 <section id="method">
@@ -450,6 +475,7 @@ td.l{text-align:left; white-space:normal; min-width:220px}
       $("comp-cap").textContent = "只比較兩者都有的週（" + C.start + " 至 " + C.end + " 那週）。成分股資料到 " + C.member_asof +
         (C.member_asof < D.asof ? "，比 ^SOX 少了 " + D.asof + " 那個交易日，所以這張表的 ^SOX 數字和上方不同。" : "。") +
         "重建指數用今天的成分名單往回推，有存活者偏差，長期報酬偏高。";
+      renderMembers(C);
     } else {
       $("comp-sub").textContent = "資料夾裡沒有重建半導體指數的輸出，這一節略過。";
       $("t-comp").closest(".tw").style.display = "none";
@@ -498,6 +524,60 @@ td.l{text-align:left; white-space:normal; min-width:220px}
       ["限制", "樣本期間約 " + Math.round(D.n_bars / 252) + " 年，20% 以上的回檔只有個位數次，任何「通常」的說法都只是少數案例。這份檢視描述走勢，不預測後市，也不是投資建議。"]
     ].map(function (x, i) { return "<li data-i='" + String(i + 1).padStart(2, "0") + "'><span><b>" + x[0] + "</b>　" + x[1] + "</span></li>"; }).join("");
     $("foot").innerHTML = "費城半導體指數檢視 · 資料日 <b>" + D.asof + "</b> · 報告產出 <b>" + D.generated + "</b> · 由 <code>analysis/sox_review.py</code> 產生";
+  }
+
+  // one row per member of the rebuilt index, sortable by any column
+  var MEM_SORT = { k: "weight", dir: -1 };
+  var IND = { "semiconductors": "半導體", "semiconductor-equipment-materials": "半導體設備" };
+  var GRP = { "AI Compute Chips": "AI 運算晶片", "Memory and Storage": "記憶體與儲存", "Semiconductor Equipment": "半導體設備",
+    "AI Servers and Networking": "AI 伺服器與網通", "Optical Communication": "光通訊", "Connectors and Components": "連接器與元件",
+    "Data Center Power and Cooling": "資料中心電力與散熱" };
+  var STATE = { bull: "多頭排列", bear: "空頭排列", neither: "整理" };
+  function renderMembers(C) {
+    var M = C.members; if (!M) return;
+    var R = M.rows, n = R.length, cnt = function (f) { return R.filter(f).length; };
+    var nb = cnt(function (r) { return r.state === "bull"; }), ns = cnt(function (r) { return r.state === "bear"; });
+    var n50 = cnt(function (r) { return r.a50; }), n200 = cnt(function (r) { return r.a200; });
+    var byW = R.slice().sort(function (a, b) { return b.weight - a.weight; }), top3 = byW.slice(0, 3);
+    var sp = R.filter(function (r) { return r.since_peak !== null; }).sort(function (a, b) { return a.since_peak - b.since_peak; });
+    var ai = cnt(function (r) { return r.group && r.group !== "None"; });
+    var med = function (a) { var x = a.slice().sort(function (p, q) { return p - q; }); return x[Math.floor((x.length - 1) / 2)]; };
+    var mSp = med(sp.map(function (r) { return r.since_peak; }));
+    var names = function (a) { return a.map(function (r) { return r.ticker + "（" + pct(r.since_peak) + "）"; }).join("、"); };
+    $("mem-sub").textContent = "重建指數的 " + n + " 檔，資料到 " + M.asof + "。前三大權重 " + top3.map(function (r) { return r.ticker; }).join("、") + " 合計 " +
+      top3.reduce(function (a, r) { return a + r.weight; }, 0).toFixed(0) + "%，指數走勢主要由它們決定。均線排列：多頭 " + nb + " 檔、空頭 " + ns + " 檔、整理 " + (n - nb - ns) +
+      " 檔；站上 50 日均線 " + n50 + " 檔、200 日均線 " + n200 + " 檔。自 ^SOX 高點（" + M.peak_date + "）以來，" + n + " 檔的中位數是 " + pct(mSp) +
+      "，跌最多的是 " + names(sp.slice(0, 3)) + (sp.length > 3 ? "，最抗跌的是 " + names(sp.slice(-2).reverse()) : "") + "。其中 " + ai + " 檔也在 AI 硬體股名單裡（「AI 硬體族群」欄）。";
+    var cols = [["ticker", "代號"], ["name", "公司"], ["industry", "產業"], ["cap_bn", "市值<br><span class='sub'>十億美元</span>"], ["weight", "指數權重"],
+      ["ret_1m", "近 1 月"], ["r3m", "近 3 月"], ["r1y", "近 1 年"], ["since_peak", "^SOX 高點以來"], ["from_high", "距 52 週高"],
+      ["state", "均線排列"], ["a50", "50 日"], ["a200", "200 日"], ["group", "AI 硬體族群"]];
+    var key = MEM_SORT.k, dir = MEM_SORT.dir;
+    var rows = R.slice().sort(function (a, b) {
+      var x = a[key], y = b[key];
+      if (x === null || x === undefined) return 1; if (y === null || y === undefined) return -1;
+      return (typeof x === "string" ? x.localeCompare(y) : x - y) * dir;
+    });
+    var neg = css("--neg"), posc = css("--pos");
+    var signed = function (v) { return { html: pct(v), cls: "n", color: v === null ? null : v < 0 ? neg : v > 0 ? posc : null }; };
+    var yn = function (v) { return { html: v === null ? "—" : v ? "之上" : "之下", cls: "n", color: v === false ? neg : null }; };
+    fillTable("t-mem", cols.map(function (c) {
+      return "<button type='button' class='th-sort' data-k='" + c[0] + "' style='all:unset;cursor:pointer'>" + c[1] + (c[0] === key ? (dir < 0 ? " ▼" : " ▲") : "") + "</button>";
+    }), rows.map(function (r) {
+      return ["<b>" + r.ticker + "</b>", { html: r.name, cls: "l" }, { html: IND[r.industry] || r.industry, cls: "l" },
+        { html: r.cap_bn.toLocaleString("en-US", { maximumFractionDigits: 0 }), cls: "n" }, { html: r.weight.toFixed(1) + "%", cls: "n" },
+        signed(r.ret_1m), signed(r.r3m), signed(r.r1y), signed(r.since_peak), signed(r.from_high),
+        { html: STATE[r.state] || r.state, cls: "l", color: r.state === "bear" ? neg : r.state === "bull" ? posc : null }, yn(r.a50), yn(r.a200),
+        { html: r.group && r.group !== "None" ? (GRP[r.group] || r.group) : "—", cls: "l" }];
+    }));
+    $("t-mem").querySelectorAll(".th-sort").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var k = b.getAttribute("data-k");
+        MEM_SORT = { k: k, dir: MEM_SORT.k === k ? -MEM_SORT.dir : (k === "ticker" || k === "name" ? 1 : -1) };
+        renderMembers(C);
+      });
+    });
+    $("mem-cap").textContent = "點欄名可排序。權重＝市值占這 " + n + " 檔合計的比例（重建指數用的固定股數）。報酬與均線位置都由本資料的收盤計算，到 " + M.asof +
+      "；「^SOX 高點以來」從 " + M.peak_date + " 的收盤算起。均線排列：收盤 > 50 日 > 200 日為多頭，相反為空頭，其餘為整理。";
   }
 
   /* ---------------- charts ---------------- */

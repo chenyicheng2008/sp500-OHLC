@@ -284,6 +284,15 @@ all days (5 done — 相差不大). Semis -84.9, positive divergence (^SOX lower
 -84.9 vs -127.2). `daily_group()` now also writes each group's A/D line, McClellan and new
 highs/lows (tech, semi, AI-hardware daily files).
 
+The comparison section lists the rebuilt index's members (asked 2026-11-24: 「和 S&P 500 半導體
+成分股比較..列出個股」): `regime_backtest`'s `constituents.semi` (cap, weight, MA alignment,
+1-month, from 52-week high, AI-hardware group) plus 3-month, 1-year and since-^SOX-high
+returns and 50/200-day position computed in `sox_review.py` from our closes, cut at the
+members' data date. Sortable by any column; the summary line is generated (top-3 weight,
+alignment counts, median since the high, worst and most resilient names). 2026-11-19: top
+three NVDA/AVGO/AMD 68% of the weight; 1 bull, 7 bear, 10 neither; since 2026-06-22 median
+-35.3%, worst INTC -60.5%, best SWKS +3.3%.
+
 The ^SOX page's breadth section uses the 18 S&P 500 semiconductor names — ^SOX's own members
 are not in our data (several are not S&P 500 stocks); every caption says so and no member
 count of ^SOX is typed. Its section numbers are generated from the visible sections.
