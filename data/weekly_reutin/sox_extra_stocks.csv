@@ -1,13 +1,13 @@
 ﻿Ticker,Short Name,Market Cap,Sector,Industry,PE Ratio,Dividend Yield,Forward P/E Ratio,50日均差%,200日均差%,CurrentY成長,NextY成長,CurrentQ成長,NextQ成長
-TSM,N/A,0,,,0,0,0,0,0,0,0,0,0
-ASML,N/A,0,,,0,0,0,0,0,0,0,0,0
-MRVL,N/A,0,,,0,0,0,0,0,0,0,0,0
-ALAB,N/A,0,,,0,0,0,0,0,0,0,0,0
-ARM,N/A,0,,,0,0,0,0,0,0,0,0,0
-CRDO,N/A,0,,,0,0,0,0,0,0,0,0,0
-GFS,N/A,0,,,0,0,0,0,0,0,0,0,0
-ENTG,N/A,0,,,0,0,0,0,0,0,0,0,0
-MTSI,N/A,0,,,0,0,0,0,0,0,0,0,0
-LSCC,N/A,0,,,0,0,0,0,0,0,0,0,0
-TSEM,N/A,0,,,0,0,0,0,0,0,0,0,0
-SITM,N/A,0,,,0,0,0,0,0,0,0,0,0
+TSM,Taiwan Semiconductor Manufactur,1775537094656,technology,semiconductors,22.18665,0.080183275,14.662347,-0.18151978,-0.15159267,0.6436,0.336,0.6446,0.48830003
+ASML,ASML Holding N.V. - New York Re,502230122496,technology,semiconductor-equipment-materials,32.063976,0.0056135203,20.553543,-0.19054648,-0.18574692,0.6746,0.3761,1.0965,0.8095
+MRVL,"Marvell Technology, Inc.",117806342144,technology,semiconductors,43.069077,0.0018241239,17.762636,-0.39106068,-0.30874205,0.48580003,0.7486,0.44869998,0.6953
+ALAB,"Astera Labs, Inc.",33268021248,technology,semiconductors,75.2332,0.0,26.299644,-0.32433537,-0.26551792,1.381,0.65199995,1.837,1.7358
+ARM,Arm Holdings plc,172815695872,technology,semiconductors,185.64368,0.0,52.3211,-0.31306604,-0.31312233,0.28100002,0.36150002,0.3105,0.2242
+CRDO,Credo Technology Group Holding ,20072325120,technology,semiconductors,37.870567,0.0,10.996609,-0.3522504,-0.4095167,0.8235,0.5392,0.9157,0.5016
+GFS,GlobalFoundries Inc.,20179646464,technology,semiconductors,103.42857,0.006589786,13.968152,-0.18633401,-0.3400342,0.1558,0.3037,0.0744,0.259
+ENTG,"Entegris, Inc.",19614935040,technology,semiconductor-equipment-materials,49.949417,0.0031294008,22.61102,-0.1297964,-0.08417434,0.592,0.29680002,0.9535,0.406
+MTSI,MACOM Technology Solutions Hold,15352904704,technology,semiconductors,46.389793,0.0,17.349924,-0.23259799,-0.29418856,0.75,0.1759,1.2067,1.1628
+LSCC,Lattice Semiconductor Corporati,13970830336,technology,semiconductors,316.87097,0.0,22.381311,-0.13038471,-0.1666539,1.3933,0.7465,1.6336,1.3249
+TSEM,Tower Semiconductor Ltd.,13819639808,technology,semiconductors,39.01923,0.0,17.381445,-0.35103706,-0.40857607,0.77599996,0.72220004,0.7721,1.1949
+SITM,SiTime Corporation,11664883712,technology,semiconductors,386.13,0.0,21.282284,-0.2607319,-0.29977643,2.9748,0.4264,2.1193,1.9197999
