@@ -1,12 +1,12 @@
 ﻿Ticker,Short Name,Market Cap,Sector,Industry,PE Ratio,Dividend Yield,Forward P/E Ratio,50日均差%,200日均差%,CurrentY成長,NextY成長,CurrentQ成長,NextQ成長
 TSM,Taiwan Semiconductor Manufactur,1832588279808,technology,semiconductors,22.899546,0.08179004,15.090139,-0.15522052,-0.12433182,0.6436,0.3377,0.6446,0.4946
 ASML,ASML Holding N.V. - New York Re,510994513920,technology,semiconductor-equipment-materials,32.623524,0.0057555945,20.912222,-0.17642075,-0.17153743,0.6746,0.3761,1.0965,0.8095
-MRVL,"Marvell Technology, Inc.",126453088256,technology,semiconductors,46.230263,0.0018330406,19.006788,-0.34636575,-0.25800508,0.48560002,0.7526,0.44869998,0.6953
+MRVL,"Marvell Technology, Inc.",126453088256,technology,semiconductors,46.230263,0.0018330406,19.06638,-0.34636575,-0.25800508,0.48560002,0.7526,0.44869998,0.6953
 ALAB,"Astera Labs, Inc.",36151926784,technology,semiconductors,81.754944,0.0,28.579481,-0.26576403,-0.20184788,1.381,0.65199995,1.837,1.7358
 ARM,Arm Holdings plc,183558504448,technology,semiconductors,197.18391,0.0,55.573555,-0.2703639,-0.27042368,0.2814,0.3646,0.3105,0.2242
 CRDO,Credo Technology Group Holding ,21721604096,technology,semiconductors,40.98227,0.0,11.900166,-0.2990269,-0.3609986,0.8235,0.5392,0.9157,0.5016
 GFS,GlobalFoundries Inc.,21021392896,technology,semiconductors,107.74286,0.006629834,14.5508,-0.15239385,-0.31250525,0.1558,0.3037,0.0744,0.259
-ENTG,"Entegris, Inc.",20779272192,technology,semiconductor-equipment-materials,52.914402,0.003115993,23.953205,-0.07814134,-0.029811163,0.592,0.29680002,0.9535,0.406
+ENTG,"Entegris, Inc.",20711278592,technology,semiconductor-equipment-materials,52.914402,0.003115993,23.953205,-0.07814134,-0.029811163,0.592,0.29680002,0.9535,0.406
 MTSI,MACOM Technology Solutions Hold,16090833920,technology,semiconductors,48.61949,0.0,18.183838,-0.19571327,-0.26026413,0.75,0.1759,1.2067,1.1628
 LSCC,Lattice Semiconductor Corporati,14737427456,technology,semiconductors,334.25806,0.0,23.6094,-0.08266787,-0.12092719,1.3933,0.7465,1.6336,1.3249
 TSEM,Tower Semiconductor Ltd.,14744809472,technology,semiconductors,41.631413,0.0,18.545063,-0.3075916,-0.36898264,0.77599996,0.72220004,0.7721,1.1949
