@@ -695,8 +695,12 @@ td.l{text-align:left; white-space:normal; min-width:220px}
     var BR = D.breadth;
     if (BR) {
       var vs = function (a, b) { return Math.abs(a - b) < 3 ? "和全市場差不多" : a > b ? "高於全市場" : "低於全市場"; };
-      $("br-sub").textContent = "^SOX 自己的成分股（含不在 S&P 500 的公司）不在我們的資料裡，所以廣度用 S&P 500 裡產業為半導體與半導體設備的 " + BR.n +
-        " 檔來量，和「和 S&P 500 半導體成分股比較」一節的重建指數是同一批。到 " + BR.asof + "，站上 200 日均線的 " + BR.now.p200.toFixed(0) + "%（" + vs(BR.now.p200, BR.mkt.p200) + "的 " + BR.mkt.p200.toFixed(0) +
+      var allP = D.spread && D.spread.n === D.spread.n_list;
+      $("br-sub").textContent = (allP
+        ? "這一節的廣度沿用 S&P 500 裡產業為半導體與半導體設備的 " + BR.n + " 檔（和「和 S&P 500 半導體成分股比較」一節的重建指數是同一批），長期序列由每日分析程式產生；^SOX 自己 " +
+          D.spread.n_list + " 檔成分股現在都有價格，它們的均線排列見「" + $("spread").querySelector("h2").textContent + "」一節。"
+        : "^SOX 自己的成分股（含不在 S&P 500 的公司）不在我們的資料裡，所以廣度用 S&P 500 裡產業為半導體與半導體設備的 " + BR.n +
+          " 檔來量，和「和 S&P 500 半導體成分股比較」一節的重建指數是同一批。") + "到 " + BR.asof + "，站上 200 日均線的 " + BR.now.p200.toFixed(0) + "%（" + vs(BR.now.p200, BR.mkt.p200) + "的 " + BR.mkt.p200.toFixed(0) +
         "%）、50 日 " + BR.now.p50.toFixed(0) + "%（全市場 " + BR.mkt.p50.toFixed(0) + "%）、20 日 " + BR.now.p20.toFixed(0) + "%（全市場 " + BR.mkt.p20.toFixed(0) + "%）。" +
         "週線上，站上 40 週均線的 " + BR.p40_now.toFixed(0) + "%，在 " + BR.w.dates[0].slice(0, 4) + " 年以來第 " + BR.p40_pctile.toFixed(0) + " 百分位（中位 " + BR.p40_median.toFixed(0) + "%）" +
         (BR.p40_last_as_low ? "；不算最近 " + BR.skip + " 週，上一次這麼低是 " + BR.p40_last_as_low + " 那週。" : "；不算最近 " + BR.skip + " 週，期間沒有這麼低的時候。");

@@ -221,6 +221,16 @@ every page label says 多空排列差 — don't reintroduce 淨值.
   was 937.46 unadjusted and 117.18 after Yahoo back-adjusted the whole history (exactly 8×),
   so no cliff reached the analysis and all 22 names stayed in. Market cap ÷ close (~955M
   shares) fits the post-split price.
+- As of 2026-11-27 (half-day Black Friday session; 11-26 closed): AI hardware bull 5%,
+  neither 33%, bear 62%, net -57.1 (lowest of the daily year), weekly -57.1; market +19.3. The
+  week: 11-24 ^SOX -7.88% (ADI -17.4%, HPE -16.3%), 11-25 -0.65%, 11-27 +4.69% (COHR +14.1%).
+  Events: E31 rewritten with the outcome (Benzinga: Q3 GDP second estimate 4.3% vs 3.4%
+  advance; October PCE 3.8% y/y, core 3.3%), E36 11-24 chip give-back (Quantisnow), E37 HPE
+  after its report, E38 ADI despite a record quarter, E39 11-27 early close with chips leading
+  (Yahoo), E40 11-27 optical rebound (24/7 Wall St.). HPQ +11.5% (11-25) and VRTX -5.2%
+  (11-27) were not searched — data moves only. **Top-ten share went negative** (-8.4%: the
+  ten largest lost cap over 12 months while the index rose 7.7%); 「只貢獻了 -8%」 read wrong,
+  so all three places that word `top10_share_of_12m_gain` now branch on its sign.
 - As of 2026-11-23 (refresh asked as 「更新資料日至11-20」; main already had 11-23 and the
   user chose it): AI hardware bull 0%, neither 48%, bear 52%, net -52.4 (lowest of the daily
   year), weekly -57.1; market +7.3. 11-20 crash (^GSPC -3.70%, ^SOX -10.73%, NVDA -14.0%) and
@@ -369,8 +379,18 @@ then -27.0%. The member table's wording (「沒有價格」 / 「已加入每日
 sox_extra_ohlc.csv」) follows `extra_file` and each row's `priced` — the old fixed line
 「每日抓取程式沒有抓價格」 went false the moment the fetch change landed.
 
-The ^SOX page's breadth section uses the 18 S&P 500 semiconductor names — ^SOX's own members
-are not in our data (several are not S&P 500 stocks); every caption says so and no member
+**First extra-member data (2026-11-28 fetch, data to 11-27):** `sox_extra_ohlc.csv` arrived
+with all 12 names, 503 daily bars each, weekly history from 2014 for most (ALAB 2024-03, ARM
+2023-09, CRDO 2022-01, GFS 2021-10, SITM 2019-11); no cliffs (CRDO's +48% / -31% days are
+below the break threshold). All 30 ^SOX members are now priced: spread -60 (1 bull / 10
+neither / 19 bear), weighted -49.4, weekly -63.3 (6th percentile since 2015-08, 24 names warm
+then); the 30-name basket from the ^SOX high -37.7% vs ^SOX -37.2% — a check that the weights
+and prices line up.
+
+The ^SOX page's breadth and McClellan sections still use the 18 S&P 500 semiconductor names
+(their long series come from `breadth_sector.py`). While ^SOX's own members were unpriced the
+caption said they were not in our data; once all are priced (`spread.n == spread.n_list`)
+it says the section keeps the 18 and points to the spread section by its live h2. No member
 count of ^SOX is typed. Its section numbers are generated from the visible sections.
 
 ## Share above moving averages, long run (section 03 first chart, asked 2026-11-13)

@@ -1,16 +1,16 @@
 ﻿Ticker,ret_3m,ret_12m,Short Name,Sector,Industry,Market Cap
-EPAM,41.010284642243455,-11.700814280491102,"EPAM Systems, Inc.",technology,information-technology-services,8047400448
-MRNA,33.52641150041747,848.479409847924,"Moderna, Inc.",healthcare,biotechnology,85812011008
-PTC,29.681090903473972,15.00323207363039,PTC Inc.,technology,software-application,21292097536
-IDXX,24.910457506765905,-0.33799320188661053,"IDEXX Laboratories, Inc.",healthcare,diagnostics-research,54127738880
-MTD,23.053665147530754,23.303390527903645,"Mettler-Toledo International, I",healthcare,diagnostics-research,34321291264
-WMT,22.964514337043028,21.99702555074179,Walmart Inc.,consumer-defensive,discount-stores,1031207911424
-RVTY,21.241051082405328,61.30908265020605,"Revvity, Inc.",healthcare,diagnostics-research,16889827328
-APP,20.409610078839215,-28.205520492809487,Applovin Corporation,communication-services,advertising-agencies,123887919104
-ACN,19.870132434800848,-5.024874908320431,Accenture plc,technology,information-technology-services,131315032064
-CDW,19.68470824236659,26.992713762949183,CDW Corporation,technology,information-technology-services,21225072640
-VLTO,19.407346583163744,21.74240418075053,Veralto Corp,industrials,pollution-treatment-controls,28637243392
-ALLE,18.433785857622897,20.06091449175409,Allegion plc,industrials,security-protection-services,15958673408
-VTRS,18.246780174753386,100.90071538123277,Viatris Inc.,healthcare,drug-manufacturers-specialty-generic,22527836160
-HAS,18.05405624968117,52.16856975326583,"Hasbro, Inc.",consumer-cyclical,leisure,15878599680
-PG,17.415935975606867,17.769583106983887,Procter & Gamble Company (The),consumer-defensive,household-personal-products,393096003584
+MRNA,65.69315913316281,823.7979773319129,"Moderna, Inc.",healthcare,biotechnology,92512534528
+EPAM,42.70905703477344,-11.824542981618247,"EPAM Systems, Inc.",technology,information-technology-services,8359153152
+SWKS,31.722149956159097,39.29095975465309,"Skyworks Solutions, Inc.",technology,semiconductors,20352501760
+IDXX,29.593324766995455,-6.1890244509220205,"IDEXX Laboratories, Inc.",healthcare,diagnostics-research,56665444352
+WMT,29.139596092778895,25.468132262571675,Walmart Inc.,consumer-defensive,discount-stores,1056219660288
+ACN,28.56920471966935,-0.17111569359614665,Accenture plc,technology,information-technology-services,142863941632
+BBY,27.696691716765454,37.74593505632924,"Best Buy Co., Inc.",consumer-cyclical,specialty-retail,21849432064
+APP,25.63254631995051,-28.203519518559617,Applovin Corporation,communication-services,advertising-agencies,132267081728
+PTC,25.26249681764663,13.497465021091681,PTC Inc.,technology,software-application,21461706752
+REGN,25.05207803635454,26.631311136945122,"Regeneron Pharmaceuticals, Inc.",healthcare,biotechnology,102634758144
+VTRS,24.383381001059835,97.00147398355776,Viatris Inc.,healthcare,drug-manufacturers-specialty-generic,23158386688
+ULTA,24.154589371980673,23.315798993298344,"Ulta Beauty, Inc.",consumer-cyclical,specialty-retail,27471675392
+ALLE,22.206752787488316,16.78970103851052,Allegion plc,industrials,security-protection-services,16170320896
+GILD,22.18348939461943,42.67959792691636,"Gilead Sciences, Inc.",healthcare,drug-manufacturers-general,219539931136
+VLTO,21.978190973158828,16.13699800641315,Veralto Corp,industrials,pollution-treatment-controls,29191606272

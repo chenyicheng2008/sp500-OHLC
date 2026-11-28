@@ -1,16 +1,16 @@
 ﻿Ticker,ret_3m,ret_12m,Short Name,Sector,Industry,Market Cap
-AXON,-49.841828717793966,-40.8017523190212,"Axon Enterprise, Inc.",industrials,aerospace-defense,25048702976
-COIN,-41.87860832932895,-54.32482486285606,"Coinbase Global, Inc.",financial-services,financial-data-stock-exchanges,28800964608
-HOOD,-39.89650731765754,-36.56905816089855,"Robinhood Markets, Inc.",financial-services,capital-markets,60666097664
-LITE,-38.52738044276636,133.3990705118413,Lumentum Holdings Inc.,technology,communication-equipment,49367052288
-ALB,-37.78479000153815,-28.253865859795535,Albemarle Corporation,basic-materials,specialty-chemicals,9745253376
-FCX,-37.658206107929296,26.60337717740795,"Freeport-McMoRan, Inc.",basic-materials,copper,71330668544
-STX,-36.651342925056895,117.53247325140963,Seagate Technology Holdings PLC,technology,computer-hardware,119394721792
-FICO,-36.38866223438887,-57.958213649256265,Fair Isaac Corporation,technology,software-application,15465893888
-SMCI,-36.219445474326776,-22.27502819473498,"Super Micro Computer, Inc.",technology,computer-hardware,16170848256
-TER,-36.20934298417492,50.16736113039586,"Teradyne, Inc.",technology,semiconductor-equipment-materials,36456689664
-CTVA,-34.856626480889254,-15.356083389166553,"Corteva, Inc.",basic-materials,agricultural-inputs,5405316608
-WDC,-34.033183984543356,112.36867026803337,Western Digital Corporation,technology,computer-hardware,111267594240
-LRCX,-33.26675460980596,50.96273282035171,Lam Research Corporation,technology,semiconductor-equipment-materials,262026084352
-FIS,-33.18791020335464,-55.51261093421682,Fidelity National Information S,technology,information-technology-services,13778519040
-CAT,-32.411223351395314,1.0184229761128538,"Caterpillar, Inc.",industrials,farm-heavy-construction-machinery,250322305024
+LITE,-42.49944079521648,76.68487118274871,Lumentum Holdings Inc.,technology,communication-equipment,46669176832
+COIN,-40.08060832890378,-57.878166625115114,"Coinbase Global, Inc.",financial-services,financial-data-stock-exchanges,28340277248
+AXON,-39.493612304366025,-31.27493412256238,"Axon Enterprise, Inc.",industrials,aerospace-defense,29599162368
+ALB,-39.42240012287391,-33.03459562659234,Albemarle Corporation,basic-materials,specialty-chemicals,9786556416
+FICO,-38.57589567033808,-60.852485783192336,Fair Isaac Corporation,technology,software-application,15149884416
+STX,-38.5281832557795,95.755535717551,Seagate Technology Holdings PLC,technology,computer-hardware,116998111232
+TER,-37.125017534710125,33.21703967280112,"Teradyne, Inc.",technology,semiconductor-equipment-materials,34809577472
+WDC,-36.40140575413575,88.31154842576463,Western Digital Corporation,technology,computer-hardware,109343563776
+LRCX,-36.106424495613865,27.413953599124063,Lam Research Corporation,technology,semiconductor-equipment-materials,240702750720
+SMCI,-35.9223326440542,-26.847288904715604,"Super Micro Computer, Inc.",technology,computer-hardware,15663243264
+NOW,-35.87174435334677,-43.77869828184934,"ServiceNow, Inc.",technology,software-application,96318701568
+INTC,-35.844416292914175,60.20094499724251,Intel Corporation,technology,semiconductors,305080991744
+HOOD,-34.85517285890882,-41.23042454936764,"Robinhood Markets, Inc.",financial-services,capital-markets,61161365504
+CTVA,-34.24285395633652,-15.866504083631117,"Corteva, Inc.",basic-materials,agricultural-inputs,5512088064
+FCX,-33.447191256207574,24.769401548844616,"Freeport-McMoRan, Inc.",basic-materials,copper,72851701760

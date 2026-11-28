@@ -714,7 +714,9 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
     },
     "Mega-cap concentration": function (s) {
       var c = s.concentration;
-      return "前十大佔指數市值 " + c.top10_weight.toFixed(1) + "%，並貢獻了 12 個月市值增幅的 " + c.top10_share_of_12m_gain.toFixed(0) + "%";
+      return "前十大佔指數市值 " + c.top10_weight.toFixed(1) + "%，" + (c.top10_share_of_12m_gain < 0
+        ? "但 12 個月合計市值反而減少（占增幅 " + c.top10_share_of_12m_gain.toFixed(0) + "%）"
+        : "並貢獻了 12 個月市值增幅的 " + c.top10_share_of_12m_gain.toFixed(0) + "%");
     },
     "Equal-weight vs cap-weight": function (s) {
       var v = s.signals.filter(function (r) { return r.signal === "Equal-weight vs cap-weight"; })[0].value;
@@ -2862,8 +2864,10 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
         : "成分股報酬中位數 <b>" + pct(p12.median_ret) + "</b>，還高於指數") + "，" +
       (p12.pct_beat_index < 45 ? "僅" : p12.pct_beat_index > 55 ? "有" : "約") + " <b>" + p12.pct_beat_index.toFixed(0) +
       "%</b> 的股票跑贏指數，前十大市值股" +
-      (c.top10_share_of_12m_gain >= 35 ? "就吃掉了 <b>" : "只貢獻了 <b>") + c.top10_share_of_12m_gain.toFixed(0) +
-      "%</b> 的指數市值增幅。眼下 <b>" + D.latest.pct_above_200dma.toFixed(0) +
+      (c.top10_share_of_12m_gain < 0
+        ? "合計市值反而減少，指數的市值增幅全來自其餘成分股（前十大占 <b>" + c.top10_share_of_12m_gain.toFixed(0) + "%</b>）"
+        : (c.top10_share_of_12m_gain >= 35 ? "就吃掉了 <b>" : "只貢獻了 <b>") + c.top10_share_of_12m_gain.toFixed(0) + "%</b> 的指數市值增幅") +
+      "。眼下 <b>" + D.latest.pct_above_200dma.toFixed(0) +
       "%</b> 的成分股" + (p200 >= 50 && !improving ? "仍站在" : improving ? "回到" : "站在") + " 200 日均線之上（" +
       (p200 >= 60 ? "長線結構完好"
         : p200 >= 45 ? (improving ? "長線結構正在修復" : "長線結構已在鬆動")
@@ -2889,7 +2893,7 @@ footer code{font-family:"IBM Plex Mono",monospace; font-size:11.5px; background:
       { k: "站上 200 日均線", v: D.latest.pct_above_200dma.toFixed(1) + "%", n: "近一年第 " + D.pctile.pct_above_200dma.toFixed(0) + " 百分位" },
       { k: "站上 50 日均線", v: D.latest.pct_above_50dma.toFixed(1) + "%", n: "近一年第 " + D.pctile.pct_above_50dma.toFixed(0) + " 百分位" },
       { k: "12 個月跑贏指數比例", v: p12.pct_beat_index.toFixed(0) + "%", n: "中位數 " + pct(p12.median_ret) + " vs 平均 " + pct(p12.mean_ret) },
-      { k: "前十大市值權重", v: c.top10_weight.toFixed(1) + "%", n: "貢獻 12 個月漲幅的 " + c.top10_share_of_12m_gain.toFixed(0) + "%" },
+      { k: "前十大市值權重", v: c.top10_weight.toFixed(1) + "%", n: c.top10_share_of_12m_gain < 0 ? "12 個月合計市值減少（占漲幅 " + c.top10_share_of_12m_gain.toFixed(0) + "%）" : "貢獻 12 個月漲幅的 " + c.top10_share_of_12m_gain.toFixed(0) + "%" },
       { k: "位於 52 週高點", v: D.drawdown[D.drawdown.length - 1].count + " 檔", n: "距高點逾 20% 者 " +
         (D.drawdown[0].pct + D.drawdown[1].pct).toFixed(0) + "%" }
     ];
